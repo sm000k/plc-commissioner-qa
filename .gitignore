@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+.venv-1/
+venv/
+env/
+
+# Transkrypcje (duże pliki, nie wersjonować)
+transcripts/
+
+# Stary rozpad docx
+_tmp_v5/
+
+# PDFy i pliki binarne (za duże, nie wersjonować)
+sources/pdfs/
+sources/books/
+archive/docx/
+
+# Obrazy PNG (duże pliki)
+docs/images/
+
+# Cookies (dane wrażliwe)
+cookies.txt
+*.cookies
+
+# Klucze API
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Linki/notatki robocze
+linki
