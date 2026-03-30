@@ -8,73 +8,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **115 pytań / 19 sekcji.** Nie ucz się po kolei od 1 do 115 — to przepis na przeciążenie. Poniżej masz 3 fazy nauki i listę pytań priorytetowych.
-
----
-
-### FAZA 1 — FUNDAMENT (2–3 dni) 🔴 MUST KNOW
-*Bez tych odpowiedzi nie przejdziesz pierwszych 10 minut rozmowy.*
-
-| # | Pytanie | Sekcja |
-|---|---------|--------|
-| 1 | Co to jest PLC i scan cycle? | 1.1, 1.2 |
-| 2 | Co to jest FB, FC, DB — różnice | 1.4 |
-| 3 | Co to jest PROFINET vs PROFIBUS | 1.8 |
-| 4 | Co to jest SIMATIC Safety Integrated | 2.1 |
-| 5 | Co to jest F-CPU i dual-channel | 2.2 |
-| 6 | Co to jest F-DI i VS* (pulse testing) | 3.1, 3.2 |
-| 7 | Dlaczego czujniki NC, nie NO | 3.3 |
-| 8 | Co to jest passivation i ACK | 5.1, 5.4 |
-| 9 | Co to jest STO i SS1 | 8.1, 8.3 |
-| 10 | Co to jest PROFIsafe i F-Address | 7.1, 7.2 |
-| 11 | Kategorie zatrzymania wg EN 60204-1 | 13.1 |
-| 12 | Co sprawdzasz przed pierwszym RUN Safety | 11.1 |
-
-**Wynik fazy 1:** Rozumiesz architekturę Safety i odpowiesz na 80% pytań wstępnych.
-
----
-
-### FAZA 2 — PRAKTYKA (3–4 dni) 🟡 SHOULD KNOW
-*Pytania techniczne zadawane przez Senior Engineers i Team Leaderów.*
-
-| # | Pytanie | Sekcja |
-|---|---------|--------|
-| 13 | Discrepancy time — konfiguracja | 3.4 |
-| 14 | pm switching vs pp switching | 3.6 |
-| 15 | 1oo1 / 1oo2 / 2oo2 — kiedy co wybierasz | 4.1, 4.2 |
-| 16 | F-signature i collective signature | 2.5 |
-| 17 | Jak wgrywasz zmianę w Safety | 9.3 |
-| 18 | Jak czytasz diagnostykę F-modułu online | 9.5 |
-| 19 | Co to jest LSafe_EStop | 13.2 |
-| 20 | Feedback circuit i dlaczego jest wymagany | 13.3 |
-| 21 | Jak testujesz e-stop podczas commissioning | 11.2 |
-| 22 | Najczęstsze przyczyny passivation F-DI | 11.5 |
-| 23 | Jak diagnostykujesz PROFINET w TIA Portal | 14.3 |
-| 24 | Jak konfigurujesz G120 z Safety przez PROFIsafe | 12.4 |
-| 25 | Jak dodajesz ET200SP Safety do projektu | 19.1 |
-| 26 | Jak komunikuje się PLC z robotem ABB IRC5 | 10.1 |
-
-**Wynik fazy 2:** Prowadzisz tekniczną rozmowę i odpowiadasz na pytania praktyczne.
-
----
-
-### FAZA 3 — SENIOR LEVEL (2–3 dni) 🟢 NICE TO KNOW
-*Pytania które wyróżniają Cię spośród innych kandydatów.*
-
-| # | Pytanie | Sekcja |
-|---|---------|--------|
-| 27 | CCF — środki dla Cat.4 | 13.4 |
-| 28 | Łańcuch Safety: PFHD, PL e, ISO 13849-1 | 13.5 |
-| 29 | Safety Matrix — co to i kiedy używasz | 9.7 |
-| 30 | Safety Report vs certyfikat CE | 9.8 |
-| 31 | FAT i SAT — co sprawdzasz | 11.3 |
-| 32 | ProDiag — diagnostyka maszyny | 11.10 |
-| 33 | SLS, SS2, SOS, SBC, SDI | 8.4 |
-| 34 | MRP i IRT w PROFINET | 14.1, 14.2 |
-| 35 | SICAR i Tec Units | 12.1, 12.2 |
-| 36 | Realne scenariusze: CPU w STOP, napęd nie kasuje | 17.5, 17.4 |
-
----
+> **115 pytań / 19 sekcji.** 
 
 ### MAPA TEMATYCZNA — który temat jest dla Ciebie najważniejszy?
 
@@ -820,40 +754,54 @@ Sekwencja kroków w praktyce commissioning z TIA Portal:
 • Moduł pokazuje błąd ale kabel OK → sprawdź numer katalogowy w TIA Portal = fizyczny moduł (inna rewizja hardware ≠ ten sam katalog).
 • HMI nie łączy się z PLC → sprawdź IP w tej samej podsieci i czy firewall laptopa nie blokuje portu 102 (S7 protocol).
 
-### 11.8. Jakie są etapy uruchomienia i konfiguracji serwonapędu SINAMICS V90 za pomocą oprogramowania V-Assistant?
-Uruchomienie serwonapędu SINAMICS V90 wymaga użycia dedykowanego oprogramowania V-Assistant do konfiguracji parametrów napędu oraz TIA Portal do programowania sterownika PLC.
-• **Wymagane oprogramowanie:**
-  • Sinamics V-Assistant Commissioning tool.
-  • TIA Portal V15.1 lub nowsza.
-• **Połączenie z V-Assistant:**
-  • Możliwe przez interfejs USB lub sieciowy (Ethernet).
-  • Po odnalezieniu serwowzmacniacza w sieci, wybiera się "Device Commissioning".
-• **Przywracanie ustawień fabrycznych:**
-  • W V-Assistant: Tools -> Factory Default -> Yes. Napęd resetuje wszystkie ustawienia.
-• **Konfiguracja podstawowa:**
-  • **Select Drive:** Wybór serwomotoru (domyślny lub inny z listy, np. z hamulcem/bez).
-  • **Control Mode:** Wybór trybu sterowania.
-    • "Speed Control" dla S7-1200 (serwowzmacniacz reguluje prędkość, PLC wykonuje obliczenia pozycjonowania).
-    • "Basic Positioner Control" dla S7-1500.
-  • **Jog:** Testowanie ruchu napędu w trybie ręcznym.
-    • Ustawienie prędkości (np. 500 obrotów/min).
-    • Sprawdzenie, czy servo działa, co potwierdza prawidłowe okablowanie.
-  • **Set PROFINET:** Wybór telegramu komunikacyjnego (np. telegram nr 3 dla S7-1200; telegram nr 102 dla S7-1500).
-  • **Konfiguracja sieciowa:** Adres IP i nazwa PROFINETowa nadawane z TIA Portal.
-  • **Set Limits:** Ustawienie limitów momentu obrotowego (np. 300% momentu znamionowego) i prędkości.
-  • **Digital Input Output:** Konfiguracja wejść/wyjść cyfrowych (np. ograniczenie momentu, zakresu prędkości, Emergency Stop, gotowość napędu, błąd).
-• **Optymalizacja napędu (Tuning):**
-  • **Optimize Drive:** Zakładka do testowania interfejsu, wejść/wyjść cyfrowych.
-  • **One Button Auto Tuning:** Automatyczna procedura tuningu regulatorów.
-    • Wprowadzenie zakresu ruchu (np. jeden obrót).
-    • Servo porusza się, sprawdzając właściwości dynamiczne układu mechanicznego i dostosowując regulator.
-  • **Optimize Drive Tuning Parameters:** Wyświetla zmienione parametry regulatora prędkości (wzmocnienie, czas zdwojenia) po autotuningu. Regulator pozycji pozostaje bez zmian w trybie prędkościowym.
-• **Zapis parametrów:**
-  • Akceptacja wartości i zapis w pamięci nieulotnej ROM.
-Praktyczne wskazówki:
-• Fakt, że servo działa w trybie Jog, świadczy o prawidłowym podłączeniu okablowania i sprawności układu.
-• Servo może być przeciążone nawet trzykrotnie w krótkim okresie, ale nie należy nadużywać tej funkcjonalności.
-*Źródło: transkrypcje ControlByte*
+### 11.8. Jakie są etapy uruchomienia napędu SINAMICS G120 — od sprzętu do pierwszego ruchu?
+SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentów: **CU (Control Unit)** + **PM (Power Module)**. Uruchomienie odbywa się przez **Startdrive** (wtyczka TIA Portal) lub standalone **STARTER**.
+
+**Budowa — dobór komponentów:**
+- CU: np. CU240E-2 DP (PROFIBUS), CU240E-2 PN (PROFINET), CU250S-2 (z enkoderem)
+- PM: PM230 (bez hamowania), PM240-2 (z chopperem hamującym), PM250 (regeneratywny)
+- Moc PM musi pasować do silnika — dobór wg karty katalogowej
+
+**Etapy uruchomienia w Startdrive (TIA Portal):**
+
+**1. Dodanie napędu do projektu:**
+- `Devices & Networks` → `Add new device` → SINAMICS G120 → wybierz wersję CU
+- Ustaw adres PROFINET (nazwa urządzenia + IP) — synchronizacja z fizycznym napędem przez `Assign device name`
+
+**2. Quick Commissioning (p0010 = 1):**
+- `p0100` — normy silnika: 0 = IEC (50 Hz, kW), 1 = NEMA (60 Hz, hp)
+- `p0300` — typ silnika: 1 = silnik asynchroniczny (IM), 2 = PMSM (synchroniczny)
+- Dane z tabliczki znamionowej silnika: `p0304` (napięcie), `p0305` (prąd znamionowy), `p0307` (moc), `p0308` (cos φ), `p0309` (sprawność), `p0310` (częstotliwość), `p0311` (prędkość)
+- `p1080` / `p1082` — prędkość minimalna / maksymalna [rpm]
+- `p1120` / `p1121` — czas rampy przyspieszania / hamowania [s]
+- Zakończenie Quick Commissioning: `p3900 = 1` → napęd przelicza parametry i wraca do `p0010 = 0`
+
+**3. Identyfikacja silnika (Motor Data Identification):**
+- `p1910 = 1` → napęd wykonuje pomiar rezystancji uzwojeń przy zatrzymanym silniku
+- `p1960 = 1` → identyfikacja przy obracającym się silniku (Speed Controller Optimization)
+- Wyniki zapisywane automatycznie do parametrów regulatora
+
+**4. Telegram PROFINET i PZD:**
+- `p0922` — wybór telegramu: 1 = standard (STW1/ZSW1 + Setpoint/Actual speed), 20 = rozszerzony, 352 = Safety
+- W TIA Portal: w konfiguracji sprzętowej przypisz telegram G120 do DB komunikacyjnego; użyj FB `SINA_SPEED` (startdrive library)
+
+**5. Fabryczny reset (gdy napęd był już używany):**
+- `p0010 = 30`, następnie `p0970 = 1` → pełny reset do ustawień fabrycznych
+
+**6. Weryfikacja i diagnostyka:**
+- `r0002` — aktualny stan napędu (gotowy / run / fault)
+- `r0945` — kod ostatniego błędu (Fault code) — niezbędny przy diagnostyce
+- `r0947` — kod ostatniego alarmu (Alarm code)
+- `r0949` — wartość powiązana z błędem (dodatkowa informacja diagnostyczna)
+- Panel BOP-2 lub IOP na froncie CU — podgląd parametrów i stanów bez laptopa
+
+**Praktyczne wskazówki:**
+- Zawsze sprawdź zgodność napięcia zasilania PM z siecią zakładową (400 V / 480 V)
+- Po `p3900 = 1` napęd generuje automatycznie parametry regulatora prędkości — nie nadpisuj ręcznie bez potrzeby
+- Przy PROFINET: nazwa urządzenia w napędzie musi być identyczna jak w konfiguracji TIA Portal — wielkość liter ma znaczenie
+- Fault `F07801` (przetężenie) przy starcie → silnik za mały do PM lub zbyt krótki czas rampy
+
+*Źródło: Siemens SINAMICS G120 Getting Started / Startdrive commissioning guide*
 
 ### 11.9. Jakie są możliwości diagnostyki i testowania programów PLC za pomocą języka Python i protokołu OPC UA?
 Język Python, w połączeniu z protokołem OPC UA, umożliwia automatyzację testów oprogramowania PLC, co jest szczególnie przydatne w przypadku złożonych projektów, gdzie testy manualne są czasochłonne i podatne na błędy.
@@ -971,19 +919,7 @@ CCF (Common Cause Failure / Usterka wspólnej przyczyny) to scenariusz gdzie JED
 ISO 13849-1 Tablica F.1 wymaga minimum 65 punktów CCF dla architektury Cat.3 i Cat.4. Punkty przyznawane za środki jak: separacja/oddzielenie tras kablowych kanałów (+15), różne technologie czujników (+20), ochrona EMC (+25), warunki środowiskowe (+10) itd.
 W praktyce: prowadź kable kanału 1 i 2 w osobnych trasach, stosuj różnych producentów czujników (diverse redundancy), zachowuj separację przestrzenną.
 Siemens F-DI realizuje diagnostykę cross-circuit (zwarcie między kanałami) i pulse-testing — ale CCF środki leżą po stronie projektu i montażu, nie CPU.
-
-### 13.5. Jak wygląda łańcuch Safety dla e-stopu: Detection → Evaluation → Reaction i co liczy się do PFH?  🟢
-Zgodnie z ISO 13849-1 (i weryfikacją w TIA Selection Tool) cały łańcuch bezpieczeństwa dzielony jest na podsystemy:
-Detection (Detekcja): przycisk e-stop (2×NC, Cat.4). Parametry: B10=100,000 ops, udNiebezpieczny=20%, T1=175,200h, CCF≥65, DC≥99% (cross-comparison F-DI). Wynik przykładowy: PFHD = 9.06×10⁻¹⁰ → PL e.
-Evaluation (Ewaluacja): F-CPU + F-DI + F-DQ komunikujące przez PROFIsafe. Dane z karty katalogowej Siemens: CPU 1516F PFHD = 2.0×10⁻⁹, F-DI = 1.0×10⁻⁹, F-DQ = 2.0×10⁻⁹. Suma = 5.0×10⁻⁹ → PL e.
-Reaction (Reakcja): styczniki (2 szeregowo, Cat.4). Parametry: B10=1,000,000 ops, udNiebezpieczny=73%, T1=175,000h, CCF≥65, DC≥99% (feedback monitoring). Wynik: PFHD = 1.45×10⁻⁹ → PL e.
-Łącznie: PFHD_total = 9.06×10⁻¹⁰ + 5.0×10⁻⁹ + 1.45×10⁻⁹ ≈ 7.35×10⁻⁹ → PL e (granica SIL 3: PFHD < 10⁻⁷).
-Narzędzie: Siemens TIA Selection Tool (wbudowane w TIA Portal lub online) automatyzuje obliczenia — wymagaj od klienta wymagań PL/SIL przed doborem sprzętu.
-
-**Obliczenia ISO 13849-1 — przykład podsystemu Detection dla E-Stop SIL 3:**
-![ISO 13849-1 evaluation: B10, DC, PFHD = 9.06×10⁻¹⁰ → PL e](images/safety/07d_estop_iso13849_p21.png)
-
-### 13.6. Czy można łączyć przyciski e-stop szeregowo do jednego wejścia F-DI?
+### 13.5. Czy można łączyć przyciski e-stop szeregowo do jednego wejścia F-DI?
 Tak, ale z ograniczeniami. EN ISO 13850 i IEC 62061 dopuszczają szeregowe połączenie e-stopów TYLKO jeśli można wykluczyć jednoczesne naciśnięcie dwóch e-stopów ORAZ jednoczesne wystąpienie awarii i naciśnięcia.
 Problem: przy szeregowym połączeniu nie wiadomo KTÓRY e-stop zadziałał → brak diagnostyki granularnej. Siemens zaleca oddzielne kanały F-DI per e-stop dla szybszej lokalizacji usterek i lepszej diagnostyki ProDiag/HMI.
 Praktyczny kompromis Siemens (wg doc. 21064024): każdy e-stop na osobnej parze kanałów F-DI z 1oo2 evaluation → każdy e-stop widoczny osobno w diagnostyce TIA Portal i na HMI.
@@ -1168,18 +1104,12 @@ Ciągły czerwony RDY LED = aktywny fault (F-alarm), nie alarm (A-alarm, który 
 
 ## 18. TIA PORTAL — ZAAWANSOWANE FUNKCJE
 
-
-### 18.1. Jak działa Know-How Protection i czym różni się od Copy Protection?
-Know-How Protection (ochrona wiedzy): hasłem blokujesz podgląd i edycję kodu bloku FB/FC/DB. Możesz uruchomić, monitorować online (Watch Table), ale nie możesz otworzyć logiki. Stosowane przez integratorów do ochrony własności intelektualnej. Ustawiasz: kliknij prawym na blok → Protection → Know-how protection → ustaw hasło.
-• Copy Protection (ochrona kopiowania): wiąże blok kryptograficznie z konkretnym CPU (serial number) lub kartą pamięci. Blok uruchamia się TYLKO na tym urządzeniu. Zapobiega kopiowaniu know-how na inne instalacje bez zgody autora.
-• Oba mechanizmy można łączyć. Uwaga: jeśli stracisz hasło Know-How Protection — nie odzyskasz kodu. Siemens nie ma backdoora.
-
-### 18.2. Co to są Project Libraries vs Global Libraries i kiedy używasz każdej?
+### 18.1. Co to są Project Libraries vs Global Libraries i kiedy używasz każdej?
 Project Library: biblioteka wewnątrz projektu TIA Portal. Przechowuje wersjonowane bloki, typy PLC (PLCtype), ekrany HMI, UDT do ponownego użycia w ramach jednego projektu. Każda zmiana w bibliotece → aktualizacja wszystkich instancji. Idealna dla standardowych rozmów jednego zakładu/línii.
 • Global Library: biblioteka zewnętrzna (.al17 plik) niezależna od projektu. Możesz ją otwierać w dowolnym projekcie TIA Portal i wstawiać jej elementy. Stosuj dla firmowych standardów używanych w wielu projektach dla wielu klientów — np. SICAR Tec Units, certyfikowane bloki Safety, własne wzorce.
 • Workflow: rozwijaj w Global Library → insertuj do Project Library → deploy do projektu. Wersjonowanie w Global Library umożliwia zarządzanie zmianami we wszystkich projektach naraz.
 
-### 18.3. Jak robisz partial download żeby nie resetować całego CPU?
+### 18.2. Jak robisz partial download żeby nie resetować całego CPU?
 TIA Portal rozróżnia typy downloadów:
 • "Download to device → Software (only changes)": pobiera wyłącznie zmienione bloki — CPU pozostaje w RUN, zmiana aplikowana online. Bezpieczne dla drobnych poprawek kodu.
 • "Download to device → Hardware and Software (only changes)": gdy zmieniłeś konfigurację sprzętu (nowy moduł IO, zmiana IP). CPU może przejść chwilowo przez STOP.
@@ -1187,32 +1117,11 @@ TIA Portal rozróżnia typy downloadów:
 • Warunek partial download: projekt musi być skompilowany bez błędów. Zmiany w Safety zawsze wymagają akceptacji F-signature — CPU zatrzymuje Safety runtime na moment (Safety LOCK → RUN), ale standard może działać.
 • Praktyczna wskazówka: przed downloadem online sprawdź "Compare offline/online" — TIA Portal pokaże diff co realnie się zróżni.
 
-### 18.4. Do czego służy OPC UA w TIA Portal i jak go aktywujesz?
+### 18.3. Do czego służy OPC UA w TIA Portal i jak go aktywujesz?
 OPC UA (Open Platform Communications Unified Architecture) to otwarte, bezpieczne (szyfrowanie + certyfikaty) API do integracji PLC z systemami SCADA, MES, ERP, chmurą i systemami IT (Python, C#, Java). Zalety nad S5/S7 Protocol lub Modbus: standaryzacja, bezpieczeństwo (TLS 1.2), model danych (nodes, methods, events), nie jest zależny od Siemens.
 • Aktywacja: TIA Portal → CPU properties → OPC UA → Server → Enable OPC UA server → ustaw port (4840 domyślny), certyfikat, listę dostępnych węzłów (selected DB lub automatycznie wszystkie tagów).
 • Klient: SIMATIC WinCC Advanced/Unified, Node-RED, Python opcua library, Kepware, Ignition. W praktyce commissioning: OPC UA server na PLC + Node-RED do szybkiego prototypowania dashboardu lub wysyłania danych do chmury.
 • Ograniczenia: OPC UA ma wyższe opóźnienie niż PROFINET (~10ms vs <1ms) — nie stosuj do sterowania real-time, tylko do monitoringu i konfiguracji.
-
-### 18.5. Jakie są poziomy dostępu (Access levels) w S7-1500 i jak chronisz CPU przed nieautoryzowanymi zmianami?
-S7-1500 ma czterostopniowe poziomy dostępu konfigurowane: TIA Portal → CPU Properties → Protection & Security → Access level.
-
-| Poziom | Nazwa | Co jest zablokowane bez hasła |
-|--------|-------|-------------------------------|
-| 1 | Full access (no restriction) | Nic — domyślny, brak ochrony |
-| 2 | Read access | Zapis do CPU, Download, Force |
-| 3 | HMI access | Jak 2 + brak odczytu przez TIA Portal (tylko HMI może czytać) |
-| 4 | No access (complete protection) | Wszystko — pełna blokada |
-
-**Praktyczne wskazówki:**
-• Poziom 2 (Read + hasło do zapisu): standardowe zabezpieczenie produkcyjne. Technik może czytać diagnostykę, nie może modyfikować programu.
-• Poziom 4 bez zapisanego hasła = niebezpieczne — stracisz dostęp do własnego CPU. Zawsze dokumentuj hasło projektowo.
-• Access level ≠ Know-How Protection: Access level chroni dostęp do CPU przez sieć. Know-How Protection chroni treść kodu bloku (osoba z hasłem do CPU nadal nie widzi zablokowanego kodu).
-
-**PUT/GET i Access levels:**
-Domyślnie S7-1500 blokuje dostęp PUT/GET z zewnętrznych urządzeń. Włączenie wymaga jawnej aktywacji → CPU Properties → **Permit access with PUT/GET**. ⚠️ Włączenie PUT/GET bez firewalla = każde urządzenie w sieci może czytać/pisać pamięć PLC.
-
-**Dla Safety CPU:** zmiana programu Safety wymaga dodatkowo hasła Safety (oddzielne od Access level) — podwójna autoryzacja.
-
 ---
 
 ## 19. COMMISSIONING — DODAWANIE STACJI I URZĄDZEŃ DO PROJEKTU

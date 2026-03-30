@@ -4,7 +4,24 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v9 — 2026-03-29 — Obrazy, System Nauki, Tagi Priorytetów ✅ AKTYWNA WERSJA
+## qa_draft_v9 — edycja 2026-03-30 — Redukcja i korekta pytań ✅ AKTYWNA WERSJA
+
+### Zmiany 2026-03-30:
+- **112 pytań** (było 115) — usunięto 6 pytań, przepisano 1
+- **Usunięte pytania (zbyt ogólne / poza zakresem PLC Commissioner):**
+  - `1.11` Warianty CPU S7-1200 i rozbudowa (SM/CM/SB) — zbyt sprzętowe/katalogowe
+  - `1.12` Co to jest HMI — zbyt podstawowe
+  - `1.13` Co to jest SCADA / WinCC — zbyt ogólne
+  - `13.5` Łańcuch Safety PFH: Detection→Evaluation→Reaction — zbędna duplikacja
+  - `18.1` Know-How Protection vs Copy Protection — poza zakresem core Safety/Commissioning
+  - `18.5` Access levels S7-1500 — poza zakresem core Safety/Commissioning
+- **Przepisane pytania:**
+  - `11.8` — zmieniono z V90/V-Assistant na **SINAMICS G120** (Quick Commissioning, p0010, p0304-p0311, p3900, p0922, p1910, p1960, p0970, r0945/r0947/r0949, FB SINA_SPEED)
+- **Przenumerowania:** 1.14→1.11 | 13.6+→13.5+ | 18.2→18.1, 18.3→18.2, 18.4→18.3
+
+---
+
+## qa_draft_v9 — 2026-03-29 — Obrazy, System Nauki, Tagi Priorytetów
 
 ### Zmiany vs v8:
 - **+5 nowych pytań** (łącznie 115 pytań)
