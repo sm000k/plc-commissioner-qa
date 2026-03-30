@@ -4,7 +4,24 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v10 — edycja ciągła ✅ AKTYWNA WERSJA
+## qa_draft_v11 — 2026-05-xx ✅ AKTYWNA WERSJA
+
+### Stan: 113 pytań, 19 sekcji — uniformalne enriched formatting przez WSZYSTKIE sekcje
+
+### Zmiany względem v10:
+- **Sekcja 17** Q17.5: tabela przyczyn STOP + `> ⚠️` zakaz Download przed diagnozą + `> 💡` warm restart
+- **Sekcja 17** Q17.6: bullets → ustrukturyzowana lista + `> ⚠️` Red flags + `> 💡` przykład skalowalności
+- **Sekcja 18** Q18.1: tabela Project Library vs Global Library + `> 💡` wersjonowanie
+- **Sekcja 18** Q18.2: tabela typów downloadu + procedura partial download + `> ⚠️` Safety partial download
+- **Sekcja 18** Q18.3: numbered steps aktywacji OPC UA + `> ⚠️` latency + `> ⚠️` security
+- **Sekcja 19** Q19.1: `> ⚠️` F-Address unikalny + `> 💡` EK element kodujący
+- **Sekcja 19** Q19.2: `> ⚠️` GSDML ≠ sprzęt + `> 💡` web server wyspy
+- **Sekcja 19** Q19.3: `> ⚠️` telegram p0922 + `> ⚠️` Safety Acceptance Test + `> 💡` Take online device as preset
+- **Wynik:** jednolite formatowanie we WSZYSTKICH 19 sekcjach (sekcje 11–19 dobrane do standardu sekcji 1–10)
+
+---
+
+## qa_draft_v10 — edycja ciągła (backup)
 
 ### Stan: 113 pytań, 19 sekcji — po sesjach redakcyjnych 2026-03-30 i późniejszych
 

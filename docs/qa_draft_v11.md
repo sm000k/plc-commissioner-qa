@@ -1,4 +1,4 @@
-﻿# KOMPENDIUM Q&A — v10
+﻿# KOMPENDIUM Q&A — v11
 
 ### PLC Programmer / Commissioner / Automatyk
 
