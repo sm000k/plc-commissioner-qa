@@ -42,13 +42,13 @@ transcripts/controlbyte/       ← Transkrypcje YouTube (52 filmy)
 | `btc.pl-SCL-S7-1200.pdf` | Programowanie S7-1200 w SCL (TIA Portal V13+) |
 
 ## Aktywny dokument Q&A
-- **Bieżący**: `docs/qa_draft_v9.md` — **112 pytań, 19 sekcji** (edycja 2026-03-30)
+- **Bieżący**: `docs/qa_draft_v10.md` — **112 pytań, 19 sekcji** (2026-03-30)
   - Zawiera PLAN NAUKI (linie 7–85) z tagami 🔴🟡🟢
   - Embedded: 9 obrazów z `docs/images/safety/` (45 PNG łącznie)
-- **Poprzedni**: `docs/qa_draft_v8.md` — 110 pytań (backup)
+- **Poprzedni**: `docs/qa_draft_v9.md` — 112 pytań (backup)
 - **Historia**: `archive/docx/` — wersje v3–v7 .docx
 
-Następna wersja: `docs/qa_draft_v10.md`
+Następna wersja: `docs/qa_draft_v11.md`
 
 ## Format dokumentu Q&A
 

@@ -4,7 +4,16 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v9 — edycja 2026-03-30 — Redukcja i korekta pytań ✅ AKTYWNA WERSJA
+## qa_draft_v10 — 2026-03-30 — Wersja stabilna ✅ AKTYWNA WERSJA
+
+### Zmiany vs v9:
+- Brak nowych pytań — wersja stabilna po sesji redakcyjnej 2026-03-30
+- **112 pytań, 19 sekcji** — identyczna treść z v9 po wszystkich poprawkach
+- Plik roboczy przeniesiony do `qa_draft_v10.md`
+
+---
+
+## qa_draft_v9 — edycja 2026-03-30 — Redukcja i korekta pytań
 
 ### Zmiany 2026-03-30:
 - **112 pytań** (było 115) — usunięto 6 pytań, przepisano 1
