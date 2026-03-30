@@ -4,20 +4,28 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v11 — 2026-05-xx ✅ AKTYWNA WERSJA
+## qa_draft_v11 — 2026-03-30 ✅ AKTYWNA WERSJA
 
-### Stan: 113 pytań, 19 sekcji — uniformalne enriched formatting przez WSZYSTKIE sekcje
+### Stan: 134 pytań, 19 sekcji — +21 nowych pytań vs v10
 
-### Zmiany względem v10:
-- **Sekcja 17** Q17.5: tabela przyczyn STOP + `> ⚠️` zakaz Download przed diagnozą + `> 💡` warm restart
-- **Sekcja 17** Q17.6: bullets → ustrukturyzowana lista + `> ⚠️` Red flags + `> 💡` przykład skalowalności
-- **Sekcja 18** Q18.1: tabela Project Library vs Global Library + `> 💡` wersjonowanie
-- **Sekcja 18** Q18.2: tabela typów downloadu + procedura partial download + `> ⚠️` Safety partial download
-- **Sekcja 18** Q18.3: numbered steps aktywacji OPC UA + `> ⚠️` latency + `> ⚠️` security
-- **Sekcja 19** Q19.1: `> ⚠️` F-Address unikalny + `> 💡` EK element kodujący
-- **Sekcja 19** Q19.2: `> ⚠️` GSDML ≠ sprzęt + `> 💡` web server wyspy
-- **Sekcja 19** Q19.3: `> ⚠️` telegram p0922 + `> ⚠️` Safety Acceptance Test + `> 💡` Take online device as preset
-- **Wynik:** jednolite formatowanie we WSZYSTKICH 19 sekcjach (sekcje 11–19 dobrane do standardu sekcji 1–10)
+### Źródła nowej wiedzy:
+- 5 transkrypcji ControlByte (serwonapędy V90, ABB TCP/XML, Safety 1oo2)
+- Targetowane rozszerzenie sekcji 4, 6, 17, 18
+- Skrypt: `scripts/patch_v11.py` (Gemini 2.5 Flash, 2 wywołania)
+
+### Nowe pytania wg sekcji:
+| Sekcja | v10 | v11 | +Δ | Dodane tematy |
+|--------|-----|-----|-----|--------------|
+| **4** Struktury głosowania | 3 | 8 | +5 | Discrepancy time, cross-circuit detection, reintegration po błędzie, scenariusze awaryjne 1oo2 |
+| **6** Safe State | 3 | 5 | +2 | STO vs OFF1/OFF2, konfiguracja substitute values per urządzenie |
+| **8** SINAMICS Safety | 7 | 8 | +1 | Parametry Safety V90 |
+| **10** Robot ABB | 5 | 8 | +3 | Komunikacja TCP/XML PLC↔ABB IRC5, format XML, obsługa błędów |
+| **16** Motion Control | 5 | 11 | +6 | Hardware V90, Startdrive, tryby sterowania, One-Button Tuning, MC_MoveJog praktyka |
+| **17** Realne scenariusze | 6 | 8 | +2 | FAT checklist Safety, SAT Site Acceptance Test |
+| **18** TIA Portal adv. | 3 | 5 | +2 | ProDiag konfiguracja, Compare online/offline |
+
+### Pliki pomocnicze:
+- `docs/knowledge_base_delta_v11.md` — delta KB z 5 transkrypcji (podgląd)
 
 ---
 

@@ -1,4 +1,4 @@
-﻿# KOMPENDIUM Q&A — v11
+# KOMPENDIUM Q&A — v11
 
 ### PLC Programmer / Commissioner / Automatyk
 
@@ -8,13 +8,13 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v10 | Data: 2026-03-30 | Pytania: 113
+### Wersja: v11 | Data: 2026-03-30 | Pytania: 137
 
 ---
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **115 pytań / 19 sekcji.**
+> **137 pytań / 19 sekcji.**
 
 
 ---
@@ -240,6 +240,29 @@ PID (Proportional-Integral-Derivative) to algorytm regulacji zamkniętej utrzymu
 - I — eliminuje uchyb ustalony (sumuje błąd w czasie)
 - D — reaguje na szybkość zmiany błędu (tłumi oscylacje)
 W TIA Portal: gotowy blok PID_Compact lub PID_3Step w OB35 (cykliczne przerwanie). W Safety PID nie jest stosowany — logika Safety jest binarna.
+
+### 1.15. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?  🟡
+
+**Enkoder** (przetwornik obrotowo-impulsowy) to czujnik zamieniający ruch mechaniczny (kąt/pozycję) na sygnał elektryczny odczytywany przez napęd lub PLC.
+
+| Cecha | Inkrementalny | Absolutny |
+|-------|---------------|-----------|
+| **Sygnał wyjściowy** | Impulsy zliczane od punktu startowego | Unikalna wartość liczbowa = aktualna pozycja |
+| **Po zaniku zasilania** | Traci pozycję — wymaga referencjonowania (homing) | Zachowuje pozycję *(absolutny)* |
+| **Homing (referencja)** | Wymagany po każdym starcie | Nie wymagany *(single-turn)* lub nie wymagany *(multi-turn)* |
+| **Interfejsy** | TTL (A/B/Z), HTL, sin/cos 1 Vpp | SSI, EnDat 2.1/2.2, HIPERFACE, HIPERFACE DSL |
+| **Rozdzielczość** | 100 – 65 536 imp/obrót (PPR) | 12 – 25 bit/obrót |
+| **Koszt** | Niższy | Wyższy |
+| **Zastosowanie** | Przenośniki, wentylatory, proste osie | Roboty, osie pionowe, serwosystemy |
+
+**Single-turn vs Multi-turn (absolutne):**
+- **Single-turn:** unikalny kod dla 1 pełnego obrotu (0°–360°). Po przekręceniu o >1 obrót — traci pozycję absolutną.
+- **Multi-turn:** dodatkowy mechanizm (getriebe optyczny lub zasilanie bateryjne) liczy pełne obroty. Np. 17 bit (131 072 poz/obrót) + 12 bit multi-turn (4096 obrotów) = ponad 536 mln unikalnych pozycji.
+
+> ⚠️ **Osie pionowe i roboty:** zawsze absolutny enkoder multi-turn — po zaniku zasilania maszyna wie dokładnie gdzie jest ramię bez potrzeby homing. Inkrementalny = homing po każdym resecie = niebezpieczne przy obciążeniu.
+
+> 💡 **Na rozmowie:** pytanie o enkodery często pojawia się razem z SLS/SDI — wspomnij że do tych funkcji Safety wymagane są enkodery certyfikowane (HIPERFACE Safety, EnDat Safety).
+
 
 ---
 
@@ -478,6 +501,43 @@ Dwa sygnały z dwóch czujników podłączone na dwa kanały tego samego modułu
 
 ---
 
+### 4.4. Jak sterownik safety reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?
+Sterownik safety wykrywa błąd rozbieżności sygnału, gdy jeden z dwóch kanałów skonfigurowanych w ocenie 1oo2 straci ciągłość obwodu lub sygnały nie zadziałają równocześnie w określonym czasie. Jest to podstawowa funkcja diagnostyczna dla urządzeń elektromechanicznych i czujników z wyjściami tranzystorowymi.
+- Błąd "Discrepancy failure" jest zgłaszany w buforze diagnostycznym PLC, wskazując kanał awarii.
+- Po usunięciu przyczyny błędu (np. ponownym podłączeniu obwodu), diody modułu naprzemian migają na czerwono i zielono, sygnalizując możliwość resetu reintegracji.
+- Czas rozbieżności (np. 50 ms) musi być precyzyjnie dobrany, aby uniknąć fałszywych błędów lub zbyt długiej zwłoki w wykryciu awarii.
+*Źródło: transkrypcje ControlByte*
+
+### 4.5. Jakie są scenariusze awaryjne wykrywane przez moduł safety w układzie dwukanałowym 1oo2?
+Moduł safety w układzie dwukanałowym 1oo2 jest w stanie wykryć różne scenariusze awaryjne, które mogą prowadzić do niebezpiecznych sytuacji, zapewniając wysoką diagnostykę.
+- **Zwarcie do potencjału 0 V (zwarcie do masy):** Moduł zgłasza błąd "Overload or internal sensor supply short circuit to ground", pasywuje kanał i rozłącza styczniki.
+- **Zwarcie międzykanałowe (do P):** Moduł zgłasza błąd "Internal sensor supply short circuit to P" lub "Short-circuit of two encoder supplies", cały moduł zapala się na czerwono.
+- **Rozbieżność sygnału (Discrepancy failure):** Wykrywana, gdy jeden z kanałów straci ciągłość obwodu lub sygnały nie zadziałają równocześnie, co jest kluczowe dla urządzeń z mechanicznymi stykami (E-STOP, wyłączniki krańcowe) lub wyjściami tranzystorowymi.
+*Źródło: transkrypcje ControlByte*
+
+### 4.6. Jak parametr "Reintegration after discrepancy error" wpływa na obsługę błędu rozbieżności sygnału?
+Parametr "Reintegration after discrepancy error" w konfiguracji modułu safety określa, czy po wystąpieniu błędu rozbieżności sygnału wymagane jest doprowadzenie sygnału do stanu zerowego przed wykonaniem resetu.
+- Jeśli wybrano opcję "Test zero signal necessary", operator musi wymusić stan zerowy na czujniku (np. wcisnąć i odciągnąć E-STOP) zanim możliwy będzie reset reintegracji.
+- Ten parametr jest istotny dla sposobu obsługi stanowiska przez operatora, szczególnie w przypadku starszych urządzeń, które mogą generować sporadyczne błędy rozbieżności.
+- Reset reintegracji kanałów safety w sterowniku PLC jest odrębny od resetu funkcji bezpieczeństwa, który wymaga innej logiki programowania.
+*Źródło: transkrypcje ControlByte*
+
+### 4.7. Co to jest czas rozbieżności (discrepancy time) w F-DI 1oo2 i co się dzieje gdy zostanie przekroczony? 🔴
+Czas rozbieżności (Discrepancy Time) to maksymalny czas, przez jaki oba kanały 1oo2 mogą mieć różne wartości logiczne bez wywołania błędu. Parametr konfigurowany w TIA Portal dla każdego F-DI z oceną 1oo2.
+- Domyślnie: 100 ms — oba sygnały muszą zmienić stan w tym oknie
+- Przekroczenie → F-DI przechodzi w stan pasywny (passivation), wyjście F-DO = substitute value
+- Typowa przyczyna: mechaniczne opóźnienie styku bezpieczeństwa lub błąd okablowania
+- Konfiguracja: właściwości modułu F-DI → zakładka „Input" → „Discrepancy time [ms]"
+- W diagnostyce: alarm „1001: Discrepancy error channel 1/2" w F_LADDR.DIAG
+
+### 4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2? 🟡
+Detekcja cross-circuit (zwarcia między kanałami) to mechanizm pozwalający wykryć zwarcie przewodu kanału 1 do kanału 2 dzięki testowym impulsom wyjść testowych (T-signal).
+- T1 i T2 generują impulsy testowe z różną fazą (wzajemnie rozłączne)
+- Wejścia odczytują sygnał z powrotem przez czujnik
+- Zwarcie między kanałami = impuls T1 pojawia się na wejściu kanału 2 → błąd cross-circuit
+- Wymaga okablowania z wyjść testowych (T1, T2) przez czujnik do wejść (DI0.0, DI0.1)
+- Nie działa przy PM-switching bez wyjść testowych (wtedy cross-circuit wykrywany ograniczenie)
+
 ## 5. PASSIVATION, REINTEGRATION, ACK
 
 ### 5.1. Co to jest passivation i co się dzieje z wyjściami/wejściami?  🔴
@@ -586,6 +646,23 @@ Parametr `substitute value` w TIA Portal (właściwości kanału F-DO) określa 
 > 💡 To jest implementacja Safe State na **poziomie sprzętowym** — zadziała nawet przy awarii sieci komunikacyjnej, bez udziału logiki CPU.
 
 ---
+
+### 6.4. Czym różni się STO jako Safe State napędu SINAMICS od zatrzymania programowego (OFF1/OFF2)? 🔴
+STO (Safe Torque Off) jako Safe State napędu oznacza zablokowanie impulsów bramkowania tranzystorów — napęd nie może generować momentu obrotowego, nawet przy zasilaniu energetycznym. Zatrzymanie OFF1/OFF2 to kontrolowane wyhamowanie przez falownik z możliwością ponownego załączenia bez potwierdzenia.
+- STO: brak momentu → wolne wybieganie jeśli nie ma hamulca mechanicznego (niebezpieczne na siłowniku pionowym!)
+- OFF1: hamowanie po rampie (p1121), potem wyłączenie impulsów — napęd można ponownie uruchomić sygnałem ON
+- OFF2: natychmiastowe wyłączenie impulsów (jak STO, ale sterowane programem, nie Safety)
+- Safe State = STO → w konfiguracji F-DO parametr „substitute value" = 0 dla wyjścia STO
+- Dla osi pionowych (roboty, podnośniki): jako Safe State użyj SS1 (Stop + STO po rampie) lub SBC
+
+### 6.5. Jak konfigurujesz substitute values dla F-DO i jaką wartość wybrać dla zaworu, siłownika i napędu? 🟡
+Substitute value to wartość logiczna wyjścia F-DO nadawana automatycznie podczas passivacji lub gdy F-CPU akceptuje błąd bezpieczeństwa. Konfigurowana w TIA Portal → właściwości modułu F-DO → „Substitute value for outputs".
+- Domyślnie: 0 (false) dla wszystkich kanałów — to zazwyczaj poprawne
+- Zawór bezpieczeństwa (NC — normalnie zamknięty): substitute value = 0 → zawór zamknięty ✓
+- Siłownik pneumatyczny: zależy od logiki bezpiecznej pozycji — z reguły 0 = bezpieczna
+- Napęd STO: substitute value = 0 → sygnał STO_active = false = brak momentu ✓
+- WYJĄTEK: zawór NO (normalnie otwarty) — substitute value = 0 → zawór OTWARTY (niespójne z intencją)
+- Ważna zasada: Zawsze weryfikuj że substitute value 0 odpowiada fizycznie bezpiecznemu stanowi urządzenia
 
 ## 7. PROFISAFE — KOMUNIKACJA SAFETY
 
@@ -738,6 +815,13 @@ Telegram PROFIdrive określa format wymiany danych między CPU a napędem przez 
 
 **Uwaga praktyczna:** Niezgodność telegramu między `p0922` a konfiguracją TIA Portal → napęd nie komunikuje się lub dane są przesuznite — błędne sterowanie bez alarmu. Zawsze weryfikuj `p0922` online po podłączeniu nowego napędu.
 
+### 8.8. Jakie funkcje bezpieczeństwa są wbudowane w serwowzmacniacz Sinamics V90 i jak należy je podłączyć?
+Serwowzmacniacz Sinamics V90 jest wyposażony w funkcję bezpieczeństwa STO (Safe Torque Off), która zapewnia bezpieczne zdjęcie momentu obrotowego z napędu.
+- Funkcja STO jest realizowana poprzez terminale STO+, STO1 i STO2.
+- Domyślnie terminale te są zmostkowane, co oznacza, że funkcja STO jest nieaktywna w trybie bezpieczeństwa.
+- W docelowej aplikacji sygnały STO należy podłączyć dwukanałowo do układu bezpieczeństwa, takiego jak przekaźnik bezpieczeństwa lub programowalny sterownik bezpieczeństwa (PLC Safety), aby zapewnić bezpieczne zatrzymanie napędu.
+*Źródło: transkrypcje ControlByte*
+
 ---
 
 ## 9. TIA PORTAL — SAFETY PRAKTYKA
@@ -859,6 +943,31 @@ Kolejność sprawdzania:
 
 ---
 
+### 10.6. Jakie protokoły komunikacyjne i format danych są wykorzystywane do integracji robota ABB IRC5 z PLC Siemens?
+Integracja robota ABB z kontrolerem IRC5 ze sterownikiem PLC Siemens może być realizowana za pośrednictwem protokołu TCP lub UDP, z wykorzystaniem standardu XML do przesyłania danych.
+- Komunikacja odbywa się z częstotliwością około 250 Hz (cykl co 4 ms) dzięki modułowi "Robot Reference Interface".
+- **TCP (Transmission Control Protocol):** Wybierany, gdy kluczowe jest otrzymanie każdej ramki danych, nawet kosztem powtórnego wysyłania.
+- **UDP (User Datagram Protocol):** Wybierany, gdy nie jest istotne otrzymanie każdej ramki (może zostać utracona), ale ważna jest aktualna wartość i ciągłość nadawania.
+- Dane są przesyłane w formacie XML, który jest językiem znaczników umożliwiającym reprezentowanie informacji za pomocą struktury elementów i atrybutów.
+*Źródło: transkrypcje ControlByte*
+
+### 10.7. Jakie są kluczowe elementy struktury telegramu XML wysyłanego z robota ABB IRC5 do PLC?
+Telegram XML wysyłany z robota ABB IRC5 do PLC zawiera ustrukturyzowane dane dotyczące stanu i położenia robota, wykorzystując elementy i atrybuty.
+- Głównymi częściami dokumentu XML są elementy, takie jak `RobData` (element nadrzędny/root), `RobMode`, `Ts_act`, `P_act`, `J_act`, `Ts_des`, `P_des`, `J_des`.
+- Elementy mogą zawierać tekst (np. `RobMode` z wartością "Auto") lub atrybuty (np. `RobData` z atrybutami `Id` i `Ts` zawierającymi wartości w cudzysłowie).
+- Możliwe jest zagnieżdżanie elementów, gdzie `RobData` zawiera inne elementy, które z kolei posiadają atrybuty informujące o aktualnym położeniu i orientacji robota.
+- Telegram jest kodowany w standardzie UTF-8, który jest rozszerzonym kodowaniem obejmującym znaki ASCII.
+*Źródło: transkrypcje ControlByte*
+
+### 10.8. Jak przebiega proces dekodowania telegramu XML z robota ABB w sterowniku PLC Siemens?
+Proces dekodowania telegramu XML z robota ABB w sterowniku PLC Siemens obejmuje odbiór danych, konwersję znaków i ekstrakcję informacji z elementów i atrybutów XML.
+- Sterownik PLC odbiera ramkę danych za pośrednictwem protokołu TCP.
+- Odebrane bajty są dekodowane jako zmienne typu `character` (char), reprezentujące znaki w formacie ASCII/UTF-8.
+- Następnie, z wykorzystaniem odpowiednich funkcji (np. z biblioteki LString), następuje dekodowanie poszczególnych pól dla elementów w znacznikach XML.
+- Odczytywane są wartości atrybutów, które stanowią zmienne robota, takie jak położenie i orientacja.
+- Do symulacji i testowania komunikacji można wykorzystać narzędzia takie jak PLCSIM Advanced i Node-RED, który generuje przykładowe telegramy XML.
+*Źródło: transkrypcje ControlByte*
+
 ## 11. COMMISSIONING I DIAGNOSTYKA
 
 ### 11.1. Co sprawdzasz przed pierwszym RUN Safety?  🔴
@@ -978,7 +1087,7 @@ Sekwencja kroków w praktyce commissioning z TIA Portal:
 
 > ⚠️ **HMI nie łączy się z PLC** → sprawdź IP w tej samej podsieci i czy firewall laptopa nie blokuje portu `102` (S7 protocol).
 
-### 11.8. Jakie są etapy uruchomienia napędu SINAMICS G120 — od sprzętu do pierwszego ruchu?
+### 1.13. Jakie są etapy uruchomienia napędu SINAMICS G120 — od sprzętu do pierwszego ruchu?
 
 SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentów: **CU (Control Unit)** + **PM (Power Module)**. Uruchomienie odbywa się przez **Startdrive** (wtyczka TIA Portal) lub standalone **STARTER**.
 
@@ -1465,6 +1574,135 @@ Motion Control to dziedzina automatyki zajmująca się precyzyjnym sterowaniem r
   - **Silniki krokowe:** Tanie w produkcji.
 *Źródło: transkrypcje ControlByte*
 
+### 16.6. Jakie są podstawowe komponenty układu napędowego opartego o serwonapęd Sinamics V90 i sterownik Siemens?
+Kompletny układ napędowy oparty o serwonapęd Sinamics V90 składa się z trzech głównych komponentów, które współpracują ze sobą w celu realizacji ruchu.
+- **Sterownik PLC:** Mózg układu (np. Siemens S7-1200, S7-1500), odpowiedzialny za obliczenia dotyczące pozycjonowania osi oraz wydawanie komend ruchu.
+- **Serwowzmacniacz (przekształtnik):** Odbiera telegramy wysyłane ze sterownika PLC poprzez sieć PROFINET i steruje serwosilnikiem. Seria V90 występuje w wersjach sterowanych sieciowo lub poprzez impulsy PTI (Pulse Train Input).
+- **Serwosilnik:** Zainstalowany w układzie mechanicznym (np. napęd liniowy ze śrubą kulową), wykonuje ruch zgodnie z komendami ze wzmacniacza.
+*Źródło: transkrypcje ControlByte*
+
+### 16.7. Jakie oprogramowanie jest wymagane do konfiguracji i programowania serwonapędu Sinamics V90?
+Do konfiguracji i programowania serwonapędów Sinamics V90 niezbędne są dwa główne środowiska programistyczne i narzędzia.
+- **Sinamics V-Assistant Commissioning tool:** Oprogramowanie służące do wstępnej konfiguracji serwowzmacniacza, testowania (np. tryb Jog), przywracania ustawień fabrycznych, wyboru serwomotoru, ustawiania trybu sterowania i przeprowadzania auto-tuningu.
+- **TIA Portal (wersja 15.1 lub nowsza):** Środowisko do programowania sterownika PLC (np. S7-1200, S7-1500), konfiguracji sieci PROFINET (nadawanie adresu IP i nazwy PROFINETowej serwowzmacniaczowi) oraz pisania programu użytkownika do sterowania napędem.
+*Źródło: transkrypcje ControlByte*
+
+### 16.8. Jakie są dostępne tryby sterowania dla serwowzmacniacza Sinamics V90 i jakie sterowniki PLC są z nimi kompatybilne?
+Serwowzmacniacz Sinamics V90 oferuje dwa główne tryby sterowania, z których każdy ma określone wymagania dotyczące sterownika PLC.
+- **Speed Control (Sterowanie prędkością):** W tym trybie serwowzmacniacz V90 współpracuje ze sterownikiem S7-1200. Wzmacniacz odpowiada za regulowanie prędkości do zadanej wartości, natomiast sterownik PLC wykonuje obliczenia związane z pozycjonowaniem.
+- **Basic Positioner Control (Sterowanie pozycjonerem):** Ten tryb wymaga zastosowania sterownika S7-1500. W tym przypadku serwowzmacniacz samodzielnie realizuje funkcje pozycjonowania.
+- Wybór odpowiedniego telegramu PROFINET jest kluczowy; sterownik S7-1200 współpracuje z telegramami 1, 2 lub 3, natomiast telegram 102 wymaga sterownika S7-1500.
+*Źródło: transkrypcje ControlByte*
+
+### 16.9. Na czym polega procedura One Button Auto Tuning w Sinamics V-Assistant i jakie parametry są optymalizowane?
+Procedura One Button Auto Tuning w oprogramowaniu Sinamics V-Assistant służy do automatycznej optymalizacji regulatorów serwonapędu Sinamics V90, dostosowując je do właściwości dynamicznych układu mechanicznego.
+- Podczas auto-tuningu serwomechanizm wykonuje ruch w określonym zakresie (np. jeden obrót), analizując obciążenie i dynamikę układu.
+- W wyniku tej procedury zmieniane są parametry regulatora prędkości, takie jak wzmocnienie (gain) i czas zdwojenia (integral time) dla części całkującej.
+- Parametry regulatora pozycji pozostają bez zmian, ponieważ w trybie prędkościowym (Speed Control) nie są one wykorzystywane przez serwowzmacniacz.
+- Zoptymalizowane wartości są zapisywane w pamięci nieulotnej ROM urządzenia.
+*Źródło: transkrypcje ControlByte*
+
+### 16.10. Do czego służy blok funkcyjny MC_MoveJog w TIA Portal i jakie są jego podstawowe parametry wejściowe?
+Blok funkcyjny MC_MoveJog w TIA Portal służy do sterowania osią z zadaną prędkością, najczęściej wykorzystywany jest do ruchu w trybie ręcznym (JOG), ale może być również używany w normalnym cyklu pracy maszyny.
+- Jest to blok typu Enable, co oznacza, że działa tak długo, dopóki na jego wejściu `JogForward` lub `JogBackward` podany jest stan wysoki.
+- **`Axis`:** Referencja do obiektu technologicznego (SpeedAxis, PositioningAxis, SynchronousAxis).
+- **`JogForward` (BOOL):** Aktywuje ruch osi do przodu.
+- **`JogBackward` (BOOL):** Aktywuje ruch osi do tyłu (jednoczesne aktywowanie obu powoduje błąd).
+- **`Velocity` (Long Real):** Bezwzględna wartość prędkości, z jaką oś ma się poruszać (np. w mm/s); wartość ujemna jest traktowana jako bezwzględna, a kierunek nadaje `JogForward`/`JogBackward`.
+- **`Acceleration`, `Deceleration`, `Jerk` (Long Real):** Parametry dynamiki ruchu; wartość -1 powoduje użycie parametrów skonfigurowanych w obiekcie technologicznym.
+- **`PositionControl` (BOOL):** Aktywuje regulator pozycji (domyślnie True).
+*Źródło: transkrypcje ControlByte*
+
+### 16.11. Jakie są kluczowe cechy i zachowania bloku MC_MoveJog podczas pracy?
+Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami statusowymi, które informują o jego działaniu i umożliwiają dynamiczną kontrolę ruchu.
+- Po aktywacji ruchu (np. `JogForward` = True), na wyjściu `Busy` pojawia się stan True, a po osiągnięciu zadanej prędkości, bit `InVelocity` również przyjmuje wartość True.
+- W przypadku błędnej parametryzacji (np. nieodpowiednie przyspieszenie), na wyjściu `Error` pojawia się True, a `ErrorID` wskazuje kod błędu (np. 8004h dla "Illegal acceleration specification").
+- Podczas trwania ruchu możliwe jest dynamiczne zmienianie parametrów `Velocity`, `Acceleration`, `Deceleration` i `Jerk` "w locie", co jest przydatne w aplikacjach wymagających adaptacji prędkości.
+- Podanie wartości 0 dla `Velocity` podczas aktywnego bloku spowoduje zahamowanie osi i utrzymanie prędkości zerowej.
+*Źródło: transkrypcje ControlByte*
+
+### 16.12. Jakie są parametry enkoderów inkrementalnych i absolutnych — rozdzielczość, co mogą i czego nie mogą?  🟡
+
+**Enkoder inkrementalny — kluczowe parametry:**
+
+| Parametr | Typowe wartości | Opis |
+|----------|----------------|------|
+| **PPR** *(Pulses Per Revolution)* | 100 / 512 / 1024 / 2048 / 4096 / 8192 | Impulsy na jeden pełny obrót osi enkodera |
+| **Napięcie zasilania** | 5 V DC (TTL) / 12–24 V DC (HTL) | TTL = linie różnicowe, HTL = sygnał push-pull |
+| **Sygnały** | A, B (faza 90°), Z (indeks/zerowy) | A+B → kierunek i liczba impulsów; Z → punkt odniesienia |
+| **Max częstotliwość** | do 500 kHz (HTL) / do 1 MHz (TTL) | Limit dla modułu licznikowego lub wejścia HSC |
+| **Ochrona** | IP54–IP67 | Zależnie od producenta i montażu |
+
+**Enkoder absolutny — kluczowe parametry:**
+
+| Parametr | Typowe wartości | Opis |
+|----------|----------------|------|
+| **Rozdzielczość single-turn** | 12–25 bit | 17 bit = 131 072 pozycji/obrót (typowy HIPERFACE/EnDat) |
+| **Rozdzielczość multi-turn** | 12 bit dodatkowe | 4096 pełnych obrotów liczonych niezależnie |
+| **Interfejs** | SSI, EnDat 2.1/2.2, HIPERFACE, HIPERFACE DSL | Patrz Q16.13 |
+| **Czas odpowiedzi** | do 8 µs (EnDat 2.2) | Limit dla krótkiego czasu cyklu napędu |
+| **Diagnostyka** | temperatura, błędy wewnętrzne | Dostępna przez EnDat 2.2 i HIPERFACE DSL |
+
+**Co mogą:**
+- Precyzyjne pozycjonowanie do ±1 impulsu (inkrementalny) lub ±0.003° przy 17 bit (absolutny)
+- Pomiar prędkości: $n = (f 	imes 60) / PPR$ [rpm]
+- Multi-turn absolutny: śledzenie pozycji przez wiele obrotów bez zasilania bateryjnego
+- Diagnostyka wewnętrzna (temperatura, błędy — EnDat 2.2, HIPERFACE DSL)
+- Synchronizacja osi (`TO_ExternalEncoder` w TIA Portal) — wałek wirtualny, master-slave
+
+**Czego nie mogą:**
+- **Inkrementalny:** nie pamięta pozycji po zaniku zasilania → **zawsze wymaga homing** po resecie
+- **Inkrementalny:** nie ma jednoznacznej pozycji absolutnej → niebezpieczne przy osiach pionowych z obciążeniem
+- **Absolutny single-turn:** zlicza tylko jeden obrót → po >360° traci pozycję absolutną
+- **Standard enkodery:** nie są certyfikowane Safety → **nie można ich używać dla SLS/SDI** (wymagają enkoder Safety: HIPERFACE Safety lub EnDat Safety)
+- **HTL przy dużej prędkości:** ograniczona częstotliwość (~500 kHz) → przy dużej prędkości i wysokim PPR może dochodzić do utraty impulsów
+
+> ⚠️ **Safety funkcje SLS/SDI:** SINAMICS wymaga enkodera certyfikowanego Safety (HIPERFACE Safety lub EnDat Safety) wbudowanego w silnik — standardowy enkoder przemysłowy nie spełnia wymagań IEC 61800-5-2 dla „safe encoder feedback".
+
+> 💡 **Przelicznik rozdzielczości:** enkoder 1024 PPR z interpolacją ×4 (A, /A, B, /B) daje **4096 kroków/obrót** — to standardowe zachowanie modułu HSC lub SINAMICS przy zliczaniu czterech zboczy.
+
+
+### 16.13. Jakie są interfejsy enkoderów i jak konfigurujesz enkoder w SINAMICS i TIA Portal?  🟡
+
+**Przegląd interfejsów:**
+
+| Interfejs | Typ sygnału | Napięcie | Kierunek | Typowe zastosowanie |
+|-----------|------------|----------|----------|---------------------|
+| **TTL (A/B/Z)** | Cyfrowy różnicowy | 5 V DC | Jednostronny | S7-1200 HSC, proste osi, tanie aplikacje |
+| **HTL (A/B/Z)** | Cyfrowy push-pull | 12–24 V DC | Jednostronny | Środowisko przemysłowe, odporność na EMC |
+| **Sin/Cos 1 Vpp** | Analogowy sinusoidalny | 5 V / 12 V | Jednostronny | G120 z CU240E, wysoka rozdzielczość przez interpolację |
+| **SSI** | Szeregowy synchroniczny | 5 V / 12 V | Jednostronny | Absolutne enkoderzy starszej generacji |
+| **EnDat 2.1/2.2** | Szeregowy, dwukierunkowy | 5 V DC | Dwukierunkowy | S120, SIMOTION, nowoczesne SINAMICS — wysoka dynamika |
+| **HIPERFACE** | Sin/Cos + RS-485 | 7–12 V DC | Dwukierunkowy | Silniki Siemens 1FK7/1FT7 (classic) |
+| **HIPERFACE DSL** | Cyfrowy, tylko 2 żyły | 5 V DC | Dwukierunkowy | V90 z 1FG/1FK7 — kabel enkodera = kabel mocy |
+
+**Konfiguracja w SINAMICS Startdrive:**
+
+| Parametr | Opis | Przykładowe wartości |
+|----------|------|---------------------|
+| `p0400` | Typ enkodera | 0=brak, 1=TTL/HTL inkr., 4=SSI, 9=EnDat 2.2, 11=HIPERFACE sin/cos |
+| `p0404` | Liczba PPR (impulsy/obrót) | 1024, 2048, 4096, 8192 |
+| `p0406` | Napięcie zasilania enkodera | 0=5V, 1=12V, 2=24V |
+| `p0408` | Liczba bitów SSI | 10–30 bit |
+| `p0418` | Współczynnik interpolacji sin/cos | 1024 lub 2048 |
+| `p0431` | Korekta offsetu enkodera (fine adjust) | Wartość w impulsach |
+
+**Konfiguracja Technology Object (TIA Portal Motion Control):**
+1. TIA Portal → Technology objects → wybrany TO (`TO_PositioningAxis` lub `TO_ExternalEncoder`)
+2. Zakładka `Encoder` → `Encoder type`: Incremental / Absolute
+3. Ustaw: `Data exchange type` (np. PROFIdrive, analog sin/cos, HSC module)
+4. `Encoder resolution`: podaj PPR lub ilość bitów
+5. Dla `TO_ExternalEncoder`: wskaż moduł HSC (S7-1200) lub interfejs sieciowy enkodera (ET200S counting module)
+
+**Wejście HSC (High Speed Counter) w S7-1200/S7-1500 dla enkoderów TTL/HTL:**
+- S7-1200: wbudowane HSC (`HSC1–HSC6`) — max **100 kHz** na kanał; moduł SB 1221 High Speed zwiększa do **200 kHz**
+- S7-1500T: moduł TM PosInput (6ES7138-6AA01) dla enkoderów sin/cos / TTL do 1 MHz
+
+> ⚠️ **PROFINET enkoder z Technology Object:** telegram `102` (z enkoderem) wymaga że SINAMICS odbiera pozycję z wbudowanego enkodera przez Startdrive, następnie przesyła ją do CPU przez PROFINET jako część PZD telegramu. Telegramy `1` i `20` **nie zawierają** danych enkodera — tylko prędkość!
+
+> 💡 **HIPERFACE DSL:** jeden kabel do serwosilnika zawiera jednocześnie zasilanie silnika (3 fazy + PE) i sygnał enkodera DSL — brak osobnego kabla enkodera. Stosowany w Sinamics V90 z silnikami 1FK7. Upraszcza montaż ale wymaga specjalnego kabla (Siemens Motion Connect 500).
+
+
 ---
 
 ## 17. REALNE SCENARIUSZE COMMISSIONING
@@ -1560,6 +1798,26 @@ Skalowalny projekt TIA Portal to taki, który można rozszerzać (nowe urządzen
 
 > 💡 **Na rozmowie:** skalowalność = biblioteki + UDT + tablice. Pokaż przykład: "Mamy 12 zaworów w tablicy, dodanie 13. to zmiana jednej stałej `MAX_VALVES`."
 
+### 17.7. Co sprawdzasz na FAT (Factory Acceptance Test) dla instalacji z Safety? 🟡
+FAT (Factory Acceptance Test) to weryfikacja systemu u producenta maszyny przed wysyłką do klienta. Dla Safety obejmuje funkcjonalne testy każdej funkcji bezpieczeństwa zgodnie z wymaganiami normy EN ISO 13849-1 i dokumentacją techniczną.
+- Weryfikacja F-Signatures (F-DB i F-CPU): sprawdź match między TIA Portal a CPU → F-Program → Signature Comparison
+- Test każdego E-Stop fizycznie: wciśnij → CPU pasywuje → wyjścia = substitute values → zwolnij → ACK → restart
+- Test discrepancy: symuluj opóźnienie jednego kanału 1oo2 > discrepancy time → passivation
+- Test muting: aktywuj oba czujniki muting w oknie czasowym → kurtyna działa → odblokowanie
+- Test napędów Safety: sprawdź STO, SS1, SLS każdej osi — porównaj z Safety Matrix
+- Documented: każdy test zapisany w protokole FAT z datą, podpisem, numerem PO
+- Checklista: F-Version, F-Address, F-Monitoring Time, passivation time, substitute values
+
+### 17.8. Jak realizujesz SAT (Site Acceptance Test) po dostarczeniu maszyny do klienta? 🟡
+SAT (Site Acceptance Test) to weryfikacja systemu na miejscu klienta po instalacji. Różni się od FAT tym, że uwzględnia rzeczywiste środowisko: okablowanie obiektowe, medium procesowe, warunki bezpieczeństwa operacyjnego.
+- Krok 1: Upload projektu z CPU i porównaj z referencją z FAT (Project → Compare)
+- Krok 2: Sprawdź F-Signature CPU vs wartość zapisana w FAT-protokole — muszą być identyczne
+- Krok 3: Fizyczny test E-Stop i kurtyn w normalnych warunkach pracy maszyny
+- Krok 4: Próba produkcyjna z rzeczywistym materiałem (opcjonalnie)
+- Krok 5: Przeszkolenie operatorów i techników serwisu
+- Dokumentacja: protokół SAT + podpis inżyniera Safety i przedstawiciela klienta
+- Jeśli F-Signature różni się od FAT → STOP — ktoś zmienił program po FAT, eskalacja
+
 ---
 
 ## 18. TIA PORTAL — ZAAWANSOWANE FUNKCJE
@@ -1624,6 +1882,26 @@ TIA Portal rozróżnia typy downloadów — wybierz najmniej inwazyjny dla sytua
 
 > 💡 **Security w produkcji:** zawsze włącz `Basic256Sha256` + certyfikaty. OPC UA bez szyfrowania to otwarta furtka do odczytu (i zapisu!) wszystkich tagów PLC.
 
+### 18.4. Czym jest SIMATIC ProDiag i jak konfigurujesz pierwsze monitory diagnostyczne? 🟡
+ProDiag (Process Diagnostics) to narzędzie TIA Portal do tworzenia automatycznej diagnostyki maszynowej generując alarmy HMI wprost z warunków logicznych PLC bez programowania w blokach.
+- Dostępny od: TIA Portal V14 SP1, dla S7-1500 i ET200SP z CPU
+- Konfiguracja: Devices & Networks → CPU → ProDiag → Add monitor
+- Monitor = warunek logiczny (np. „siłownik nie dosunął się w 5s") → automatyczny alarm HMI + log
+- Typy monitorów: Supervision (stan), Process Monitor (czas reakcji), Travel movement (pozycja)
+- Krok 1: Zdefiniuj warunek triggering (bool z programu PLC)
+- Krok 2: Przypisz tekst alarmu (wielojęzyczny) i kategorie (Error, Warning, Info)
+- Krok 3: Skompiluj → alarmy automatycznie pojawiają się w HMI bez dodatkowej konfiguracji WinCC
+- Korzyść: czas od awarii do diagnozy przyczyny bez przeglądania kodu — operator widzi kontekst
+
+### 18.5. Jak używasz funkcji Compare (porównywanie) w TIA Portal i co konkretnie porównujesz? 🟢
+Compare to narzędzie TIA Portal umożliwiające porównanie projektu online (CPU) z projektem offline (plik), wykrywające różnice w logice, konfiguracji sprzętu i danych — kluczowe przy commissioning i utrzymaniu.
+- Dostęp: Menu Project → Compare → Online/Offline
+- Kolory wyników: identyczne (biały), zmienione (żółty), tylko offline (niebieski), tylko online (czerwony)
+- Co porównujesz: bloki programu, konfigurację HW, DB — osobno lub wszystko naraz
+- Przy SAT: porównaj CPU (online) vs referencja FAT (offline) → sprawdź zero czerwonych/żółtych różnic
+- Przy serwisie: sprawdź czy serwisant nie zmienił czegoś bez dokumentacji
+- F-Program: po porównaniu sprawdź F-Signature — zmiana dowolnego F-bloku zmienia signature
+- Export: wynik porównania możesz drukować do PDF jako dowód zgodności
 
 ## 19. COMMISSIONING — DODAWANIE STACJI I URZĄDZEŃ DO PROJEKTU
 
