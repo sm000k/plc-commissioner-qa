@@ -4,10 +4,27 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v10 — 2026-03-30 — Wersja stabilna ✅ AKTYWNA WERSJA
+## qa_draft_v10 — edycja ciągła ✅ AKTYWNA WERSJA
 
-### Zmiany vs v9:
-- Brak nowych pytań — wersja stabilna po sesji redakcyjnej 2026-03-30
+### Stan: 113 pytań, 19 sekcji — po sesjach redakcyjnych 2026-03-30 i późniejszych
+
+### Zmiany redakcyjne (sesja formatowania):
+- **Global reformat:** `•` → `-` bullets, blank lines przed/po nagłówkach `###`, collapse 3+ blank lines, strip trailing whitespace (1287 → 1394 linii)
+- **Sekcja 5** (Passivation/Reintegration/ACK): pełny enriched reformat — tabele, blockquotes `> ⚠️` / `> 💡`, checklisty `- [ ]`, color spans, backtick zmienne
+- **Sekcja 6** (Safe State): dodano tabelę urządzenie→Safe State, blockquotes, backtick dla `substitute value`
+- **Sekcja 7** (PROFIsafe): dodano tabelę pakiet PROFIsafe, tabelę F-peripheral IP/montaż, blockquotes dla F-Address warning i F-monitoring time
+- **Sekcja 4** (Struktury głosowania): przepisano na tabelę XooY + blockquoty z pułapkami
+- **Sekcja 8.1–8.4** (SINAMICS Safety): Q8.1 color span STO + różnica od OFF, Q8.2 tabela STO vs wyłączenie programowe, Q8.3 color span SS1, Q8.4 przepisano na tabelę SS2/SOS/SLS/SDI/SBC
+- **Sekcja 2.1** (Safety arch): color span SIMATIC Safety Integrated, bullet list korzyści
+- **Sekcja 13.1**: przepisano na tabelę Kat.0/1/2 → STO/SS1/SS2; blockquote norma EN 60204-1
+- **Sekcja 13.2**: przepisano LSafe_EStop — rozdzielono wejścia/wyjścia, dodano blockquote
+- **Naprawiono**: obraz `06d_wiring_et200mp_p9.png` → `06e_wiring_et200mp_p10.png` (Q3.8 — właściwy schemat Figure 3-1)
+
+### Dodane pytania:
+- **Q17.6** „Po czym poznajesz że projekt TIA Portal jest skalowalny?" — dodane do sekcji 17 (Realne scenariusze)
+
+### Poprzedni stan vs v9:
+- Brak nowych pytań przy pierwszej promocji — wersja stabilna po sesji redakcyjnej 2026-03-30
 - **112 pytań, 19 sekcji** — identyczna treść z v9 po wszystkich poprawkach
 - Plik roboczy przeniesiony do `qa_draft_v10.md`
 
