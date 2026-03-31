@@ -1854,6 +1854,24 @@ Poniższa procedura opisuje uruchomienie napędu G120 (CU240E-2 PN + PM240-2) z 
 3. Monitoruj słowo statusowe ZSW1 (`r0052`) — bit 2 = napęd gotowy, bit 4 = napęd w ruchu
 4. Zapisz parametry do ROM: `p0971 = 1` (zapis trwały) lub przez Startdrive → `Save to device`
 
+**Faza 7 — Konfiguracja przekładni (jeśli silnik pracuje przez reduktor):**
+
+Gdy między silnikiem a maszyną roboczą znajduje się przekładnia mechaniczna, G120 musi znać jej przełożenie — inaczej prędkość wyświetlana i regulowana odnosi się do wału silnika, nie do wału roboczego.
+
+| Parametr | Opis | Przykład (i = 10:1) |
+|----------|------|-------------------|
+| `p0521` | Licznik przełożenia (obroty silnika) | `10` |
+| `p0522` | Mianownik przełożenia (obroty wału roboczego) | `1` |
+| `p2000` | Prędkość referencyjna (odnosi się do wału **silnika**) | np. 1500 rpm |
+
+> ⚠️ `p0521`/`p0522` są aktywne tylko gdy włączony jest enkoder po stronie silnika (tryb Vector z enkoderem, `p1300 = 21`). W trybie V/f (`p1300 = 0`) napęd nie koryguje prędkości o przekładnię — PLC musi przeliczać samodzielnie.
+
+**Praktyczna wskazówka przy przekładni:**
+- Prędkość zadana z PLC (HSW) zawsze odnosi się do `p2000` (prędkość silnika)
+- Jeśli chcesz zadawać prędkość wału roboczego: PLC mnoży żądaną prędkość roboczą × przełożenie przed wysłaniem do HSW
+- Przy enkodzie na wale **roboczym** (za przekładnią): enkoder podłącz do CU, ustaw `p0408` (PPR enkodera), system automatycznie reguluje prędkość wału roboczego
+- Sprawdź luzy w przekładni (`backlash`) — przy wektorowym sterowaniu mogą powodować oscylacje regulatora prędkości → obniż wzmocnienie `p1460` (Kp regulatora prędkości)
+
 **Kluczowe parametry diagnostyczne:**
 
 | Parametr | Opis |
@@ -1870,6 +1888,7 @@ Poniższa procedura opisuje uruchomienie napędu G120 (CU240E-2 PN + PM240-2) z 
 > - `F07011` (Motor blocked) → silnik zablokowany mechanicznie lub zbyt mały moment
 > - `A07991` (Motor data missing) → nie wykonano kreatora komisjoningu
 > - Brak komunikacji PROFINET → sprawdź `p8920`/`p8921` i zgodność telegram PLC↔napęd
+> - Silnik obraca się za szybko / za wolno → sprawdź `p0521`/`p0522` (przełożenie przekładni)
 
 > 💡 **Szybki test bez PLC:** Startdrive → Control panel → przełącz na `Manual` → JOG. Działa nawet bez podłączonego sterownika.
 
