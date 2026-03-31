@@ -4,7 +4,35 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v11 — 2026-03-30 ✅ AKTYWNA WERSJA
+## qa_draft_v12 — 2026-03-31 ✅ AKTYWNA WERSJA
+
+### Stan: 146 pytań, 19 sekcji — +9 nowych pytań vs v11
+
+### Źródła nowej wiedzy:
+- Transkrypcje ControlByte: rygle bezpieczeństwa, PackML/OOP, radar Safety, HMI Template Suite
+- Priorytetowe tematy (PLAN NAUKI): IO-Link, S7-1500H, PROFINET TSN, IE5 silniki
+- Ręczna edycja (Copilot Agent)
+
+### Nowe pytania wg sekcji:
+| Sekcja | v11 | v12 | +Δ | Dodane tematy |
+|--------|-----|-----|-----|--------------|
+| **1** Podstawy PLC | 15 | 16 | +1 | Q1.16 IO-Link — Data Storage, tryby AI/IO-Link |
+| **2** Architektura Safety | 8 | 9 | +1 | Q2.9 S7-1500H Hot Standby — sync link, bumpless switchover |
+| **14** PROFINET zaawansowane | 7 | 8 | +1 | Q14.8 PROFINET TSN — IEEE 802.1Qbv, preemption, porównanie z IRT |
+| **15** Kurtyny i Muting | 4 | 6 | +2 | Q15.5 Elektrorygiel (PSENmlock/PSENslock 2), Q15.6 Czujnik radarowy PSEN RD 1.2 |
+| **16** Motion Control | 13 | 14 | +1 | Q16.14 Silniki IE5/IPM — p0300, klasy sprawności IEC 60034-30-1 |
+| **17** Realne scenariusze | 8 | 9 | +1 | Q17.9 Diagnostyka legacy projektu TIA Portal |
+| **18** TIA Portal adv. | 5 | 7 | +2 | Q18.6 PackML standard ISA-88, Q18.7 HMI Template Suite |
+
+### Kluczowe dodane treści:
+- Tabele porównawcze: IE3 vs IE5, IRT vs TSN, PSENmlock vs PSENslock, radar vs laser
+- Nowe parametry: `p0300`, `p1910`, `p1960` (typ silnika w SINAMICS)
+- Nowe normy: IEC 60034-30-1 (klasy sprawności silników), ISA-88 (PackML)
+- Nowe urządzenia: PSEN RD 1.2 (radar), PSENmlock mini/PSENslock 2, SIMOTICS GP 1LA (IE5)
+
+---
+
+## qa_draft_v11 — 2026-03-30
 
 ### Stan: 134 pytań, 19 sekcji — +21 nowych pytań vs v10
 
