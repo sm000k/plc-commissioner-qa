@@ -1691,46 +1691,123 @@ Praktyczne wskazówki:
 - Na panelu BOP-2: długie wciśnięcie ESC/OK
 - Historia faultów: `r0945[0..7]`
 
-### 16.5. Czym jest Motion Control i jakie silniki są w nim wykorzystywane?
+### 16.5. Czym jest SINAMICS G120 i do jakich silników oraz aplikacji jest przeznaczony? 🔴
 
-Motion Control to dziedzina automatyki zajmująca się precyzyjnym sterowaniem ruchem części mechanicznych maszyn, wymagająca wysokiej dokładności pozycjonowania i często dużej dynamiki.
-- **Definicja:** Precyzyjne sterowanie ruchem.
-- **Silniki wykorzystywane w Motion Control:**
-  - **Silniki DC szczotkowe:** Używane w przeszłości w układach serwo ze względu na prosty układ sterowania. Obecnie rzadko, głównie w pozycjonerach o małej liczbie cykli, w trybie pracy dorywczej.
-  - **Silniki asynchroniczne klatkowe z enkoderem:** Stosowane w aplikacjach o małej dynamice. Charakteryzują się słabą dynamiką ze względu na duży moment bezwładności wirnika.
-  - **Silniki asynchroniczne przystosowane do pracy serwo:** Ulepszona wersja silników asynchronicznych, ze zmniejszoną wagą i momentem bezwładności wirnika, co poprawia dynamikę. Posiadają zabudowany enkoder.
-  - **Silniki synchroniczne z magnesami trwałymi (Servo Motors):** Najlepsze parametry dynamiczne, najczęściej wykorzystywane w aplikacjach precyzyjnego sterowania ruchem.
-  - **Silniki liniowe:** Odmiana silnika synchronicznego z magnesami trwałymi, gdzie wirnik jest rozwinięty do postaci listwy, a stojan ma formę sztaby mocowanej do wózka.
-  - **Silniki krokowe:** Tanie w produkcji.
-*Źródło: transkrypcje ControlByte*
+**SINAMICS G120** to rodzina przemysłowych przemienników częstotliwości (falowników) firmy Siemens przeznaczonych do regulacji prędkości silników indukcyjnych (asynchronicznych) klatkowych w aplikacjach ogólnoprzemysłowych.
 
-### 16.6. Jakie są podstawowe komponenty układu napędowego opartego o serwonapęd Sinamics V90 i sterownik Siemens?
-Kompletny układ napędowy oparty o serwonapęd Sinamics V90 składa się z trzech głównych komponentów, które współpracują ze sobą w celu realizacji ruchu.
-- **Sterownik PLC:** Mózg układu (np. Siemens S7-1200, S7-1500), odpowiedzialny za obliczenia dotyczące pozycjonowania osi oraz wydawanie komend ruchu.
-- **Serwowzmacniacz (przekształtnik):** Odbiera telegramy wysyłane ze sterownika PLC poprzez sieć PROFINET i steruje serwosilnikiem. Seria V90 występuje w wersjach sterowanych sieciowo lub poprzez impulsy PTI (Pulse Train Input).
-- **Serwosilnik:** Zainstalowany w układzie mechanicznym (np. napęd liniowy ze śrubą kulową), wykonuje ruch zgodnie z komendami ze wzmacniacza.
-*Źródło: transkrypcje ControlByte*
+**Podstawowe dane:**
+- Zakres mocy: 0,37 kW – 250 kW (napięcie 3×400V AC / 3×690V AC)
+- Topologia: modułowa — Control Unit (CU) + Power Module (PM) + opcjonalnie BOP (panel operatorski)
+- Komunikacja: PROFINET, PROFIBUS, USS, Modbus RTU (zależy od wersji CU)
 
-### 16.7. Jakie oprogramowanie jest wymagane do konfiguracji i programowania serwonapędu Sinamics V90?
-Do konfiguracji i programowania serwonapędów Sinamics V90 niezbędne są dwa główne środowiska programistyczne i narzędzia.
-- **Sinamics V-Assistant Commissioning tool:** Oprogramowanie służące do wstępnej konfiguracji serwowzmacniacza, testowania (np. tryb Jog), przywracania ustawień fabrycznych, wyboru serwomotoru, ustawiania trybu sterowania i przeprowadzania auto-tuningu.
-- **TIA Portal (wersja 15.1 lub nowsza):** Środowisko do programowania sterownika PLC (np. S7-1200, S7-1500), konfiguracji sieci PROFINET (nadawanie adresu IP i nazwy PROFINETowej serwowzmacniaczowi) oraz pisania programu użytkownika do sterowania napędem.
-*Źródło: transkrypcje ControlByte*
+**Stosowane silniki:**
+| Typ silnika | Tryb sterowania G120 | Typowe zastosowanie |
+|-------------|---------------------|-------------------|
+| Silnik indukcyjny klatkowy (IM) | V/f, Vector (VVC+) | Wentylatory, pompy, przenośniki |
+| Silnik indukcyjny z enkoderem | Vector closed-loop | Wciągarki, prasy, mieszalniki |
+| PMSM / IPM (IE4/IE5) | Vector PMSM | Sprężarki, pompy wysokosprawne |
 
-### 16.8. Jakie są dostępne tryby sterowania dla serwowzmacniacza Sinamics V90 i jakie sterowniki PLC są z nimi kompatybilne?
-Serwowzmacniacz Sinamics V90 oferuje dwa główne tryby sterowania, z których każdy ma określone wymagania dotyczące sterownika PLC.
-- **Speed Control (Sterowanie prędkością):** W tym trybie serwowzmacniacz V90 współpracuje ze sterownikiem S7-1200. Wzmacniacz odpowiada za regulowanie prędkości do zadanej wartości, natomiast sterownik PLC wykonuje obliczenia związane z pozycjonowaniem.
-- **Basic Positioner Control (Sterowanie pozycjonerem):** Ten tryb wymaga zastosowania sterownika S7-1500. W tym przypadku serwowzmacniacz samodzielnie realizuje funkcje pozycjonowania.
-- Wybór odpowiedniego telegramu PROFINET jest kluczowy; sterownik S7-1200 współpracuje z telegramami 1, 2 lub 3, natomiast telegram 102 wymaga sterownika S7-1500.
-*Źródło: transkrypcje ControlByte*
+**Typowe aplikacje G120:**
+- Wentylatory i pompy (redukcja zużycia energii przez regulację prędkości)
+- Przenośniki taśmowe i rolkowe
+- Mieszalniki, ekstruktory, wciągarki
+- Sprężarki powietrza
 
-### 16.9. Na czym polega procedura One Button Auto Tuning w Sinamics V-Assistant i jakie parametry są optymalizowane?
-Procedura One Button Auto Tuning w oprogramowaniu Sinamics V-Assistant służy do automatycznej optymalizacji regulatorów serwonapędu Sinamics V90, dostosowując je do właściwości dynamicznych układu mechanicznego.
-- Podczas auto-tuningu serwomechanizm wykonuje ruch w określonym zakresie (np. jeden obrót), analizując obciążenie i dynamikę układu.
-- W wyniku tej procedury zmieniane są parametry regulatora prędkości, takie jak wzmocnienie (gain) i czas zdwojenia (integral time) dla części całkującej.
-- Parametry regulatora pozycji pozostają bez zmian, ponieważ w trybie prędkościowym (Speed Control) nie są one wykorzystywane przez serwowzmacniacz.
-- Zoptymalizowane wartości są zapisywane w pamięci nieulotnej ROM urządzenia.
-*Źródło: transkrypcje ControlByte*
+> ⚠️ **G120 ≠ serwonapęd** — G120 nie jest przeznaczony do precyzyjnego pozycjonowania (brak sprzężenia zwrotnego pozycji w standardzie). Do servo używaj SINAMICS S120 lub V90.
+
+*Źródło: Siemens SINAMICS G120 Getting Started / transkrypcje ControlByte*
+
+### 16.6. Jakie są podstawowe komponenty układu napędowego z SINAMICS G120 i sterownikiem Siemens? 🔴
+
+Kompletny układ z G120 składa się z kilku modułów, które można dobierać niezależnie.
+
+**Architektura modułowa G120:**
+
+| Komponent | Opis | Przykładowe typy |
+|-----------|------|-----------------|
+| **Control Unit (CU)** | "Mózg" napędu — sterowanie, komunikacja, Safety | CU240E-2 PN, CU250S-2 PN, CU230P-2 |
+| **Power Module (PM)** | Przekształtnik mocy — prostownik + falownik IGBT | PM240-2, PM250, PM330 |
+| **BOP-2 / IOP** | Panel operatorski — parametryzacja, diagnostyka | BOP-2 (basic), IOP-2 (graficzny) |
+| **Silnik** | Silnik indukcyjny klatkowy 3-fazowy | SIMOTICS GP, SD, DP |
+| **Sterownik PLC** | Wydaje rozkazy przez PROFINET/PROFIBUS | S7-1200, S7-1500 |
+
+**Połączenia:**
+- CU ↔ PM: złącze wewnętrzne (snap-in) lub kabel adaptera
+- PLC ↔ CU: PROFINET lub PROFIBUS — telegramy standardowe (1, 20, 352)
+- Czujnik temperatury silnika: PTC/KTY84 do wejścia CU (ochrona termiczna)
+
+> 💡 **PM250** ma funkcję odzysku energii (regeneracja do sieci) — stosowany przy wciągarkach i aplikacjach z hamowaniem.
+
+*Źródło: Siemens SINAMICS G120 Getting Started / transkrypcje ControlByte*
+
+### 16.7. Jakie oprogramowanie służy do konfiguracji i uruchomienia SINAMICS G120? 🔴
+
+Do uruchomienia G120 dostępne są trzy narzędzia — wybór zależy od zakresu prac.
+
+| Narzędzie | Zastosowanie | Kiedy używać |
+|-----------|-------------|-------------|
+| **Startdrive** *(wtyczka TIA Portal)* | Pełna konfiguracja, parametryzacja, diagnostyka online, Safety | Nowe projekty, integracja z PLC |
+| **STARTER** *(standalone)* | Parametryzacja offline/online, oscyloskop, Drive Control Chart | Starsze projekty, poza TIA |
+| **BOP-2 / IOP** | Parametryzacja ręczna na panelu napędu | Szybki serwis w terenie bez laptopa |
+| **SINAMICS Smart Access Module** | Parametryzacja przez Wi-Fi z przeglądarki | Uruchomienie mobilne |
+
+**Startdrive — kluczowe kroki commission:**
+1. TIA Portal → Add new device → Drives → SINAMICS G120 → wybierz CU i PM
+2. Konfiguracja silnika: `p0304` (napięcie), `p0305` (prąd), `p0307` (moc), `p0310` (częstotliwość), `p0311` (prędkość znamionowa)
+3. Identyfikacja silnika: `p1910 = 1` (pomiar stojana w stanie spoczynku) lub `p1960 = 1` (obracająca się identyfikacja)
+4. Wybór metody sterowania: `p1300` (0 = V/f, 20 = Vector bez enkodera, 21 = Vector z enkoderem)
+5. Download → Compile → Go online → Test Jog
+
+*Źródło: Siemens SINAMICS G120 Getting Started / transkrypcje ControlByte*
+
+### 16.8. Jakie tryby sterowania oferuje SINAMICS G120 i czym się różnią? 🟡
+
+G120 obsługuje kilka metod sterowania silnikiem — dobór zależy od wymagań aplikacji.
+
+| Tryb (`p1300`) | Nazwa | Enkoder | Dokładność prędkości | Zastosowanie |
+|----------------|-------|---------|---------------------|-------------|
+| **0** | V/f (liniowy) | Nie | ±3–5% | Wentylatory, pompy, proste przenośniki |
+| **2** | V/f z FCC (Flux Current Control) | Nie | ±2–3% | Wyższy moment przy małych prędkościach |
+| **20** | Vector (bez enkodera) | Nie | ±0,5% | Wymagania na moment, bez czujnika |
+| **21** | Vector (z enkoderem) | Tak | ±0,01% | Wciągarki, precyzyjne prędkości |
+| **22** | PMSM Vector (bez enk.) | Nie | ±0,5% | Silniki IE4/IE5 bez enkodera |
+| **23** | PMSM Vector (z enk.) | Tak | ±0,01% | Silniki IE4/IE5 z enkoderem |
+
+**Telegramy PROFINET dla G120:**
+- **Telegram 1** (standardowy): słowo sterujące STW1 + prędkość zadana (16-bit)
+- **Telegram 20**: rozszerzony — dodaje prąd, moment, status
+- **Telegram 352** (Safety): zawiera PROFIsafe — dla wersji CU z Safety Integrated
+
+> ⚠️ **p1300 = 0 (V/f)** nie reguluje momentu — przy przeciążeniu prędkość spada. Do stałego momentu niezależnego od obciążenia → Vector (p1300 = 20/21).
+
+*Źródło: Siemens SINAMICS G120 Getting Started / transkrypcje ControlByte*
+
+### 16.9. Jak przebiega procedura identyfikacji silnika (Motor ID) w SINAMICS G120 i dlaczego jest niezbędna? 🟡
+
+**Identyfikacja silnika** to pomiar elektrycznych parametrów podłączonego silnika przez napęd G120. Bez niej regulator wektorowy nie działa poprawnie — używa jedynie wartości tabliczkowych, które nie uwzględniają rzeczywistego okablowania i stanu silnika.
+
+**Dwa rodzaje identyfikacji:**
+
+| Parametr | Typ | Opis | Warunek |
+|----------|-----|------|---------|
+| `p1910 = 1` | **Stojanova (statyczna)** | Pomiar rezystancji stojana R1, indukcyjności rozproszenia — silnik stoi | Silnik może być połączony z maszyną |
+| `p1960 = 1` | **Wirująca (dynamiczna)** | Pomiar R1 + R2, indukcyjności magnesującej Lm — silnik obraca się | Silnik musi móc się obracać swobodnie |
+
+**Procedura `p1910` (statyczna) krok po kroku:**
+1. Podaj dane tabliczkowe silnika: `p0304`, `p0305`, `p0307`, `p0310`, `p0311`
+2. Ustaw `p1910 = 1` → przy następnym rozruchu napęd przeprowadzi pomiar
+3. Daj rozkaz RUN (Enable) → napęd wykonuje pomiar (~10–30 s), silnik może lekko drżeć
+4. Po zakończeniu `p1910` wraca do 0, parametry `p0350` (R1), `p0356` (Ls) są zapisane
+5. Zapisz parametry: `p0971 = 1` (zapis do ROM) lub przez Startdrive → Download
+
+**Dlaczego toważne:**
+- Zbyt wysokie R1 (długi kabel) → regulator wektorowy kompensuje automatycznie po ID
+- Silnik inny niż w danych tabliczkowych (np. przewinięty) → ID wykryje różniące się R1
+- Brak ID przy `p1300 = 20/21` → moment może być niedokładny o 20–40%
+
+> ⚠️ **Najczęstszy błąd na komisjoningu:** download projektu, pierwsze uruchomienie → silnik wibruje lub nie osiąga zadanej prędkości → przyczyną brak identyfikacji lub błędne dane tabliczkowe.
+
+*Źródło: Siemens SINAMICS G120 Getting Started / transkrypcje ControlByte*
 
 ### 16.10. Do czego służy blok funkcyjny MC_MoveJog w TIA Portal i jakie są jego podstawowe parametry wejściowe?
 Blok funkcyjny MC_MoveJog w TIA Portal służy do sterowania osią z zadaną prędkością, najczęściej wykorzystywany jest do ruchu w trybie ręcznym (JOG), ale może być również używany w normalnym cyklu pracy maszyny.
