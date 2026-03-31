@@ -20,8 +20,6 @@ sources/pdfs/
 sources/books/
 archive/docx/
 
-# Obrazy PNG (duże pliki)
-docs/images/
 
 # Cookies (dane wrażliwe)
 cookies.txt
