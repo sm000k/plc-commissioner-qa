@@ -12,6 +12,87 @@
 
 ---
 
+## SPIS TREŚCI
+
+### Sekcje
+- [1. Podstawy PLC i automatyki](#1-podstawy-plc-i-automatyki)
+- [2. Architektura SIMATIC Safety Integrated](#2-architektura-simatic-safety-integrated)
+- [3. Moduły F-DI / F-DO — okablowanie i parametry](#3-moduły-f-di--f-do--okablowanie-i-parametry)
+- [4. Struktury głosowania — 1oo1/1oo2/2oo2/2oo3](#4-struktury-głosowania--1oo11oo22oo22oo3)
+- [5. Passivation, Reintegration, ACK](#5-passivation-reintegration-ack)
+- [6. Safe State — bezpieczny stan](#6-safe-state--bezpieczny-stan)
+- [7. PROFIsafe — komunikacja Safety](#7-profisafe--komunikacja-safety)
+- [8. Napędy Safety — SINAMICS z wbudowanym Safety](#8-napędy-safety--sinamics-z-wbudowanym-safety)
+- [9. TIA Portal — Safety praktyka](#9-tia-portal--safety-praktyka)
+- [10. Robot ABB IRC5 — integracja z PLC](#10-robot-abb-irc5--integracja-z-plc)
+- [11. Commissioning i diagnostyka](#11-commissioning-i-diagnostyka)
+- [12. SICAR i napędy SINAMICS](#12-sicar-i-napędy-sinamics)
+- [13. E-Stop — normy, implementacja i obliczenia bezpieczeństwa](#13-e-stop--normy-implementacja-i-obliczenia-bezpieczeństwa)
+- [14. PROFINET — topologia, diagnostyka i zaawansowane funkcje](#14-profinet--topologia-diagnostyka-i-zaawansowane-funkcje)
+- [15. Kurtyny bezpieczeństwa i Muting](#15-kurtyny-bezpieczeństwa-i-muting)
+- [16. Motion Control i SINAMICS — praktyka commissioning](#16-motion-control-i-sinamics--praktyka-commissioning)
+- [17. Realne scenariusze commissioning](#17-realne-scenariusze-commissioning)
+- [18. TIA Portal — zaawansowane funkcje](#18-tia-portal--zaawansowane-funkcje)
+- [19. Commissioning — dodawanie stacji i urządzeń do projektu](#19-commissioning--dodawanie-stacji-i-urządzeń-do-projektu)
+
+### Pytania
+
+**1. Podstawy PLC**
+[1.1](#11-co-to-jest-plc-i-czym-różni-się-od-zwykłego-komputera--) · [1.2](#12-co-to-jest-scan-cycle-i-ile-trwa--) · [1.3](#13-co-to-jest-ob1-ob35-ob100--kiedy-każdego-używasz) · [1.4](#14-co-to-jest-fb-fc-db--kiedy-używasz-każdego--) · [1.5](#15-co-to-jest-udt-i-po-co-go-używasz) · [1.6](#16-co-to-są-języki-programowania-plc--lad-fbd-scl-graph) · [1.7](#17-co-to-jest-sygnał-4-20ma-i-dlaczego-nie-0-20ma) · [1.8](#18-co-to-jest-profinet-i-czym-różni-się-od-profibus--) · [1.9](#19-jakie-są-główne-rodziny-sterowników-plc-siemens-i-do-jakich-zastosowań-są-dedykowane) · [1.10](#110-jakie-są-kluczowe-aspekty-pamięci-sterownika-plc-siemens-s7-12001500) · [1.11](#111-jakie-są-warianty-cpu-s7-1200-i-jakie-mają-możliwości-rozbudowy) · [1.12](#112-co-to-jest-hmi-i-do-czego-służy-w-automatyce) · [1.13](#113-co-to-jest-scada-i-czym-różni-się-od-hmi) · [1.14](#114-co-to-jest-pid-i-kiedy-go-używasz-w-plc) · [1.15](#115-czym-jest-enkoder-i-jaka-jest-różnica-między-inkrementalnym-a-absolutnym--) · [1.16](#116-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc--)
+
+**2. Safety Integrated**
+[2.1](#21-co-to-jest-simatic-safety-integrated-i-co-oznacza-wszystko-w-jednym-sterowniku--) · [2.2](#22-co-to-jest-f-cpu-i-jak-działa-dual-channel-processing--) · [2.3](#23-jakie-sterowniki-siemens-obsługują-funkcje-safety) · [2.4](#24-co-to-jest-f-db-i-dlaczego-nie-można-go-edytować-ręcznie) · [2.5](#25-co-to-jest-f-signature-i-collective-signature--) · [2.6](#26-jakie-są-tryby-pracy-safety-cpu-i-jak-się-przełącza) · [2.7](#27-co-to-jest-step-7-safety-advanced-vs-safety-basic) · [2.8](#28-jakie-są-podstawowe-komponenty-i-zasady-programowania-sterowników-bezpieczeństwa-pilz-pnozmulti) · [2.9](#29-co-to-jest-s7-1500h-hot-standby-i-kiedy-go-stosujesz--)
+
+**3. F-DI / F-DO**
+[3.1](#31-co-to-jest-f-di-i-jak-różni-się-od-standardowego-di--) · [3.2](#32-co-to-jest-vs-pulse-testing-i-jak-wykrywa-usterki--) · [3.3](#33-dlaczego-czujniki-safety-podłącza-się-jako-nc-normalnie-zamknięty--) · [3.4](#34-co-to-jest-discrepancy-time-i-jak-go-konfigurujesz--) · [3.5](#35-co-to-jest-substitute-value-na-f-do-i-kto-decyduje-o-jego-wartości) · [3.6](#36-co-to-jest-pm-switching-i-pp-switching--różnica--) · [3.7](#37-co-to-jest-f-pm-e-i-do-czego-służy) · [3.8](#38-jak-bezpiecznie-wyłączyć-standardowe-moduły-wyjść-przez-safety) · [3.9](#39-jak-sterownik-bezpieczeństwa-reaguje-na-typowe-awarie-wejść-dwukanałowych-1oo2) · [3.10](#310-jakie-parametry-są-kluczowe-przy-konfiguracji-wejść-dwukanałowych-w-sterowniku-bezpieczeństwa)
+
+**4. Struktury głosowania**
+[4.1](#41-wyjaśnij-notację-xooy-i-podaj-przykład-każdej-architektury--) · [4.2](#42-kiedy-wybierasz-1oo2-a-kiedy-2oo2--) · [4.3](#43-jak-1oo2-jest-realizowane-w-module-f-di-siemens) · [4.4](#44-jak-sterownik-safety-reaguje-na-błąd-rozbieżności-sygnału-discrepancy-failure-w-konfiguracji-1oo2) · [4.5](#45-jakie-są-scenariusze-awaryjne-wykrywane-przez-moduł-safety-w-układzie-dwukanałowym-1oo2) · [4.6](#46-jak-parametr-reintegration-after-discrepancy-error-wpływa-na-obsługę-błędu-rozbieżności-sygnału) · [4.7](#47-co-to-jest-czas-rozbieżności-discrepancy-time-w-f-di-1oo2-i-co-się-dzieje-gdy-zostanie-przekroczony-) · [4.8](#48-jak-moduł-f-di-et200sp-wykrywa-zwarcie-między-kanałami-cross-circuit-detection-w-obwodzie-1oo2-)
+
+**5. Passivation / ACK**
+[5.1](#51-co-to-jest-passivation-i-co-się-dzieje-z-wyjściamiwejściami--) · [5.2](#52-dlaczego-moduł-nie-wraca-automatycznie-po-usunięciu-błędu) · [5.3](#53-moduł-nie-wychodzi-z-passivation--co-sprawdzasz) · [5.4](#54-co-to-jest-ack_req-i-ack_nec-w-praktyce--) · **6.** [6.1](#61-co-to-jest-safe-state-i-kto-go-definiuje) · [6.2](#62-dlaczego-safe-state-to-nie-zawsze-wyłączenie) · [6.3](#63-jak-f-do-substitute-value-wpływa-na-safe-state) · [6.4](#64-czym-różni-się-sto-jako-safe-state-napędu-sinamics-od-zatrzymania-programowego-off1off2-) · [6.5](#65-jak-konfigurujesz-substitute-values-dla-f-do-i-jaką-wartość-wybrać-dla-zaworu-siłownika-i-napędu-)
+
+**7. PROFIsafe**
+[7.1](#71-co-to-jest-profisafe-i-co-zawiera-jego-pakiet--) · [7.2](#72-co-to-jest-f-address-i-jak-go-konfigurujesz--) · [7.3](#73-co-to-jest-f-monitoring-time-i-co-się-dzieje-po-jego-przekroczeniu) · [7.4](#74-jak-safety-działa-przez-et200-zdalne-io-i-czym-jest-f-peripheral)
+
+**8. Napędy Safety**
+[8.1](#81-co-to-jest-sto-safe-torque-off-i-jak-działa--) · [8.2](#82-jaka-jest-różnica-między-sto-a-zwykłym-wyłączeniem-napędu-przez-plc) · [8.3](#83-co-to-jest-ss1-i-kiedy-go-używasz-zamiast-sto--) · [8.4](#84-co-to-są-ss2-sos-sls-sdi-sbc--) · [8.5](#85-jak-sto-jest-realizowane-sprzętowo--zaciski-vs-profisafe) · [8.6](#86-co-sprawdzasz-przy-commissioning-napędu-z-sto) · [8.7](#87-czym-różnią-się-telegramy-profidrive-1-20-102-352-i-jak-dobirasz-telegram-dla-napędu-sinamics) · [8.8](#88-jakie-funkcje-bezpieczeństwa-są-wbudowane-w-serwowzmacniacz-sinamics-v90-i-jak-należy-je-podłączyć)
+
+**9. Safety praktyka TIA**
+[9.1](#91-jak-wygląda-struktura-programu-safety-w-tia-portal) · [9.2](#92-jak-przekazujesz-sygnał-z-obszaru-f-do-standardowego-ob) · [9.3](#93-jak-wgrywasz-zmianę-w-programie-safety--) · [9.4](#94-co-się-dzieje-gdy-f-signature-nie-zgadza-się-po-wgraniu) · [9.5](#95-jak-czytasz-diagnostykę-f-modułu-online-w-tia-portal--) · [9.6](#96-co-to-jest-plcsim-i-jak-pomaga-w-safety) · [9.7](#97-co-to-jest-safety-matrix-w-tia-portal-i-jak-z-niej-korzystasz--) · [9.8](#98-jak-generujesz-safety-report--certyfikat-safety-w-tia-portal-i-co-zawiera--)
+
+**10. Robot ABB IRC5**
+[10.1](#101-jak-przebiega-komunikacja-siemens-plc-z-robotem-abb-irc5--) · [10.2](#102-co-to-jest-gsdml-i-jak-go-instalujesz-w-tia-portal) · [10.3](#103-jak-plc-wysyła-numer-programu-do-robota-i-jak-robot-go-odczytuje) · [10.4](#104-jak-działa-przesyłanie-offsetu-pozycji-z-plc-do-rapid) · [10.5](#105-jak-debugujesz-brak-komunikacji-profinet-między-plc-a-robotem) · [10.6](#106-jakie-protokoły-komunikacyjne-i-format-danych-są-wykorzystywane-do-integracji-robota-abb-irc5-z-plc-siemens) · [10.7](#107-jakie-są-kluczowe-elementy-struktury-telegramu-xml-wysyłanego-z-robota-abb-irc5-do-plc) · [10.8](#108-jak-przebiega-proces-dekodowania-telegramu-xml-z-robota-abb-w-sterowniku-plc-siemens)
+
+**11. Commissioning / diagnostyka**
+[11.1](#111-co-sprawdzasz-przed-pierwszym-run-safety--) · [11.2](#112-jak-testujesz-e-stop-podczas-commissioning--) · [11.3](#113-co-to-jest-fat-i-sat-w-kontekście-safety--) · [11.4](#114-jak-postępujesz-gdy-odkryjesz-błąd-w-logice-safety-po-fat) · [11.5](#115-jakie-są-najczęstsze-przyczyny-passivation-f-di-w-praktyce--) · [11.6](#116-jak-reagować-gdy-moduł-f-świeci-błędem-którego-nie-możesz-skasować) · [11.7](#117-jak-wygląda-typowy-workflow-pierwszego-commissioning-z-tia-portal--od-projektu-do-działającej-maszyny) · [11.8](#118-jakie-są-etapy-uruchomienia-napędu-sinamics-g120--od-sprzętu-do-pierwszego-ruchu) · [11.9 (ProDiag)](#1110-co-to-jest-prodiag-i-jak-go-używasz-do-diagnostyki-maszyny--)
+
+**12. SICAR / SINAMICS**
+[12.1](#121-co-to-jest-sicar-i-gdzie-jest-używany--) · [12.2](#122-co-to-są-tec-units-i-jak-z-nich-korzystasz--) · [12.3](#123-co-to-jest-sinamics-startdrive-w-tia-portal) · [12.4](#124-jak-konfigurujesz-sinamics-g120-z-safety-przez-profisafe--)
+
+**13. E-Stop**
+[13.1](#131-jakie-są-kategorie-zatrzymania-wg-en-60204-1-i-jak-wpływają-na-wybór-sto-vs-ss1--) · [13.2](#132-co-to-jest-lsafe_estop-i-gdzie-go-znajdziesz-w-tia-portal--) · [13.3](#133-co-to-jest-feedback-circuit-obwód-sprzężenia-zwrotnego-styczników-i-dlaczego-jest-wymagany-dla-sil-3--pl-e--) · [13.4](#134-co-to-są-ccf-common-cause-failure-i-jakie-środki-są-wymagane-dla-cat4--) · [13.5](#135-czy-można-łączyć-przyciski-e-stop-szeregowo-do-jednego-wejścia-f-di)
+
+**14. PROFINET advanced**
+[14.1](#141-co-to-jest-mrp-media-redundancy-protocol-i-kiedy-go-stosujesz--) · [14.2](#142-co-to-jest-irt-isochronous-real-time-i-kiedy-jest-wymagany--) · [14.3](#143-jak-diagnostykujesz-sieć-profinet-w-tia-portal-i-proneta--) · [14.4](#144-co-to-jest-shared-device-i-kiedy-go-używasz) · [14.5](#145-jak-działa-device-replacement-bez-pg-automatic-name-assignment) · [14.6](#146-jakie-są-rodzaje-i-funkcje-przemysłowych-switchy-ethernet-oraz-ich-znaczenie-w-sieciach-profinet) · [14.7](#147-co-to-jest-s7-communication-getput-i-iso-on-tcp--kiedy-i-jak-je-stosujesz) · [14.8](#148-co-to-jest-profinet-tsn-time-sensitive-networking-i-czym-różni-się-od-irt--)
+
+**15. Kurtyny / Safety sensors**
+[15.1](#151-czym-różni-się-kurtyna-bezpieczeństwa-type-2-od-type-4-iec-61496) · [15.2](#152-jak-działa-muting-i-czym-różni-się-od-override) · [15.3](#153-jak-podłączasz-ossd-output-signal-switching-device-kurtyny-do-modułu-f-di) · [15.4](#154-jakie-jest-zastosowanie-wyjść-tranzystorowych-z-czujników-bezpieczeństwa-w-systemach-plc-safety) · [15.5](#155-jakie-typy-elektrygli-bezpieczeństwa-door-interlocks-istnieją-i-jak-dobirasz-odpowiedni-performance-level--) · [15.6](#156-czym-jest-czujnik-radarowy-bezpieczeństwa-np-pilz-psen-rd-12-i-kiedy-go-stosujesz-zamiast-skanera-laserowego--)
+
+**16. Motion Control / SINAMICS G120**
+[16.1](#161-co-to-jest-technology-object-to-w-tia-portal-i-jak-go-używasz) · [16.2](#162-jak-robisz-autotuning-napędu-g120v90-w-startdrive) · [16.3](#163-jakie-są-najważniejsze-parametry-sinamics-g120-które-musisz-znać) · [16.4](#164-jak-interpretujesz-i-kasujesz-fault-f30001-i-f07801-w-sinamics) · [16.5](#165-czym-jest-sinamics-g120-i-do-jakich-silników-oraz-aplikacji-jest-przeznaczony-) · [16.6](#166-jakie-są-podstawowe-komponenty-układu-napędowego-z-sinamics-g120-i-sterownikiem-siemens-) · [16.7](#167-jakie-oprogramowanie-służy-do-konfiguracji-i-uruchomienia-sinamics-g120-) · [16.8](#168-jakie-tryby-sterowania-oferuje-sinamics-g120-i-czym-się-różnią-) · [16.9](#169-jak-przebiega-procedura-identyfikacji-silnika-motor-id-w-sinamics-g120-i-dlaczego-jest-niezbędna-) · [16.10](#1610-jak-wygląda-pełna-procedura-commissioning-sinamics-g120-z-tia-portal-krok-po-kroku-) · [16.11](#1611-do-czego-służy-blok-funkcyjny-mc_movejog-w-tia-portal-i-jakie-są-jego-podstawowe-parametry-wejściowe) · [16.12](#1612-jakie-są-kluczowe-cechy-i-zachowania-bloku-mc_movejog-podczas-pracy) · [16.13](#1613-jakie-są-parametry-enkoderów-inkrementalnych-i-absolutnych--rozdzielczość-co-mogą-i-czego-nie-mogą--) · [16.14](#1614-jakie-są-interfejsy-enkoderów-i-jak-konfigurujesz-enkoder-w-sinamics-i-tia-portal--) · [16.15](#1615-czym-są-silniki-ie5-ipm--synchroniczne-z-magnesami-trwałymi-i-dlaczego-zastępują-klasyczne-silniki-indukcyjne-w-nowych-projektach--)
+
+**17. Realne scenariusze**
+[17.1](#171-maszyna-startuje-sama-po-ack-bez-przycisku-start--co-sprawdzasz) · [17.2](#172-hmi-pokazuje-alarm-którego-nie-ma-w-projekcie-tia-portal--skąd-pochodzi) · [17.3](#173-moduł-et200sp-nie-pojawia-się-w-sieci-po-podłączeniu--lista-kroków-diagnostycznych) · [17.4](#174-napęd-sinamics-g120-świeci-ciągłym-czerwonym-led-i-nie-kasuje-się--co-robisz--) · [17.5](#175-cpu-przeszło-w-stop-podczas-produkcji--pierwsze-3-kroki--) · [17.6](#176-po-czym-poznajesz-że-projekt-w-tia-portal-jest-skalowalny--) · [17.7](#177-co-sprawdzasz-na-fat-factory-acceptance-test-dla-instalacji-z-safety-) · [17.8](#178-jak-realizujesz-sat-site-acceptance-test-po-dostarczeniu-maszyny-do-klienta-) · [17.9](#179-jak-podejść-do-diagnostyki-nieznanego-lub-legacy-projektu-tia-portal-który-przejmujesz-po-raz-pierwszy-)
+
+**18. TIA Portal advanced**
+[18.1](#181-co-to-są-project-libraries-vs-global-libraries-i-kiedy-używasz-każdej) · [18.2](#182-jak-robisz-partial-download-żeby-nie-resetować-całego-cpu) · [18.3](#183-do-czego-służy-opc-ua-w-tia-portal-i-jak-go-aktywujesz) · [18.4](#184-czym-jest-simatic-prodiag-i-jak-konfigurujesz-pierwsze-monitory-diagnostyczne-) · [18.5](#185-jak-używasz-funkcji-compare-porównywanie-w-tia-portal-i-co-konkretnie-porównujesz--) · [18.6](#186-co-to-jest-standard-packml-i-jak-wpływa-na-strukturę-programu-sekwencji-maszyny--) · [18.7](#187-czym-jest-hmi-template-suite-i-jak-przyspiesza-tworzenie-paneli-operatorskich-w-tia-portal--)
+
+**19. Commissioning — stacje i urządzenia**
+[19.1](#191-jak-krok-po-kroku-dodajesz-nową-wyspę-sygnałową-et200sp-safety-f-peripheral-do-istniejącego-projektu--) · [19.2](#192-jak-dodajesz-wyspę-pneumatyczną-smc-seria-ex600-do-projektu-tia-portal-przez-profinet) · [19.3](#193-jak-krok-po-kroku-dodajesz-napęd-sinamics-g120-przez-profinet-do-projektu-tia-portal)
+
+---
+
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
 > **146 pytań / 19 sekcji.**
