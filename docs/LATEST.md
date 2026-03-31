@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12 | Data: 2026-03-31 | Pytania: 150
+### Wersja: v12 | Data: 2026-03-31 | Pytania: 143
 
 ---
 
@@ -38,7 +38,7 @@
 ### Pytania
 
 **1. Podstawy PLC**
-[1.1](#11-co-to-jest-plc-i-czym-różni-się-od-zwykłego-komputera--) · [1.2](#12-co-to-jest-scan-cycle-i-ile-trwa--) · [1.3](#13-co-to-jest-ob1-ob35-ob100--kiedy-każdego-używasz) · [1.4](#14-co-to-jest-fb-fc-db--kiedy-używasz-każdego--) · [1.5](#15-co-to-jest-udt-i-po-co-go-używasz) · [1.6](#16-co-to-są-języki-programowania-plc--lad-fbd-scl-graph) · [1.7](#17-co-to-jest-sygnał-4-20ma-i-dlaczego-nie-0-20ma) · [1.8](#18-co-to-jest-profinet-i-czym-różni-się-od-profibus--) · [1.9](#19-jakie-są-główne-rodziny-sterowników-plc-siemens-i-do-jakich-zastosowań-są-dedykowane) · [1.10](#110-jakie-są-kluczowe-aspekty-pamięci-sterownika-plc-siemens-s7-12001500) · [1.11](#111-jakie-są-warianty-cpu-s7-1200-i-jakie-mają-możliwości-rozbudowy) · [1.12](#112-co-to-jest-hmi-i-do-czego-służy-w-automatyce) · [1.13](#113-co-to-jest-scada-i-czym-różni-się-od-hmi) · [1.14](#114-co-to-jest-pid-i-kiedy-go-używasz-w-plc) · [1.15](#115-czym-jest-enkoder-i-jaka-jest-różnica-między-inkrementalnym-a-absolutnym--) · [1.16](#116-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc--)
+[1.1](#11-co-to-jest-plc-i-czym-różni-się-od-zwykłego-komputera--) · [1.2](#12-co-to-jest-scan-cycle-i-ile-trwa--) · [1.3](#13-co-to-jest-ob1-ob35-ob100--kiedy-każdego-używasz) · [1.4](#14-co-to-jest-fb-fc-db--kiedy-używasz-każdego--) · [1.5](#15-co-to-jest-udt-i-po-co-go-używasz) · [1.6](#16-co-to-są-języki-programowania-plc--lad-fbd-scl-graph) · [1.7](#17-co-to-jest-sygnał-4-20ma-i-dlaczego-nie-0-20ma) · [1.8](#18-co-to-jest-profinet-i-czym-różni-się-od-profibus--) · [1.9](#19-jakie-są-główne-rodziny-sterowników-plc-siemens-i-do-jakich-zastosowań-są-dedykowane) · [1.10](#110-jakie-są-kluczowe-aspekty-pamięci-sterownika-plc-siemens-s7-12001500) · [1.11](#111-jakie-są-warianty-cpu-s7-1200-i-jakie-mają-możliwości-rozbudowy) · [1.12](#112-co-to-jest-hmi-i-do-czego-służy-w-automatyce) · [1.13](#113-co-to-jest-scada-i-czym-różni-się-od-hmi) · [1.14](#114-co-to-jest-pid-i-kiedy-go-używasz-w-plc) · [1.15](#115-czym-jest-enkoder-i-jaka-jest-różnica-między-inkrementalnym-a-absolutnym--) · [1.16](#116-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc--) · [1.17](#117-co-to-jest-przerzutnik-sr-i-rs-w-tia-portal-i-jaka-jest-różnica-w-priorytecie--)
 
 **2. Safety Integrated**
 [2.1](#21-co-to-jest-simatic-safety-integrated-i-co-oznacza-wszystko-w-jednym-sterowniku--) · [2.2](#22-co-to-jest-f-cpu-i-jak-działa-dual-channel-processing--) · [2.3](#23-jakie-sterowniki-siemens-obsługują-funkcje-safety) · [2.4](#24-co-to-jest-f-db-i-dlaczego-nie-można-go-edytować-ręcznie) · [2.5](#25-co-to-jest-f-signature-i-collective-signature--) · [2.6](#26-jakie-są-tryby-pracy-safety-cpu-i-jak-się-przełącza) · [2.7](#27-co-to-jest-step-7-safety-advanced-vs-safety-basic) · [2.8](#28-jakie-są-podstawowe-komponenty-i-zasady-programowania-sterowników-bezpieczeństwa-pilz-pnozmulti) · [2.9](#29-co-to-jest-s7-1500h-hot-standby-i-kiedy-go-stosujesz--)
@@ -86,7 +86,7 @@
 [17.1](#171-maszyna-startuje-sama-po-ack-bez-przycisku-start--co-sprawdzasz) · [17.2](#172-hmi-pokazuje-alarm-którego-nie-ma-w-projekcie-tia-portal--skąd-pochodzi) · [17.3](#173-moduł-et200sp-nie-pojawia-się-w-sieci-po-podłączeniu--lista-kroków-diagnostycznych) · [17.4](#174-napęd-sinamics-g120-świeci-ciągłym-czerwonym-led-i-nie-kasuje-się--co-robisz--) · [17.5](#175-cpu-przeszło-w-stop-podczas-produkcji--pierwsze-3-kroki--) · [17.6](#176-po-czym-poznajesz-że-projekt-w-tia-portal-jest-skalowalny--) · [17.7](#177-co-sprawdzasz-na-fat-factory-acceptance-test-dla-instalacji-z-safety-) · [17.8](#178-jak-realizujesz-sat-site-acceptance-test-po-dostarczeniu-maszyny-do-klienta-) · [17.9](#179-jak-podejść-do-diagnostyki-nieznanego-lub-legacy-projektu-tia-portal-który-przejmujesz-po-raz-pierwszy-)
 
 **18. TIA Portal advanced**
-[18.1](#181-co-to-są-project-libraries-vs-global-libraries-i-kiedy-używasz-każdej) · [18.2](#182-jak-robisz-partial-download-żeby-nie-resetować-całego-cpu) · [18.3](#183-do-czego-służy-opc-ua-w-tia-portal-i-jak-go-aktywujesz) · [18.4](#184-czym-jest-simatic-prodiag-i-jak-konfigurujesz-pierwsze-monitory-diagnostyczne-) · [18.5](#185-jak-używasz-funkcji-compare-porównywanie-w-tia-portal-i-co-konkretnie-porównujesz--) · [18.6](#186-co-to-jest-standard-packml-i-jak-wpływa-na-strukturę-programu-sekwencji-maszyny--) · [18.7](#187-czym-jest-hmi-template-suite-i-jak-przyspiesza-tworzenie-paneli-operatorskich-w-tia-portal--)
+[18.1](#181-co-to-są-project-libraries-vs-global-libraries-i-kiedy-używasz-każdej) · [18.2](#182-jak-robisz-partial-download-żeby-nie-resetować-całego-cpu) · [18.3](#183-do-czego-służy-opc-ua-w-tia-portal-i-jak-go-aktywujesz) · [18.4](#184-czym-jest-simatic-prodiag-i-jak-konfigurujesz-pierwsze-monitory-diagnostyczne-)
 
 **19. Commissioning — stacje i urządzenia**
 [19.1](#191-jak-krok-po-kroku-dodajesz-nową-wyspę-sygnałową-et200sp-safety-f-peripheral-do-istniejącego-projektu--) · [19.2](#192-jak-dodajesz-wyspę-pneumatyczną-smc-seria-ex600-do-projektu-tia-portal-przez-profinet) · [19.3](#193-jak-krok-po-kroku-dodajesz-napęd-sinamics-g120-przez-profinet-do-projektu-tia-portal)
@@ -375,6 +375,62 @@ Po wymianie uszkodzonego czujnika IO-Link Master automatycznie wgrywa zapisane p
 > 💡 **IO-Link ≠ Safety** — standard IO-Link nie jest Safety-certified. Do zastosowań Safety wymagane są osobne kanały F-DI. IO-Link służy wyłącznie do danych procesowych i diagnostyki (standard world).
 
 *Źródło: Siemens ET200SP IO-Link Master product documentation*
+
+### 1.17. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?  🟢
+
+**Przerzutniki bistabilne SR i RS** to elementy PLC zapamiętujące stan (bit) po zaniku sygnału sterującego. Różnią się zachowaniem gdy **S i R są aktywne jednocześnie** — wtedy priorytet decyduje o stanie wyjścia.
+
+**SR — priorytet Set (Set dominant):**
+- Wyjście `Q` ustawia sygnał `S` (Set), kasuje sygnał `R1` (Reset)
+- Gdy `S=1` i `R1=1` jednocześnie → `Q = 1` (Set wygrywa)
+- Stosowany gdy **ważniejsze jest uruchomienie** niż zatrzymanie (np. zapłon palnika — jeśli coś każe zapalić, to zapala)
+
+**RS — priorytet Reset (Reset dominant):**
+- Wyjście `Q` ustawia sygnał `S1` (Set), kasuje sygnał `R` (Reset)
+- Gdy `S1=1` i `R=1` jednocześnie → `Q = 0` (Reset wygrywa)
+- Stosowany gdy **ważniejsze jest zatrzymanie** niż uruchomienie (np. blokada silnika przez warunek bezpieczeństwa — safety beat start)
+
+**LAD w TIA Portal — wizualnie:**
+
+```
+// SR (Set dominant)
+---[S]---+---( S )---
+         |   [SR]
+---[R1]--+---( R1)
+              Q ──► bit zapamiętany
+
+// RS (Reset dominant)
+---[R]---+---( R )---
+         |   [RS]
+---[S1]--+---( S1)
+              Q ──► bit zapamiętany
+```
+
+**Równoważny kod SCL — implementacja ręczna:**
+
+```scl
+// SR — priorytet Set (kolejność: najpierw Reset, potem Set nadpisuje)
+"MotorRunSR" := "MotorRunSR" OR "StartBtn";
+IF "StopBtn" THEN "MotorRunSR" := FALSE; END_IF;
+IF "StartBtn" THEN "MotorRunSR" := TRUE; END_IF;   // Set na końcu = priorytet
+
+// RS — priorytet Reset (kolejność: najpierw Set, potem Reset nadpisuje)
+"MotorRunRS" := "MotorRunRS" OR "StartBtn";
+IF "StartBtn" THEN "MotorRunRS" := TRUE; END_IF;
+IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = priorytet
+```
+
+**Praktyczna zasada doboru:**
+
+| Sytuacja | Wybór |
+|----------|-------|
+| Stop ma wyższy priorytet (99% maszyn przemysłowych) | **RS** |
+| Start/Set ważniejszy (np. latch alarmu do potwierdzenia) | **SR** |
+| Fizyczny E-Stop / Guard | Zawsze **RS** — Reset (bezpieczeństwo) dominuje |
+
+> ⚠️ W TIA Portal LAD bloki SR/RS są dostępne w *Basic Instructions → Bistable operations*. Parametr `Q` to bit zapamiętany — musi być adres **Memory** (`M`) lub **DB bit**, nigdy wejście `I`.
+
+*Źródło: TIA Portal Help — LAD Bistable Operations; IEC 61131-3 §3.2.3*
 
 
 ---
@@ -2323,89 +2379,6 @@ ProDiag (Process Diagnostics) to narzędzie TIA Portal do tworzenia automatyczne
 - Krok 2: Przypisz tekst alarmu (wielojęzyczny) i kategorie (Error, Warning, Info)
 - Krok 3: Skompiluj → alarmy automatycznie pojawiają się w HMI bez dodatkowej konfiguracji WinCC
 - Korzyść: czas od awarii do diagnozy przyczyny bez przeglądania kodu — operator widzi kontekst
-
-### 18.5. Jak używasz funkcji Compare (porównywanie) w TIA Portal i co konkretnie porównujesz? 🟢
-Compare to narzędzie TIA Portal umożliwiające porównanie projektu online (CPU) z projektem offline (plik), wykrywające różnice w logice, konfiguracji sprzętu i danych — kluczowe przy commissioning i utrzymaniu.
-- Dostęp: Menu Project → Compare → Online/Offline
-- Kolory wyników: identyczne (biały), zmienione (żółty), tylko offline (niebieski), tylko online (czerwony)
-- Co porównujesz: bloki programu, konfigurację HW, DB — osobno lub wszystko naraz
-- Przy SAT: porównaj CPU (online) vs referencja FAT (offline) → sprawdź zero czerwonych/żółtych różnic
-- Przy serwisie: sprawdź czy serwisant nie zmienił czegoś bez dokumentacji
-- F-Program: po porównaniu sprawdź F-Signature — zmiana dowolnego F-bloku zmienia signature
-- Export: wynik porównania możesz drukować do PDF jako dowód zgodności
-
-### 18.6. Co to jest standard PackML i jak wpływa na strukturę programu sekwencji maszyny? 🟢
-
-**PackML** *(Packaging Machine Language)* to standard OMAC/ISA-88 definiujący ujednolicone nazewnictwo stanów maszyny, strukturę programu i interfejs operatora. Stosowany głównie w maszynach pakujących, ale przeniesiony na wiele branż.
-
-**Automat stanów PackML — główne stany:**
-
-| Stan | Znaczenie | Kolumna świetlna |
-|------|-----------|-----------------|
-| **Idle** | Gotowy, czeka na start | Żółty |
-| **Starting** | Przejście do Execute | Żółty mig. |
-| **Execute** | Produkcja w toku | Zielony |
-| **Held** | Tymczasowy stop (operator) | Żółty |
-| **Suspended** | Zatrzymany przez zewnętrzny warunek | Żółty |
-| **Stopping** | Planowane zatrzymanie | Żółty |
-| **Stopped** | Zatrzymany, bezpieczny | Żółty |
-| **Aborting** | Zatrzymanie awaryjne w toku | Czerwony mig. |
-| **Aborted** | Zatrzymany awaryjnie | Czerwony |
-| **Complete** | Cykl ukończony | Zielony mig. |
-| **Clearing** | Kasowanie alarmu, reset | Żółty |
-
-**Komendy operatora (Unit Procedure Commands):**
-- `SC_Start`, `SC_Stop`, `SC_Hold`, `SC_UnHold`, `SC_Abort`, `SC_Clear`, `SC_Reset`
-
-**Implementacja w TIA Portal:**
-- FB `PackML_Unit_Manager` z wejściem `iCommand` (INT) i wyjściem `iCurrentState`
-- Wewnętrzna sekwencja STL/SCL switch-case po bieżącym stanie
-- Parametry `PackTags` — ustandaryzowane zmienne dla OPC UA / SCADA: `Status\StateCurrent`, `Status\MachSpeed`, `Admin\MachDescription`
-
-**Zalety dla integratora:**
-- SCADA/MES może obsługiwać różne maszyny tym samym interfejsem
-- Skraca czas rozruchu bo operator i automatyk mówią tym samym językiem
-- Klient może wymagać PackML w specyfikacji maszyny — znajomość = wyróżnik
-
-> 💡 **Pytanie na rozmowie:** *"Znasz PackML?"* — opisz stany + pokaż że umiesz połączyć z HMI (komenda `SC_Hold` z panelu → FB → zmiana stanu). Wspomnij że ISA-88 to standard, a PackML to jego implementacja dla maszyn pakujących.
-
-*Źródło: transkrypcja ControlByte — programowanie obiektowe i standardy przemysłowe*
-
-### 18.7. Czym jest HMI Template Suite i jak przyspiesza tworzenie paneli operatorskich w TIA Portal? 🟢
-
-**HMI Template Suite** to gotowy zestaw widoków (ekranów), fragmentów kodu i typów danych dla paneli Siemens (Comfort, Unified) dostarczany w TIA Portal jako Global Library. Skraca czas tworzenia HMI z dni do godzin.
-
-**Główne komponenty Template Suite:**
-
-| Element | Opis |
-|---------|------|
-| **Ekran startowy** | Nawigacja, status maszyny, kolumna świetlna |
-| **Ekran alarmu** | Bufor alarmów, filtry, potwierdzanie |
-| **Ekran receptury** | Parametry procesu, zapis/odczyt receptury |
-| **Ekran serwisowy** | Wymuszenia, diagnoza I/O, godziny pracy |
-| **Fragmenty nawigacyjne** | Przyciski F1–F8, pasek zadań |
-| **Typy Faceplate** | Gotowe maski dla napędów, zaworów, PID |
-
-**Jak używać w TIA Portal:**
-1. Libraries panel → Global libraries → pobierz Template Suite z TIA Portal Automation Tool lub Siemens Industry Mall
-2. Kopiuj gotowe ekrany do projektu HMI
-3. Dostosuj kolorystykę i logo klienta (Theme → Corporate Color)
-4. Połącz zmienne PLC używając udostępnionych TagTable
-
-**Multilingual (wielojęzyczność):**
-- Template Suite wspiera wymagany panel wielojęzyczny od razu
-- Menu → Languages → dodaj język; teksty w tabelach tłumaczeń
-- Eksport/import tłumaczeń do CSV dla biura tłumaczeń
-
-**Integracja z Safety:**
-- Ekran serwisowy zawiera gotowe segmenty do potwierdzenia (ACK) passivation i reintegration
-- Template Suite Unified Panel: widok F-Signature z możliwością wydruku
-
-> ⚠️ **Uwaga:** Template Suite nie zastępuje projektowania — to punkt startowy. Zawsze dostosuj do wymagań klienta (kolorystyka, język, poziomy dostępu).
-
-> 💡 **Praktyczna wskazówka:** Pytanie *"jak szybko zbudujesz HMI dla nowej maszyny?"* → wspomnij Template Suite → skrócenie z 3 dni do ~4 godzin dla standardowego panelu. Klienci (zwłaszcza automotive) cenią ustandaryzowane HMI.
-
-*Źródło: transkrypcja ControlByte — HMI Template Suite dla TIA Portal*
 
 ---
 
