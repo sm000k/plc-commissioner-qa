@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="680" height="280" viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, monospace">
+  <!-- Background -->
+  <rect width="680" height="280" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="340" y="24" text-anchor="middle" font-size="15" font-weight="bold" fill="#003366">TIA Portal LAD — Bistable Operations: SR vs RS</text>
+
+  <!-- === SR BLOCK (SET DOMINANT) === -->
+  <text x="115" y="54" text-anchor="middle" font-size="13" font-weight="bold" fill="#004080">SR — priorytet Set</text>
+  <!-- Power rail left -->
+  <line x1="20" y1="65" x2="20" y2="220" stroke="#000" stroke-width="3"/>
+  <!-- Power rail right -->
+  <line x1="210" y1="65" x2="210" y2="220" stroke="#000" stroke-width="3"/>
+
+  <!-- Rung 1: S input -->
+  <line x1="20" y1="110" x2="60" y2="110" stroke="#000" stroke-width="2"/>
+  <!-- S contact (NO) -->
+  <line x1="60" y1="100" x2="60" y2="120" stroke="#000" stroke-width="2"/>
+  <line x1="75" y1="100" x2="75" y2="120" stroke="#000" stroke-width="2"/>
+  <line x1="60" y1="110" x2="75" y2="110" stroke="#000" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <text x="67" y="95" text-anchor="middle" font-size="11" fill="#333">Btn_Start</text>
+  <line x1="75" y1="110" x2="100" y2="110" stroke="#000" stroke-width="2"/>
+
+  <!-- SR Block box -->
+  <rect x="100" y="75" width="70" height="100" fill="#E8F0FB" stroke="#003366" stroke-width="2"/>
+  <text x="135" y="92" text-anchor="middle" font-size="14" font-weight="bold" fill="#003366">SR</text>
+  <!-- S input label -->
+  <text x="105" y="114" font-size="11" fill="#000">S</text>
+  <!-- R1 input label -->
+  <text x="103" y="154" font-size="11" fill="#000">R1</text>
+  <!-- Q output label -->
+  <text x="150" y="130" font-size="11" fill="#000">Q</text>
+
+  <!-- Rung 2: R1 input -->
+  <line x1="20" y1="150" x2="60" y2="150" stroke="#000" stroke-width="2"/>
+  <!-- R contact (NO) -->
+  <line x1="60" y1="140" x2="60" y2="160" stroke="#000" stroke-width="2"/>
+  <line x1="75" y1="140" x2="75" y2="160" stroke="#000" stroke-width="2"/>
+  <line x1="60" y1="150" x2="75" y2="150" stroke="#000" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <text x="67" y="135" text-anchor="middle" font-size="11" fill="#333">Btn_Stop</text>
+  <line x1="75" y1="150" x2="100" y2="150" stroke="#000" stroke-width="2"/>
+
+  <!-- Q output line -->
+  <line x1="170" y1="128" x2="210" y2="128" stroke="#000" stroke-width="2"/>
+  <!-- Q coil symbol  -->
+  <circle cx="185" cy="128" r="8" fill="none" stroke="#003366" stroke-width="2"/>
+  <text x="185" y="150" text-anchor="middle" font-size="10" fill="#555">Motor_Run</text>
+
+  <!-- Annotation S=1,R1=1 => Q=1 -->
+  <rect x="10" y="225" width="200" height="42" fill="#FFF8DC" stroke="#CC9900" stroke-width="1" rx="4"/>
+  <text x="110" y="239" text-anchor="middle" font-size="10" fill="#333">S=1 i R1=1 jednocześnie:</text>
+  <text x="110" y="252" text-anchor="middle" font-size="11" font-weight="bold" fill="#006600">Q = 1 (Set wygrywa)</text>
+  <text x="110" y="263" text-anchor="middle" font-size="10" fill="#555">np. zapłon, blokada harmonogramu</text>
+
+  <!-- === RS BLOCK (RESET DOMINANT) === -->
+  <text x="480" y="54" text-anchor="middle" font-size="13" font-weight="bold" fill="#800000">RS — priorytet Reset</text>
+  <!-- Power rail left -->
+  <line x1="380" y1="65" x2="380" y2="220" stroke="#000" stroke-width="3"/>
+  <!-- Power rail right -->
+  <line x1="580" y1="65" x2="580" y2="220" stroke="#000" stroke-width="3"/>
+
+  <!-- Rung 1: R input -->
+  <line x1="380" y1="110" x2="420" y2="110" stroke="#000" stroke-width="2"/>
+  <!-- R contact (NO) -->
+  <line x1="420" y1="100" x2="420" y2="120" stroke="#000" stroke-width="2"/>
+  <line x1="435" y1="100" x2="435" y2="120" stroke="#000" stroke-width="2"/>
+  <line x1="420" y1="110" x2="435" y2="110" stroke="#000" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <text x="427" y="95" text-anchor="middle" font-size="11" fill="#333">Btn_Stop</text>
+  <line x1="435" y1="110" x2="460" y2="110" stroke="#000" stroke-width="2"/>
+
+  <!-- RS Block box -->
+  <rect x="460" y="75" width="70" height="100" fill="#FBE8E8" stroke="#800000" stroke-width="2"/>
+  <text x="495" y="92" text-anchor="middle" font-size="14" font-weight="bold" fill="#800000">RS</text>
+  <!-- R input label -->
+  <text x="465" y="114" font-size="11" fill="#000">R</text>
+  <!-- S1 input label -->
+  <text x="463" y="154" font-size="11" fill="#000">S1</text>
+  <!-- Q output label -->
+  <text x="510" y="130" font-size="11" fill="#000">Q</text>
+
+  <!-- Rung 2: S1 input -->
+  <line x1="380" y1="150" x2="420" y2="150" stroke="#000" stroke-width="2"/>
+  <!-- S1 contact (NO) -->
+  <line x1="420" y1="140" x2="420" y2="160" stroke="#000" stroke-width="2"/>
+  <line x1="435" y1="140" x2="435" y2="160" stroke="#000" stroke-width="2"/>
+  <line x1="420" y1="150" x2="435" y2="150" stroke="#000" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <text x="427" y="135" text-anchor="middle" font-size="11" fill="#333">Btn_Start</text>
+  <line x1="435" y1="150" x2="460" y2="150" stroke="#000" stroke-width="2"/>
+
+  <!-- Q output line -->
+  <line x1="530" y1="128" x2="580" y2="128" stroke="#000" stroke-width="2"/>
+  <!-- Q coil symbol  -->
+  <circle cx="550" cy="128" r="8" fill="none" stroke="#800000" stroke-width="2"/>
+  <text x="550" y="150" text-anchor="middle" font-size="10" fill="#555">Motor_Run</text>
+
+  <!-- Annotation S1=1,R=1 => Q=0 -->
+  <rect x="375" y="225" width="200" height="42" fill="#FFF0F0" stroke="#CC0000" stroke-width="1" rx="4"/>
+  <text x="475" y="239" text-anchor="middle" font-size="10" fill="#333">S1=1 i R=1 jednocześnie:</text>
+  <text x="475" y="252" text-anchor="middle" font-size="11" font-weight="bold" fill="#CC0000">Q = 0 (Reset wygrywa)</text>
+  <text x="475" y="263" text-anchor="middle" font-size="10" fill="#555">zawsze do E-Stop / blokad safety</text>
+
+  <!-- Separator -->
+  <line x1="340" y1="50" x2="340" y2="275" stroke="#999" stroke-width="1" stroke-dasharray="5,5"/>
+  <text x="340" y="275" text-anchor="middle" font-size="9" fill="#888">IEC 61131-3 / TIA Portal S7-1200/1500 LAD</text>
+</svg>

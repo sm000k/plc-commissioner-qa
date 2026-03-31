@@ -392,19 +392,7 @@ Po wymianie uszkodzonego czujnika IO-Link Master automatycznie wgrywa zapisane p
 
 **LAD w TIA Portal — wizualnie:**
 
-```
-// SR (Set dominant)
----[S]---+---( S )---
-         |   [SR]
----[R1]--+---( R1)
-              Q ──► bit zapamiętany
-
-// RS (Reset dominant)
----[R]---+---( R )---
-         |   [RS]
----[S1]--+---( S1)
-              Q ──► bit zapamiętany
-```
+![SR vs RS w TIA Portal LAD](images/safety/sr_rs_tia_portal.png)
 
 **Równoważny kod SCL — implementacja ręczna:**
 
