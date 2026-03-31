@@ -1854,43 +1854,43 @@ Poniższa procedura opisuje uruchomienie napędu G120 (CU240E-2 PN + PM240-2) z 
 3. Monitoruj słowo statusowe ZSW1 (`r0052`) — bit 2 = napęd gotowy, bit 4 = napęd w ruchu
 4. Zapisz parametry do ROM: `p0971 = 1` (zapis trwały) lub przez Startdrive → `Save to device`
 
-**Faza 7 — Konfiguracja przekładni (jeśli silnik pracuje przez reduktor):**
+**Faza 7 — Napęd liniowy z enkoderem liniowym:**
 
-Gdy między silnikiem a maszyną roboczą znajduje się przekładnia mechaniczna, G120 musi znać jej przełożenie — inaczej prędkość wyświetlana i regulowana odnosi się do wału silnika, nie do wału roboczego.
+Gdy G120 napędza oś liniową (pasek zębaty, śruba kulowa, szyna liniowa) z enkoderem liniowym mierzącym prędkość/pozycję bezpośrednio w mm/s zamiast rpm:
 
-| Parametr | Opis | Przykład (i = 10:1) |
-|----------|------|-------------------|
-| `p0521` | Licznik przełożenia (obroty silnika) | `10` |
-| `p0522` | Mianownik przełożenia (obroty wału roboczego) | `1` |
-| `p2000` | Prędkość referencyjna (odnosi się do wału **silnika**) | np. 1500 rpm |
+| Parametr | Opis | Przykład |
+|----------|------|---------|
+| `p0408` | Ilość impulsów enkodera na obrót (PPR) — dla liniowego: impulsy na mm skoku śruby/paska | Enkoder 1000 imp/mm = `p0408 = 1000` |
+| `p0521` | Licznik mechaniczny (np. skok śruby w mm × 1000) | Śruba 10 mm/obr → `10000` |
+| `p0522` | Mianownik mechaniczny (1 obrót silnika) | `1` |
+| `p2000` | Prędkość referencyjna — w tym przypadku [mm/s] po przeliczeniu | np. `500` (mm/s) |
 
-> ⚠️ `p0521`/`p0522` są aktywne tylko gdy włączony jest enkoder po stronie silnika (tryb Vector z enkoderem, `p1300 = 21`). W trybie V/f (`p1300 = 0`) napęd nie koryguje prędkości o przekładnię — PLC musi przeliczać samodzielnie.
+**Przeliczenie: jak G120 widzi prędkość liniową:**
+- G120 wewnętrznie reguluje w rpm (obroty silnika)
+- Enkoder liniowy z `p0408` dostarcza sprzężenie zwrotne w impulsach/mm
+- Skok śruby lub paska (`p0521`/`p0522`) przelicza rpm → mm/s
+- `r0021` wyświetla prędkość w rpm — przelicz: `v [mm/s] = r0021 × skok_śruby / 60`
 
-**Praktyczna wskazówka przy przekładni:**
-- Prędkość zadana z PLC (HSW) zawsze odnosi się do `p2000` (prędkość silnika)
-- Jeśli chcesz zadawać prędkość wału roboczego: PLC mnoży żądaną prędkość roboczą × przełożenie przed wysłaniem do HSW
-- Przy enkodzie na wale **roboczym** (za przekładnią): enkoder podłącz do CU, ustaw `p0408` (PPR enkodera), system automatycznie reguluje prędkość wału roboczego
-- Sprawdź luzy w przekładni (`backlash`) — przy wektorowym sterowaniu mogą powodować oscylacje regulatora prędkości → obniż wzmocnienie `p1460` (Kp regulatora prędkości)
+**Konfiguracja krok po kroku (śruba kulowa, skok 10 mm/obr, enkoder 2500 PPR):**
+1. `p0400 = 1` — włącz enkoder inkrementalny (HTL/TTL)
+2. `p0408 = 2500` — 2500 impulsów na obrót enkodera
+3. `p0521 = 10`, `p0522 = 1` — skok 10 mm na 1 obrót silnika
+4. `p1300 = 21` — Vector z enkoderem (closed-loop)
+5. `p2000 = 1500` — prędkość referencyjna silnika [rpm] odpowiadająca max prędkości liniowej: `1500 rpm × 10 mm = 25 000 mm/min = 416 mm/s`
+6. W PLC: HSW = `16384` odpowiada `p2000` → przelicz żądaną prędkość liniową na HSW: `HSW = (v_żądana / v_max) × 16384`
+
+> ⚠️ Enkoder liniowy z wyjściem analogowym (np. ±10V) **nie jest** obsługiwany przez standardowe wejście enkodera CU — wymagany moduł SM i inne podejście (zewnętrzne sprzężenie przez AI → p2253 jako setpoint prędkości).
 
 **Kluczowe parametry diagnostyczne:**
 
 | Parametr | Opis |
 |----------|------|
 | `r0945` | Kod ostatniego błędu (Fault code) |
-| `r0947` | Kod ostatniego alarmu (Alarm code) |
-| `r0021` | Prędkość aktualna [rpm] |
+| `r0021` | Prędkość aktualna silnika [rpm] |
 | `r0027` | Prąd aktualny [A] |
 | `r0052` | Słowo statusowe ZSW1 |
-| `r0722` | Stan wejść cyfrowych DI0–DI7 |
 
-> ⚠️ **Najczęstsze problemy na komisjoningu:**
-> - `F07801` (Overcurrent) → złe dane silnika lub brak identyfikacji
-> - `F07011` (Motor blocked) → silnik zablokowany mechanicznie lub zbyt mały moment
-> - `A07991` (Motor data missing) → nie wykonano kreatora komisjoningu
-> - Brak komunikacji PROFINET → sprawdź `p8920`/`p8921` i zgodność telegram PLC↔napęd
-> - Silnik obraca się za szybko / za wolno → sprawdź `p0521`/`p0522` (przełożenie przekładni)
-
-> 💡 **Szybki test bez PLC:** Startdrive → Control panel → przełącz na `Manual` → JOG. Działa nawet bez podłączonego sterownika.
+> 💡 **Szybki test bez PLC:** Startdrive → Control panel → `Manual` → JOG. Obserwuj `r0021` i przelicz na mm/s ręcznie.
 
 *Źródło: Siemens SINAMICS G120 Getting Started, Startdrive commissioning guide*
 
