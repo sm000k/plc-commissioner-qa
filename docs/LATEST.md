@@ -2775,6 +2775,24 @@ Q0.2 = KM3 (wysoka prędkość)  -- wyklucza Q0.1
 
 > ⚠️ **Moment przy zmianie biegów:** przejście Δ→YY powoduje chwilowy skok prądu — nie zmieniaj biegu pod obciążeniem zderzakowym. W razie potrzeby stosuj łagodny rozruch (soft-starter) lub przemiennik częstotliwości.
 
+**Schemat połączeń uzwojeń Dahlander — konfiguracja Δ/YY (szybka/wolna prędkość):**
+
+![Schemat Dahlander Δ/YY](images/electrical/dahlander_TDD.jpg)
+
+*Rys. 20.1a — Połączenie uzwojeń silnika Dahlander: trójkąt (marcha rápida) i gwiazda-gwiazda (marcha lenta). Źródło: Wikimedia Commons, CC BY-SA 4.0*
+
+**Schemat połączeń uzwojeń Dahlander — konfiguracja Y/YY:**
+
+![Schemat Dahlander Y/YY](images/electrical/dahlander_DetaDeta.jpg)
+
+*Rys. 20.1b — Połączenie uzwojeń silnika Dahlander: gwiazda/gwiazda-gwiazda. Źródło: Wikimedia Commons, CC BY-SA 4.0*
+
+**Kompletny schemat sterowania silnikiem Dahlander z wentylacją:**
+
+![Schemat sterowania Dahlander](images/electrical/dahlander_ventilation.jpg)
+
+*Rys. 20.1c — Profesjonalny schemat obwodu mocy silnika Dahlander z wentylacją Y/YY — styczniki, przekaźniki termiczne, tabliczka zaciskowa. Źródło: Wikimedia Commons, CC BY-SA 4.0*
+
 *Źródło: EN 60034-8, praktyka rozdzielnica automatyki przemysłowej*
 
 ---
@@ -2815,6 +2833,18 @@ Q0.2 = KM3 (wysoka prędkość)  -- wyklucza Q0.1
 **Kiedy NIE stosować Y/Δ:**
 - Duże obciążenie przy starcie (np. przenośniki taśmowe z ładunkiem) → stosuj soft-starter lub VFD
 - Silnik 3-wyprowadzeniowy (tylko Δ lub tylko Y z fabryki) — brak możliwości przełączenia
+
+**Schemat obwodu mocy — rozruch gwiazda-trójkąt:**
+
+![Schemat Y/Δ obwód mocy](images/electrical/stern_dreieck_schaltung.png)
+
+*Rys. 20.2a — Obwód mocy rozruchu Y/Δ: K1 = stycznik sieciowy (Netz), K2 = stycznik gwiazdowy (Stern), K3 = stycznik trójkątowy (Dreieck), M 3~ = silnik trójfazowy z 6 zaciskami (U1/V1/W1, U2/V2/W2). Źródło: Wikimedia Commons, Public Domain*
+
+**Tabliczka zaciskowa silnika — połączenie gwiazda (Y) i trójkąt (Δ):**
+
+![Tabliczka zaciskowa Y i Δ](images/electrical/svorkovnice_star_delta.png)
+
+*Rys. 20.2b — Tabliczka zaciskowa silnika asynchronicznego: po lewej połączenie w gwiazdę (Y), po prawej w trójkąt (Δ). Źródło: Wikimedia Commons, Public Domain*
 
 *Źródło: EN 60204-1 §9, praktyka szafy rozdzielniczej automotive*
 
@@ -2865,6 +2895,18 @@ L3 ─┴── KM_R_styk ─┘   (krzyżowe połączenie L1/L3 w KM_R)
 > ⚠️ **Zmiana pod napięciem:** zmiana kierunku gdy silnik kręci się z pełną prędkością = silny szok mechaniczny + prąd udarowy do 10× I_n. Zawsze zastosuj logikę: STOP → czekaj aż silnik się zatrzyma → START w przeciwnym kierunku (lub hamowanie dynamiczne).
 
 > 💡 **Gotowe zestawy odwracające:** Siemens oferuje zestawy `3RA2` i `3RA1` z fabryczną blokadą mechaniczną — szybszy montaż i certyfikowana blokada.
+
+**Schemat kompletnego układu rewersyjnego silnika trójfazowego:**
+
+![Schemat rewersji silnika 3-fazowego](images/electrical/motor_reverse_3phase.jpg)
+
+*Rys. 20.3a — Kompletny układ odwracania kierunku obrotów: QS1 = rozłącznik, FU1-3 = bezpieczniki, KM1/KM2 = styczniki z krzyżowym połączeniem faz (L1↔L3), PTT1 = termistor, SB1/SB2 = przyciski START, SB3 = STOP, styki NC KM1 i KM2 = blokada elektryczna wzajemna. Źródło: Wikimedia Commons, CC BY-SA 3.0*
+
+**Uproszczony schemat mocy — rozruch bezpośredni dwukierunkowy:**
+
+![Schemat mocy rewersji](images/electrical/demarrage_direct_2sens.png)
+
+*Rys. 20.3b — Obwód mocy rewersji: Q2 = rozłącznik, KM1/KM2 = styczniki kierunkowe, F1 = przekaźnik termiczny, M = silnik. Źródło: Wikimedia Commons, CC BY-SA 3.0*
 
 *Źródło: EN 60204-1, katalog Siemens SIRIUS aparatura łączeniowa*
 
@@ -3043,6 +3085,12 @@ Network 1:
   [Q0.0 KM] ─────┘
 ```
 
+**Schemat układu samopodtrzymania z timerem (przełączenie Δ→Y):**
+
+![Układ samopodtrzymania z timerem](images/electrical/delta_star_switching.jpg)
+
+*Rys. 20.8 — Kompletny schemat: obwód mocy (F1, K1 stycznik główny, K2 timer) + obwód sterowania z samopodtrzymaniem (S1 STOP NC, S2 START NO, cewka K1 z samopodtrzymaniem, cewka K2 timer). Źródło: Wikimedia Commons, CC BY-SA 3.0*
+
 **Integracja z PLC a klasyczny schemat:**
 - Przy sterowaniu PLC: często rezygnuje się z hardware self-holding (PLC to realizuje programowo)
 - Wymaganie bezpieczeństwa: obwód STOP w sprzęcie (HW) — np. PLC może się zawiesić, a Stop musi działać
@@ -3134,6 +3182,12 @@ IF KM_D THEN KM_Y := FALSE; END_IF;
 | KM_Δ i KM_Y wyzwalają jednocześnie | Brak blokady mechanicznej lub elektrycznej | Zamontuj 3RA1934-1A + sprawdź styki NC |
 
 > 💡 **Monitoruj prąd online:** przy komisjonowaniu przyłącz multimetr cęgowy do fazy silnika — sprawdź prąd w Y (powinien być ~1/3 prądu w Δ). Jeśli prąd w Y jest równy prądowi Δ = uzwojenia podłączone jako 660V silnik na sieci 400V (błąd: silnik jest gwiazdowy z fabryki, a ty go prefabrykujesz w Y/Δ).
+
+**Schemat rozruchu bezpośredniego jednokierunkowego (DOL) — porównanie z Y/Δ:**
+
+![Schemat DOL](images/electrical/demarrage_direct.png)
+
+*Rys. 20.9 — Rozruch bezpośredni (DOL): Q2 = rozłącznik, KM1 = stycznik, F1 = przekaźnik termiczny, M = silnik. W schemacie Y/Δ dochodzą dwa dodatkowe styczniki (KM_Y i KM_Δ). Źródło: Wikimedia Commons, CC BY-SA 3.0*
 
 *Źródło: EN 60204-1, praktyka szafy rozdzielniczej commissioning, Siemens Industry*
 
