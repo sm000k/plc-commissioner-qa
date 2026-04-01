@@ -4,9 +4,20 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v12 — 2026-03-31 ✅ AKTYWNA WERSJA
+## qa_draft_v12 — 2026-04-01 (aktualizacja) ✅ AKTYWNA WERSJA
 
-### Stan: 146 pytań, 19 sekcji — +9 nowych pytań vs v11
+### Stan: 155 pytań, 20 sekcji — +9 nowych pytań (schematy elektryczne) vs poprzedniego stanu
+
+### Nowa sekcja 20 — Schematy elektryczne | Silniki i aparatura łączeniowa (+9 pytań, 2026-04-01)
+- **Q20.1** Silnik Dahlander (6 wyprowadzeń) — przełączanie biegunów Δ→YY, aparatura (KM_L/KM2/KM3)
+- **Q20.2** Rozruch gwiazda-trójkąt Y/Δ — parametry elektryczne, aparatura, sekwencja, kiedy NIE stosować
+- **Q20.3** Zmiana kierunku obrotów — zamiana faz, 3-warstwowa blokada (mech.+el.+PLC), czas martwy
+- **Q20.4** Przekaźnik termiczny 3RU2 — zasada, dobór I_set, klasy 10/20/30, sygnał do PLC
+- **Q20.5** Aparat różnicowoprądowy RCD — zasada, typy A/B/F, progi 30/300 mA, problem z VFD
+- **Q20.6** Blokada elektryczna i mechaniczna — interlocking 3-warstwowy, Siemens 3RA1934-1A
+- **Q20.7** Wyłącznik silnikowy 3RV2 vs bezpiecznik topikowy — tabela porównawcza, klasy gG/aM
+- **Q20.8** Układ samopodtrzymania — schemat NC/NO, STOP musi być NC (fail-safe), realizacja LAD
+- **Q20.9** Schemat Y/Δ sterowany PLC — kompletna sekwencja SCL z timerami, tabela diagnostyczna
 
 ### Źródła nowej wiedzy:
 - Transkrypcje ControlByte: rygle bezpieczeństwa, PackML/OOP, radar Safety, HMI Template Suite
