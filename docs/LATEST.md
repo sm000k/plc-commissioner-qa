@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12 | Data: 2026-03-31 | Pytania: 143
+### Wersja: v12 | Data: 2026-04-01 | Pytania: 155
 
 ---
 
@@ -34,6 +34,7 @@
 - [17. REALNE SCENARIUSZE COMMISSIONING](#17-realne-scenariusze-commissioning)
 - [18. TIA PORTAL — ZAAWANSOWANE FUNKCJE](#18-tia-portal-zaawansowane-funkcje)
 - [19. COMMISSIONING — DODAWANIE STACJI I URZĄDZEŃ DO PROJEKTU](#19-commissioning-dodawanie-stacji-i-urządzeń-do-projektu)
+- [20. SCHEMATY ELEKTRYCZNE — SILNIKI I APARATURA ŁĄCZENIOWA](#20-schematy-elektryczne-silniki-i-aparatura-łączeniowa)
 
 ### Pytania
 
@@ -55,6 +56,7 @@
 - [1.15. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?](#115-czym-jest-enkoder-i-jaka-jest-różnica-między-inkrementalnym-a-absolutnym)
 - [1.16. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?](#116-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc)
 - [1.17. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?](#117-co-to-jest-przerzutnik-sr-i-rs-w-tia-portal-i-jaka-jest-różnica-w-priorytecie)
+- [1.18. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?](#118-czym-różni-się-dominacja-set-od-dominacji-reset-w-układzie-samopodtrzymania-lad)
 
 **2. ARCHITEKTURA SIMATIC SAFETY INTEGRATED**
 - [2.1. Co to jest SIMATIC Safety Integrated i co oznacza 'wszystko w jednym sterowniku'?](#21-co-to-jest-simatic-safety-integrated-i-co-oznacza-wszystko-w-jednym-sterowniku)
@@ -215,6 +217,17 @@
 - [18.4. Czym jest SIMATIC ProDiag i jak konfigurujesz pierwsze monitory diagnostyczne?](#184-czym-jest-simatic-prodiag-i-jak-konfigurujesz-pierwsze-monitory-diagnostyczne)
 
 **19. COMMISSIONING — DODAWANIE STACJI I URZĄDZEŃ DO PROJEKTU**
+
+**20. SCHEMATY ELEKTRYCZNE — SILNIKI I APARATURA ŁĄCZENIOWA**
+- [20.1. Co to jest silnik Dahlander (6 wyprowadzeń) i jak uzyskuje się dwa zakresy prędkości?](#201-co-to-jest-silnik-dahlander-6-wyprowadzeń-i-jak-uzyskuje-się-dwa-zakresy-prędkości)
+- [20.2. Jak działa rozruch gwiazda-trójkąt (Y/Δ) i kiedy go stosujemy?](#202-jak-działa-rozruch-gwiazda-trójkąt-yδ-i-kiedy-go-stosujemy)
+- [20.3. Jak realizuje się zmianę kierunku obrotów silnika asynchronicznego?](#203-jak-realizuje-się-zmianę-kierunku-obrotów-silnika-asynchronicznego)
+- [20.4. Czym jest przekaźnik termiczny (bimetalowy) i jak go dobierasz do silnika?](#204-czym-jest-przekaźnik-termiczny-bimetalowy-i-jak-go-dobierasz-do-silnika)
+- [20.5. Co to jest aparat różnicowoprądowy (RCD/RCCB) i czym różni się od bezpiecznika nadprądowego?](#205-co-to-jest-aparat-różnicowoprądowy-rcdrccb-i-czym-różni-się-od-bezpiecznika-nadprądowego)
+- [20.6. Na czym polega blokada elektryczna i mechaniczna między dwoma stycznikami?](#206-na-czym-polega-blokada-elektryczna-i-mechaniczna-między-dwoma-stycznikami)
+- [20.7. Czym różni się wyłącznik silnikowy (3RV) od bezpiecznika wkładkowego (wkładka topikowa)?](#207-czym-różni-się-wyłącznik-silnikowy-3rv-od-bezpiecznika-wkładkowego-wkładka-topikowa)
+- [20.8. Co to jest układ samopodtrzymania w schemacie elektrycznym i jak go realizujesz?](#208-co-to-jest-układ-samopodtrzymania-w-schemacie-elektrycznym-i-jak-go-realizujesz)
+- [20.9. Jak wygląda typowy schemat rozruchu Y/Δ sterowanego przez PLC — kolejność wyjść i blokady?](#209-jak-wygląda-typowy-schemat-rozruchu-yδ-sterowanego-przez-plc-kolejność-wyjść-i-blokady)
 - [19.1. Jak krok po kroku dodajesz nową wyspę sygnałową ET200SP Safety (F-peripheral) do istniejącego projektu?](#191-jak-krok-po-kroku-dodajesz-nową-wyspę-sygnałową-et200sp-safety-f-peripheral-do-istniejącego-projektu)
 - [19.2. Jak dodajesz wyspę pneumatyczną SMC (seria EX600) do projektu TIA Portal przez PROFINET?](#192-jak-dodajesz-wyspę-pneumatyczną-smc-seria-ex600-do-projektu-tia-portal-przez-profinet)
 - [19.3. Jak krok po kroku dodajesz napęd SINAMICS G120 przez PROFINET do projektu TIA Portal?](#193-jak-krok-po-kroku-dodajesz-napęd-sinamics-g120-przez-profinet-do-projektu-tia-portal)
@@ -547,6 +560,97 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 > ⚠️ W TIA Portal LAD bloki SR/RS są dostępne w *Basic Instructions → Bistable operations*. Parametr `Q` to bit zapamiętany — musi być adres **Memory** (`M`) lub **DB bit**, nigdy wejście `I`.
 
 *Źródło: TIA Portal Help — LAD Bistable Operations; IEC 61131-3 §3.2.3*
+
+
+---
+
+### 1.18. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
+
+**Dominacja** określa, który sygnał wygrywa gdy jednocześnie wciśniemy START i STOP. Jest to praktyczny odpowiednik priorytetu przerzutnika SR/RS, widoczny bezpośrednio w schemacie drabinkowym.
+
+**Dominacja SET** (lewy obwód) — priorytet ma START:
+- START steruje Lampką **bezpośrednio** (równolegle z samopodtrzymaniem przez Lampkę)
+- STOP jest szeregowy z samopodtrzymaniem, ale gdy START=1 — omija STOP
+- Gdy `START=1` i `STOP=1` jednocześnie → **Lampka = 1** (SET wygrywa)
+- „START bezpośrednio steruje Lampką, dlatego STOP nie ma tutaj nic do gadania"
+
+**Dominacja RESET** (prawy obwód) — priorytet ma STOP:
+- START zasila Lampkę **przez** STOP (szeregowo w tej samej gałęzi)
+- Gdy `START=1` i `STOP=1` jednocześnie → **Lampka = 0** (RESET wygrywa — STOP odcina zasilanie)
+- „START zasila Lampkę poprzez STOP, dlatego przycisk wyłączenia jest ważniejszy"
+
+![Dominacja SET vs RESET — porównanie obwodów LAD](images/safety/dominacja_set_reset_lad.png)
+
+**Tabele prawdy — zachowanie Lampki:**
+
+![Tabele prawdy Dominacja SET i RESET](images/safety/dominacja_set_reset_tabela.png)
+
+| Stan | START | STOP | Lampka (Dominacja SET) | Lampka (Dominacja RESET) |
+|------|-------|------|------------------------|--------------------------|
+| Oba wciśnięte | 1 | 1 | **1** ← SET wygrywa | **0** ← RESET wygrywa |
+| Tylko START | 1 | 0 | 1 | 1 |
+| Tylko STOP | 0 | 1 | 0 | 0 |
+| Żaden | 0 | 0 | * (stan poprzedni) | * (stan poprzedni) |
+
+> Gwiazdka „*" oznacza stan zapamiętany — bez akcji na wejściach układ nie zmienia stanu (samopodtrzymanie działa).
+
+**Związek z przerzutnikami bistabilnymi w TIA Portal:**
+
+| Schemat LAD (ręczny) | Odpowiednik bloku TIA Portal |
+|----------------------|------------------------------|
+| Dominacja SET | Blok **SR** — Set-Dominant (S wygrywa) |
+| Dominacja RESET | Blok **RS** — Reset-Dominant (R wygrywa) |
+
+**Zasada projektowania bezpiecznych maszyn:** Zawsze stosuj **Dominację RESET** dla obwodów STOP i E-Stop. Operator musi mieć gwarancję, że wciśnięcie przycisku wyłączenia zatrzyma maszynę niezależnie od innych sygnałów (EN 60204-1 §9.2.2).
+
+*Źródło: Kurs ControlByte — Układy samopodtrzymania, Dominacja SET/RESET; EN 60204-1 §9.2.2*
+
+
+---
+
+### 1.19. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?  🔴
+
+**Pułapka samopodtrzymania** polega na błędnym umieszczeniu styku samopodtrzymania (Lampka) tak, że **omija on przycisk STOP** — wciśnięcie STOP nie wyłącza cewki, bo prąd płynie alternatywną ścieżką.
+
+**Obwód LEWOSTRONNY — poprawny (Dominacja RESET):**
+```
+BARIERA_MAGISTRALI
++--[ START ]--+----[ /STOP ]----(  Lampka  )
+              |
++--[ Lampka ]-+
+```
+- Styk `Lampka` (samopodtrzymanie) jest w gałęzi **równoległej do START** — przed STOP
+- STOP jest **szeregowy z oboma ścieżkami** (START i samopodtrzymaniem)
+- Wciśnięcie STOP → otwiera jedyną drogę do cewki → Lampka **gaśnie** ✅
+
+**Obwód PRAWOSTRONNY — niepoprawny (STOP omijany):**
+```
++--[ START ]--[ /STOP ]---(  Lampka  )
+|                              |
++--------[ Lampka ]------------+
+```
+- Styk `Lampka` (samopodtrzymanie) jest w gałęzi **równoległej do całego szeregu START–STOP**
+- Gdy Lampka=1 i operator wciśnie STOP: prąd nadal płynie dolną ścieżką przez `Lampka` → cewka **nadal zasilona** ❌
+- STOP jest **bezużyteczny** gdy Lampka jest już włączona
+
+**Tabela porównawcza:**
+
+| Stan | STOP wciśnięty | Obwód LEWY (poprawny) | Obwód PRAWY (błędny) |
+|------|----------------|----------------------|----------------------|
+| Lampka=1 | TAK | Lampka → 0 ✅ | Lampka → **1** ❌ |
+| Lampka=0 | TAK | Lampka → 0 ✅ | Lampka → 0 ✅ |
+| START=1 | NIE | Lampka → 1 | Lampka → 1 |
+
+> ⚠️ **Błąd projektowy klasy STOP-ignorowanego!** Prawy obwód sprawia wrażenie poprawnego podczas statycznej analizy schematu. Błąd ujawnia się dopiero w działaniu — gdy Lampka raz się załączy, przycisku STOP nie można jej wyłączyć. W systemach safety jest to krytyczny błąd bezpieczeństwa.
+
+> 💡 **Reguła zapamiętywania:** Styk samopodtrzymania **zawsze przed STOP** (w gałęzi równoległej tylko do START). STOP musi być „po" całej logice podtrzymania, żeby faktycznie odcinał zasilanie cewki.
+
+**Zastosowanie w praktyce:**
+- Typowy obwód układu napędowego: `(START || KM_zal) AND STOP_NC → KM_cewka`
+- W TIA Portal LAD: samopodtrzymanie = styk wyjściowego bitu Q równoległy do przycisku START, STOP zawsze w gałęzi głównej przed cewką
+- Analogiczny błąd w SCL: `IF Start OR Q THEN Q := TRUE; IF Stop THEN Q := FALSE; END_IF;` — STOP nie zadziała jeśli `Start=TRUE` jednocześnie (priorytet SET)
+
+*Źródło: Kurs ControlByte — Slajd 9/24 „Znajdź różnice", Układy samopodtrzymania; EN 60204-1 §9.2.2*
 
 
 ---
@@ -2635,3 +2739,402 @@ Wyspa zawór pneumatycznych SMC EX600 komunikuje się przez PROFINET jako standa
 > ⚠️ **Safety komisjonowanie = wymagany test:** po każdej zmianie parametrów Safety (STO, SS1, SLS) obowiązuje **Safety Acceptance Test** z raportem i podpisem. Dotyczy każdego napędu z Safety Integrated.
 
 > 💡 **`Take online device as preset`:** jeśli napęd był wcześniej skonfigurowany (legacy), użyj tej opcji — TIA Portal/Startdrive wczyta aktualną konfigurację z napędu jako punkt startowy, nie nadpisze parametrów.
+---
+
+## 20. SCHEMATY ELEKTRYCZNE — SILNIKI I APARATURA ŁĄCZENIOWA
+
+### 20.1. Co to jest silnik Dahlander (6 wyprowadzeń) i jak uzyskuje się dwa zakresy prędkości?
+
+**Silnik Dahlander** (pol. *silnik z przełączaniem biegunów*) to trójfazowy silnik asynchroniczny z 6 wyprowadzeniami (U1, V1, W1 — niskiej prędkości; U2, V2, W2 — wysokiej prędkości), który dzięki zmianie połączenia uzwojeń uzyskuje dwie synchroniczne prędkości w stosunku **1:2**.
+
+**Zasada działania:**
+- Zmiana połączenia uzwojeń = zmiana liczby par biegunów (p) → zmiana prędkości synchronicznej: `n = 60·f / p`
+- Stosunek prędkości zawsze **dokładnie 1:2** (np. 750/1500 rpm, 1000/2000 rpm przy 50 Hz)
+
+**Połączenia uzwojeń:**
+
+| Prędkość | Konfiguracja uzwojenia | Zasilanie | Zwarte wyprowadzenia |
+|----------|------------------------|-----------|----------------------|
+| Niska (więcej biegunów) | Trójkąt (Δ) | U1, V1, W1 | U2, V2, W2 — otwarte |
+| Wysoka (mniej biegunów) | Podwójna gwiazda (YY) | U2, V2, W2 | U1, V1, W1 — zwarte razem |
+
+**Schemat aparatury (3 styczniki):**
+- **KM1** — główny (zawsze zamknięty gdy silnik pracuje)
+- **KM2** — niskiej prędkości (Δ: zasila U1/V1/W1, U2/V2/W2 otwarte)
+- **KM3** — wysokiej prędkości (YY: zasila U2/V2/W2, zwiera U1/V1/W1)
+- **Blokada:** KM2 i KM3 MUSZĄ być wzajemnie blokowane (el. + mech.) — jednoczesne zadziałanie = zwarcie
+
+**Sterowanie z PLC:**
+```
+Q0.0 = KM1 (główny)
+Q0.1 = KM2 (niska prędkość)   -- wyklucza Q0.2
+Q0.2 = KM3 (wysoka prędkość)  -- wyklucza Q0.1
+```
+- Przy zmianie z niskiej na wysoką: przerwa min. 50–100 ms (rozpad łuku na KM2 zanim zamknie KM3)
+- Zabezpieczenie: dla każdej prędkości osobny przekaźnik termiczny (różne prądy znamionowe przy Δ i YY)
+
+> ⚠️ **Moment przy zmianie biegów:** przejście Δ→YY powoduje chwilowy skok prądu — nie zmieniaj biegu pod obciążeniem zderzakowym. W razie potrzeby stosuj łagodny rozruch (soft-starter) lub przemiennik częstotliwości.
+
+*Źródło: EN 60034-8, praktyka rozdzielnica automatyki przemysłowej*
+
+---
+
+### 20.2. Jak działa rozruch gwiazda-trójkąt (Y/Δ) i kiedy go stosujemy?
+
+**Rozruch Y/Δ** to metoda łagodnego rozruchu silnika asynchronicznego, polegająca na etapowym przełączeniu uzwojeń: najpierw w gwiazdę (Y — niższe napięcie na uzwojeniu), potem w trójkąt (Δ — pełne napięcie).
+
+**Parametry elektryczne:**
+
+| Parametr | Bezpośredni (DOL) | Gwiazda (Y) | Trójkąt (Δ) |
+|----------|-------------------|-------------|-------------|
+| Napięcie na uzwojeniu | U_line | U_line / √3 ≈ 58% U_n | U_line = 100% U_n |
+| Prąd rozruchowy sieciowy | ~6–8× I_n | ~2–2.7× I_n (1/3 DOL) | ~6–8× I_n |
+| Moment rozruchowy | ~100% | ~33% | ~100% |
+
+> ⚠️ **Moment = 1/3 przy starcie w Y:** silnik NIE nadaje się do rozruchu pod pełnym obciążeniem — stosuj tylko przy lekkim obciążeniu startowym (wentylatory, pompy odśrodkowe, sprężarki bez obciążenia startowego).
+
+**Aparatura (3 elementy aparatury):**
+- **KM_L** — główny liniowy (zasilanie L1/L2/L3 → U1/V1/W1 silnika)
+- **KM_Y** — gwiazda (zwiera U2/V2/W2 = punkt gwiazdowy; uzwojenia w Y)
+- **KM_Δ** — trójkąt (łączy U2→V1, V2→W1, W2→U1 = uzwojenia w Δ)
+- **Blokada:** KM_Y i KM_Δ MUSZĄ być blokowane wzajemnie elektrycznie i mechanicznie
+
+**Sekwencja rozruchu:**
+1. PLC zamknij **KM_L** (główny)
+2. PLC zamknij **KM_Y** (gwiazda) → silnik rusza z ~33% momentu, prąd ~2–3× I_n
+3. Poczekaj na timer T1 (typowo 3–10 s, aż silnik osiągnie ~70–80% prędkości docelowej)
+4. PLC otwórz **KM_Y** → odczekaj 50–100 ms (czas zaniku łuku)
+5. PLC zamknij **KM_Δ** (trójkąt) → silnik na pełnej prędkości
+6. Skok prądu przy przełączeniu: krótkotrwały ~4–6× I_n — niemalże jak DOL — to **chwilowe uderzenie prądowe** przy przejściu Y→Δ
+
+**Warunki stosowania:**
+- Silnik 6-wyprowadzeniowy (U1, V1, W1, U2, V2, W2)
+- Napięcie znamionowe silnika = napięcie sieci (np. 400 V / Δ przy sieci 3×400 V)
+- Obciążenie nie wymaga pełnego momentu rozruchowego
+
+**Kiedy NIE stosować Y/Δ:**
+- Duże obciążenie przy starcie (np. przenośniki taśmowe z ładunkiem) → stosuj soft-starter lub VFD
+- Silnik 3-wyprowadzeniowy (tylko Δ lub tylko Y z fabryki) — brak możliwości przełączenia
+
+*Źródło: EN 60204-1 §9, praktyka szafy rozdzielniczej automotive*
+
+---
+
+### 20.3. Jak realizuje się zmianę kierunku obrotów silnika asynchronicznego?
+
+**Zmiana kierunku** silnika trójfazowego to zamiana kolejności faz — wystarczy zamienić dowolne dwie fazy (np. L1↔L3, L2 pozostaje). Realizuje się to dwoma blokami stykowymi (stycznikami KM_F i KM_R) z rygorystyczną blokadą.
+
+**Zasada:**
+
+| Styk czynny | Fazy na silniku | Kierunek |
+|-------------|-----------------|----------|
+| KM_F (Forward/Prawy) | L1 → U, L2 → V, L3 → W | Prawoskrętny |
+| KM_R (Reverse/Lewy) | L3 → U, L2 → V, L1 → W | Lewoskrętny |
+
+*(Zamiana L1↔L3, L2 pozostaje — wynik: odwrócona kolejność faz)*
+
+**Schemat aparatury:**
+
+```
+L1 ─┬── KM_F_styk ─┐
+L2 ──────────────── Silnik (U, V, W)
+L3 ─┴── KM_R_styk ─┘   (krzyżowe połączenie L1/L3 w KM_R)
+```
+
+**Trójstopniowa blokada (OBOWIĄZKOWA):**
+
+1. **Blokada mechaniczna** — blokada mechaniczna Siemens `3RT1946-2G` montowana między dwoma zestawami stykowymi (fizycznie uniemożliwia jednoczesne zadziałanie)
+2. **Blokada elektryczna** — styk NC (normalnie zamknięty) KM_F w obwodzie cewki KM_R i vice versa
+3. **Blokada programowa (PLC)** — wzajemne wykluczenie w logice programu, np.:
+   ```
+   // SCL Siemens TIA Portal
+   IF Forward AND NOT Reverse_FB THEN
+       KM_F := TRUE;
+       KM_R := FALSE;
+   ELSIF Reverse AND NOT Forward_FB THEN
+       KM_R := TRUE;
+       KM_F := FALSE;
+   END_IF;
+   ```
+
+**Czas martwy przy zmianie kierunku:**
+- Min. 100–300 ms między wyłączeniem jednego a włączeniem drugiego stycznika
+- Konieczny ze względu na rozpad łuku elektrycznego na styling i demagnetyzację uzwojeń silnika
+- Przy PLC: zrealizuj timerem (TOF lub TON)
+
+> ⚠️ **Zmiana pod napięciem:** zmiana kierunku gdy silnik kręci się z pełną prędkością = silny szok mechaniczny + prąd udarowy do 10× I_n. Zawsze zastosuj logikę: STOP → czekaj aż silnik się zatrzyma → START w przeciwnym kierunku (lub hamowanie dynamiczne).
+
+> 💡 **Gotowe zestawy odwracające:** Siemens oferuje zestawy `3RA2` i `3RA1` z fabryczną blokadą mechaniczną — szybszy montaż i certyfikowana blokada.
+
+*Źródło: EN 60204-1, katalog Siemens SIRIUS aparatura łączeniowa*
+
+---
+
+### 20.4. Czym jest przekaźnik termiczny (bimetalowy) i jak go dobierasz do silnika?
+
+**Przekaźnik termiczny** (termobimetalowy) to element zabezpieczający silnik przed przeciążeniem przez detekcję nadmiernego prądu — bimetale nagrzewają się proporcjonalnie do r.m.s. prądu i otwierają styk wyzwalający po osiągnięciu temperatury progowej.
+
+**Zasada:**
+- Bimetal = dwie warstwy metalu o różnym współczynniku rozszerzalności → ugięcie przy nagrzaniu
+- Symuluje nagrzewanie silnika (model termiczny) — zabezpiecza przed długotrwałym przeciążeniem
+- **NIE** chroni przed zwarciem (to zadanie bezpiecznika lub WS/wyłącznik silnikowy)
+
+**Dobór przekaźnika termicznego:**
+
+| Parametr | Wartość |
+|----------|---------|
+| Prąd nastawiania | I_set = I_n silnika (wartość z tabliczki znamionowej) |
+| Zakres nastawy | Wybierz model o zakresie obejmującym I_n |
+| Klasa wyzwalania | Class 10 (standard), Class 20 (ciężki rozruch), Class 30 (bardzo ciężki) |
+| Typ | 1-fazowy (brak symetrii faz), 3-fazowy (asymetria faz, utrata fazy) |
+
+**Siemens SIRIUS — wybór modelu:**
+- `3RU2` — elektroniczny przekaźnik przeciążeniowy (dokładniejszy, klasy 5/10/20/30 przestawiane)
+- `3RB3` — elektroniczny z czujnikiem termistorowym PTC (bezpośredni pomiar temperatury uzwojenia)
+- `3RT` + `3RU2` jako zestaw (bezpośredni styk pomocniczy, mechaniczna blokada)
+
+**Sygnały z przekaźnika do PLC:**
+- Styk NC → obwód sterowania cewki KM (otwarcie = wyłączenie silnika)
+- Styk NO → wejście PLC jako sygnał alarmu: `"TermalTrip"` → diagnostyka HMI
+
+> ⚠️ **Reset po zadziałaniu:** po wyzwoleniu przekaźnik NIE resetuje się automatycznie — wymagany czas ostygnięcia (zwykle 3–5 min) + ręczny reset przyciskiem. Siemens 3RU2 ma tryb auto-reset (niezalecany = może uruchomić silnik bez wiedzy operatora).
+
+*Źródło: Siemens Industry Catalog — SIRIUS Motor Starters 3RT/3RU, EN 60947-4-1*
+
+---
+
+### 20.5. Co to jest aparat różnicowoprądowy (RCD/RCCB) i czym różni się od bezpiecznika nadprądowego?
+
+**Aparat różnicowoprądowy** (RCD — Residual Current Device, pol. *wyłącznik różnicowoprądowy*) to urządzenie ochronne wykrywające upływ prądu do ziemi przez porównanie sumy prądów w przewodach fazowych i zerowym.
+
+**Zasada działania:**
+- Wszystkie przewody (L1, L2, L3, N) przechodzą przez wspólny przekładnik prądowy (toroid)
+- W stanie normalnym: ΣI = 0 (prąd wychodzący = powracający)
+- Przy upływności: ΣI ≠ 0 → napięcie na cewce → wyzwolenie w ciągu <40 ms
+
+**Wartości wrażliwości (czułości):**
+
+| Prąd wyzwalający | Zastosowanie |
+|-----------------|--------------|
+| 10 mA | Ochrona osób w miejscach szczególnie niebezpiecznych (baseny, medycyna) |
+| 30 mA | Ochrona przeciwporażeniowa (standard w instalacjach ogólnych, EN 60364) |
+| 100 mA | Ochrona pożarowa urządzeń |
+| 300 mA / 500 mA | Ochrona pożarowa obwodów zbiorczych |
+
+**Typy RCD — kluczowe dla automatyki:**
+
+| Typ | Wykrywany prąd upływu | Zastosowanie |
+|-----|----------------------|--------------|
+| Typ AC | Tylko sinusoidalny przemienny | Klasyczne obciążenia rezystancyjne/indukcyjne |
+| Typ A | AC + pulsujący DC | Silniki z tyrystorami (falowniki 1-fazowe) |
+| Typ B | AC + pulsujący DC + gładki DC | **Przemienniki częstotliwości VFD, UPS, ładowarki EV** |
+| Typ F | Jak A + wysokoczęstotliwościowy | Falowniki z filtrem EMC |
+
+> ⚠️ **RCD + VFD:** przemiennik częstotliwości generuje prądy upływu pojemnościowe (filtr EMC, kable ekranowane) → mogą wyzwalać RCD 30 mA bez powodu. Rozwiązania: (1) użyj RCD typ B 300 mA jako pożarowy, (2) zastosuj RCD selektywny (opóźniony), (3) RCD dedykowany do VFD (np. Siemens 5SV — Enhanced protection).
+
+**RCD vs bezpiecznik/MCB:**
+
+| Cecha | RCD (różnicowoprądowy) | MCB (nadprądowy) / bezpiecznik |
+|-------|------------------------|-------------------------------|
+| Czego broni | Upływu do ziemi (porażenie, pożar) | Przed przeciążeniem i zwarciem |
+| Zasada | Pomiar różnicy prądów | Bimetale + wyzwalacz elektromagnetyczny |
+| Prądy robocze | Nie ogranicza obciążenia | Odcina powyżej I_n |
+| Stosowanie | Zawsze z MCB/bezpiecznikiem | Może pracować samodzielnie |
+
+> 💡 **RCBO = RCD + MCB w jednym urządzeniu** — oszczędność miejsca w rozdzielnicy, jedno urządzenie łączy obie funkcje.
+
+*Źródło: EN 60364-4-41 (ochrona przed porażeniem), EN 61008, katalog Siemens SENTRON*
+
+---
+
+### 20.6. Na czym polega blokada elektryczna i mechaniczna między dwoma stycznikami?
+
+**Blokada wzajemna** (interlocking) to układ zabezpieczający przed jednoczesnym zadziałaniem dwóch styków wzajemnie wykluczających się — konieczna wszędzie tam, gdzie jednoczesne zadziałanie grozi zwarciem (Y/Δ, rewersja, przełączanie źródeł zasilania).
+
+**Rodzaje blokad:**
+
+**1. Blokada elektryczna (electrical interlock):**
+- Styk NC (normalnie zamknięty) jednego stycznika wstawiony szeregowo do obwodu cewki drugiego
+- Gdy KM_A jest pod napięciem → jego NC styk w obwodzie KM_B otwiera się → KM_B nie może zadziałać
+
+```
+Obwód KM_A:  [START_A] NC(KM_B) [Cewka KM_A]
+Obwód KM_B:  [START_B] NC(KM_A) [Cewka KM_B]
+```
+
+**2. Blokada mechaniczna (mechanical interlock):**
+- Fizyczna belka sprzęgająca dwie obudowy styków (montaż między nimi)
+- Gdy jeden jest zamknięty, mechaniczna dźwignia fizycznie blokuje zadziałanie drugiego
+- Siemens: moduły `3RA1934-1A` (dla 3RT1) lub `3RA1944-2A` (dla 3RT2)
+- Nie zależy od obwodu elektrycznego — chroni nawet przy awarii sterowania
+
+**3. Blokada programowa (software interlock):**
+- Wzajemne wykluczenie bitów wyjściowych w programie PLC
+- Najlepsza dla skrótu typowych błędów, ale tylko jako warstwa trzecia
+- Sama w sobie NIEDOSTATECZNA — błąd w programie lub awaria CPU może ją ominąć
+
+**Dlaczego wszystkie trzy warstwy?**
+- EN 60204-1 §9 wymaga, aby blokada funkcji wzajemnie wykluczających była zrealizowana sprzętowo
+- IEC 60947-4-1 — wymagania dla układów rewersyjnych
+
+> ⚠️ **Kolejność hierarchii:** blokada mechaniczna > elektryczna > programowa. Przy audycie bezpieczeństwa sprawdzaj fizycznie, czy moduł mechaniczny jest zamontowany — sam schemat elektryczny nie wystarczy.
+
+*Źródło: EN 60204-1 §9.3, Siemens Catalog SIRIUS D*
+
+---
+
+### 20.7. Czym różni się wyłącznik silnikowy (3RV) od bezpiecznika wkładkowego (wkładka topikowa)?
+
+**Wyłącznik silnikowy** (Motor Circuit Breaker — MCB/MP, Siemens seria `3RV2`) to wielofunkcyjny wyłącznik chroniący silnik zarówno przed przeciążeniem jak i zwarciem, z możliwością wielokrotnego użycia.
+
+**Porównanie:**
+
+| Cecha | Wyłącznik silnikowy (3RV2) | Bezpiecznik wkładkowy (topikowy) |
+|-------|---------------------------|----------------------------------|
+| Zasada działania | Bimetal (przeciążenie) + elektromagnes (zwarcie) | Topliwy drucik/wkładka |
+| Ponowne użycie | Tak — reset przyciskiem | Nie — wymiana wkładki po zadziałaniu |
+| Nastawianie I | Tak — pokrętło I_set | Nie — stała klasa (gG, aM) |
+| Sygnalizacja | Styk pomocniczy (NO/NC) do PLC | Brak (lub sygnalizator topikowy) |
+| Ochrona przed utratą fazy | Tak (3-fazowy termobimetal) | Tak (osobna wkładka na fazę) |
+| Montaż | Na szynie DIN, łączy się z KM | Na szynie DIN lub w listwach |
+| Zastosowanie | Silniki do ~45 kW (3RV2) | Duże silniki, obwody główne |
+
+**Klasy bezpieczników:**
+- **gG** — ogólne przeznaczenie (ochrona przewodów i ogólnych odbiorników) — wolne topienie
+- **aM** — motorowe (ochrona uzwojeń silnika) — szybkie przy zwarciu, toleruje prąd rozruchowy
+
+**Dobór wyłącznika silnikowego 3RV2:**
+- Nastaw `I_set` na I_n silnika z tabliczki znamionowej
+- Klasa wyzwalania: 10 (standard) lub 20 (dla silników z ciężkim rozruchem Y/Δ)
+- Sprawdź zdolność łączeniową (Ics) ≥ prąd zwarcia w punkcie instalacji
+
+> 💡 **Siemens 3RV2 + 3RT2 = zestaw:** wyłącznik silnikowy + stycznik montowane razem na szynie DIN, łączą się łącznikiem mechanicznym bez dodatkowych przewodów — standardowe rozwiązanie w szafach automatyki.
+
+*Źródło: Siemens Catalog SIRIUS D, EN 60947-2, IEC 60947-4-1*
+
+---
+
+### 20.8. Co to jest układ samopodtrzymania w schemacie elektrycznym i jak go realizujesz?
+
+**Układ samopodtrzymania** (ang. *latching circuit / self-holding circuit*) to obwód sterowania, w którym krótki impuls przycisku START uruchamia odbiornik, a styk pomocniczy NO stycznika podtrzymuje jego własny obwód zasilania po zwolnieniu przycisku.
+
+**Schemat klasyczny (obwód sterowniczy 230 VAC / 24 VDC):**
+
+```
+L (24V) ─── [STOP NC] ─┬─ [START NO] ─── [Cewka KM]
+                        └─ [KM styk NO] ─┘
+N (0V) ─────────────────────────────────────────────
+```
+
+**Działanie:**
+1. `STOP` NC — normalnie zamknięty → prąd może płynąć
+2. Naciśnij `START` NO → zamknięcie → prąd przez cewkę KM → KM zastyga (zamknięcie styku głównego + pomocniczego)
+3. Zwolnij `START` → styk pomocniczy NO (KM) przejął zadanie podtrzymania → cewka nadal zasilona
+4. Naciśnij `STOP` → otwarcie NC → cewka bez zasilania → KM opada → silnik wyłączony
+
+**Sygnał STOP musi być NC (normalnie zamknięty):**
+- Zgodnie z EN 60204-1 i EN ISO 13849-1 — stan bezpieczny = brak sygnału
+- Uszkodzenie przewodu do STOP → otwarcie = maszyna się zatrzymuje (fail-safe)
+
+**Realizacja w PLC (program LAD):**
+```
+Network 1:
+  [I0.0 START] ──┬── [I0.1 STOP NC] ─── (Q0.0 KM)
+  [Q0.0 KM] ─────┘
+```
+
+**Integracja z PLC a klasyczny schemat:**
+- Przy sterowaniu PLC: często rezygnuje się z hardware self-holding (PLC to realizuje programowo)
+- Wymaganie bezpieczeństwa: obwód STOP w sprzęcie (HW) — np. PLC może się zawiesić, a Stop musi działać
+
+*Źródło: EN 60204-1 §10, EN ISO 13849-1, praktyka automatyki przemysłowej*
+
+---
+
+### 20.9. Jak wygląda typowy schemat rozruchu Y/Δ sterowanego przez PLC — kolejność wyjść i blokady?
+
+**Kompletna procedura commissioning i uruchomienia układu Y/Δ z PLC (TIA Portal):**
+
+**Przypisanie wyjść PLC:**
+
+| Wyjście PLC | Styk / Element | Opis |
+|-------------|----------------|------|
+| Q0.0 | KM_L (liniowy) | Zasila uzwojenia silnika (U1/V1/W1) |
+| Q0.1 | KM_Y (gwiazda) | Zwiera U2/V2/W2 = punkt gwiazdowy |
+| Q0.2 | KM_Δ (trójkąt) | Łączy U2/V2/W2 → U1/V1/W1 (skrzyżowanie) |
+
+**Wejścia PLC (sprzężenie zwrotne):**
+
+| Wejście PLC | Sygnał | Opis |
+|-------------|--------|------|
+| I0.0 | START | Przycisk Start (NO) |
+| I0.1 | STOP | Przycisk Stop (NC) |
+| I0.2 | FB_KM_L | Potwierdzenie załączenia KM_L (styk pomocniczy NO) |
+| I0.3 | FB_KM_Y | Potwierdzenie załączenia KM_Y |
+| I0.4 | FB_KM_Δ | Potwierdzenie załączenia KM_Δ |
+| I0.5 | FAULT_THERMAL | Styk NC z przekaźnika termicznego |
+
+**Sekwencja sterowania (SCL):**
+
+```scl
+// TIA Portal S7-1500 — rozruch Y/Delta
+VAR_GLOBAL
+    Timer_YD : TON;       // timer przełączenia Y→Δ
+    Timer_Gap : TON;      // timer przerwy między KM_Y off a KM_D on
+    Running : BOOL;
+    YD_State : INT;       // 0=stop, 1=Y, 2=gap, 3=delta
+END_VAR
+
+CASE YD_State OF
+    0: // STOP
+        KM_L := FALSE; KM_Y := FALSE; KM_D := FALSE;
+        IF Start AND NOT Fault_Thermal THEN
+            KM_L := TRUE;
+            KM_Y := TRUE;
+            Timer_YD(IN:=TRUE, PT:=T#6S);
+            YD_State := 1;
+        END_IF;
+
+    1: // Gwiazda (Y)
+        IF Timer_YD.Q THEN
+            KM_Y := FALSE;                     // wyłącz gwiazdę
+            Timer_YD(IN:=FALSE);
+            Timer_Gap(IN:=TRUE, PT:=T#100MS);  // przerwa 100ms
+            YD_State := 2;
+        END_IF;
+        IF NOT Stop OR Fault_Thermal THEN YD_State := 0; END_IF;
+
+    2: // Przerwa (gap) między Y a Δ
+        IF Timer_Gap.Q THEN
+            KM_D := TRUE;                      // zamknij trójkąt
+            Timer_Gap(IN:=FALSE);
+            YD_State := 3;
+        END_IF;
+
+    3: // Trójkąt (Δ) — praca nominalna
+        IF NOT Stop OR Fault_Thermal THEN
+            KM_L := FALSE; KM_D := FALSE;
+            YD_State := 0;
+        END_IF;
+END_CASE;
+
+// Blokada programowa — nigdy jednocześnie Y i Δ
+IF KM_Y THEN KM_D := FALSE; END_IF;
+IF KM_D THEN KM_Y := FALSE; END_IF;
+```
+
+**Diagnostyka typowych problemów:**
+
+| Objaw | Przyczyna | Naprawa |
+|-------|-----------|---------|
+| Silnik nie startuje | KM_L nie zasila (brak FB_KM_L) | Sprawdź bezpieczniki, przekaźnik termiczny |
+| Wyłączenie przy przełączeniu Y→Δ | Przerwa zbyt krótka → łuk → zwarcie | Wydłuż Timer_Gap do 150–200 ms |
+| Ciągły prąd rozruchowy, nie przyspiesza | Zbyt krótki Timer_YD — przełączenie za wcześnie | Ustaw 5–8 s zamiast 3 s |
+| Przekaźnik termiczny wyciąga | I_set za nisko lub klasa wyzwalania 10 zamiast 20 | Nastaw I_set = I_n, zmień na klasę 20 |
+| KM_Δ i KM_Y wyzwalają jednocześnie | Brak blokady mechanicznej lub elektrycznej | Zamontuj 3RA1934-1A + sprawdź styki NC |
+
+> 💡 **Monitoruj prąd online:** przy komisjonowaniu przyłącz multimetr cęgowy do fazy silnika — sprawdź prąd w Y (powinien być ~1/3 prądu w Δ). Jeśli prąd w Y jest równy prądowi Δ = uzwojenia podłączone jako 660V silnik na sieci 400V (błąd: silnik jest gwiazdowy z fabryki, a ty go prefabrykujesz w Y/Δ).
+
+*Źródło: EN 60204-1, praktyka szafy rozdzielniczej commissioning, Siemens Industry*
+
+---
