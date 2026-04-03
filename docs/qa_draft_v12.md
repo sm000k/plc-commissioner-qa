@@ -3039,81 +3039,7 @@ Obwód cewki KM_R:  ──[S2 START_R]──[NC KM_F]──(Cewka KM_R)
 
 ---
 
-### 20.7. Jak wygląda schemat rozruchu Y/Δ sterowanego przez PLC i jak go programujesz w TIA Portal?
-
-**Kompletny schemat Y/Δ z PLC — mapowanie I/O:**
-
-**Wyjścia PLC → styczniki:**
-
-| Wyjście | Element | Opis |
-|---------|---------|------|
-| Q0.0 | KM_L (liniowy) | Zasila U1/V1/W1 |
-| Q0.1 | KM_Y (gwiazda) | Zwiera U2/V2/W2 |
-| Q0.2 | KM_Δ (trójkąt) | Łączy skrzyżowanie U2→V1, V2→W1, W2→U1 |
-
-**Wejścia PLC ← sprzężenia zwrotne:**
-
-| Wejście | Sygnał | Po co |
-|---------|--------|-------|
-| I0.0 | START (NO) | Impuls rozruchu |
-| I0.1 | STOP (NC) | Zatrzymanie — fail-safe |
-| I0.2 | FB_KM_L | Potwierdzenie załączenia stycznika głównego |
-| I0.3 | FB_KM_Y | Potwierdzenie gwiazdy |
-| I0.4 | FB_KM_Δ | Potwierdzenie trójkąta |
-| I0.5 | THERMAL_FAULT (NC) | Przekaźnik termiczny — 0 = wyzwolony |
-
-**Program SCL w TIA Portal (maszyna stanów):**
-
-```scl
-CASE YD_State OF
-    0: // STOP
-        KM_L := FALSE; KM_Y := FALSE; KM_D := FALSE;
-        IF Start AND NOT Fault_Thermal THEN
-            KM_L := TRUE; KM_Y := TRUE;
-            Timer_YD(IN:=TRUE, PT:=T#6S);
-            YD_State := 1;
-        END_IF;
-
-    1: // GWIAZDA
-        IF Timer_YD.Q THEN
-            KM_Y := FALSE;
-            Timer_Gap(IN:=TRUE, PT:=T#100MS);
-            YD_State := 2;
-        END_IF;
-
-    2: // PRZERWA (gap Y→Δ)
-        IF Timer_Gap.Q THEN
-            KM_D := TRUE;
-            YD_State := 3;
-        END_IF;
-
-    3: // TRÓJKĄT — praca nominalna
-        IF NOT Stop OR Fault_Thermal THEN
-            KM_L := FALSE; KM_D := FALSE;
-            YD_State := 0;
-        END_IF;
-END_CASE;
-
-// Blokada programowa — nigdy jednocześnie
-IF KM_Y THEN KM_D := FALSE; END_IF;
-IF KM_D THEN KM_Y := FALSE; END_IF;
-```
-
-**Diagnostyka typowych problemów:**
-
-| Objaw | Co sprawdzasz na schemacie/PLC |
-|-------|-------------------------------|
-| Silnik nie startuje | FB_KM_L = 0? → sprawdź bezpiecznik, termiczny |
-| Wyłączenie przy Y→Δ | Timer_Gap za krótki → wydłuż do 150–200 ms |
-| Nie przyspiesza w Y | Timer_YD za krótki → wydłuż do 5–8 s |
-| Termiczny wyzwala po starcie | I_set za nisko lub klasa 10 zamiast 20 |
-| KM_Y i KM_Δ jednocześnie | Brak blokady mechanicznej → zamontuj 3RA1934-1A |
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej, EN 60204-1*
-
----
-
-### 20.8. Jak na schemacie rozpoznajesz obwód bezpieczeństwa (Safety) i czym różni się od standardowego obwodu sterowania?
+### 20.7. Jak na schemacie rozpoznajesz obwód bezpieczeństwa (Safety) i czym różni się od standardowego obwodu sterowania?
 
 **Obwód Safety** na schemacie jest wyraźnie oddzielony od standardowego sterowania — rozpoznajesz go po:
 
@@ -3148,6 +3074,18 @@ IF KM_D THEN KM_Y := FALSE; END_IF;
 2. Feedback: styk NO stycznika wraca do F-DI jako potwierdzenie otwarcia
 3. Separacja tras kablowych: kanał 1 i kanał 2 prowadzone osobno (nie w jednym kablu)
 4. Oznaczenia: numery F-address na schemacie muszą zgadzać się z konfiguracją TIA Portal
+
+**Przykładowy schemat Safety — E-Stop SIL 3 z F-CPU 1516F:**
+
+![Schemat okablowania Safety — E-Stop](images/safety/07c_estop_hw_setup_p10.png)
+
+*Rys. 20.7a — Okablowanie E-Stop do systemu Safety: CPU 1516F + DI/DQ (standard) + F-DI (dwukanałowe wejście NC E-Stop) + F-DQ (wyjścia Q1/Q2 z feedbackiem). START/STOP/ACK przez standardowe DI. Źródło: Siemens Application Example 21064024, V7.0.1*
+
+**Schemat okablowania F-DI/F-DO — PM-switching (ET200SP):**
+
+![Schemat PM-switching Safety](images/safety/06a_wiring_pm_switching_p6.png)
+
+*Rys. 20.7b — Architektura PM-switching: rozdzielone zasilanie elektroniki (P/M Electronic supply) i obciążenia (24V DC Load supply), izolacja galwaniczna przez Isoface. Źródło: Siemens Wiring Example 39198632, V2.7*
 
 > 💡 **Schemat Safety jest dowodem** — audytor TÜV/UDT porównuje schemat z fizycznym okablowaniem i konfiguracją TIA Portal. Niezgodność = blokada odbioru maszyny.
 
