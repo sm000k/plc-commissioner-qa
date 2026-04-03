@@ -19,6 +19,7 @@ a wejścia raportowane są do F-CPU jako wartość bezpieczna (`0`).
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 5.2. Dlaczego moduł nie wraca automatycznie po usunięciu błędu?
 
 Celowo — zasada **"no silent recovery"** w systemach Safety.
@@ -33,6 +34,7 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 5.3. Moduł nie wychodzi z passivation — co sprawdzasz?
 
 **Checklista:**
@@ -48,6 +50,7 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 5.4. Co to jest ACK_REQ i ACK_NEC w praktyce?  🔴
 
 | Zmienna | Kierunek | Opis |
@@ -66,3 +69,4 @@ Reset_HMI: --|P|-- [ACK_NEC]   ← impuls z przycisku, tylko 1 cykl PLC
 > generuje zbiorczy impuls do **wszystkich** F-I/O w grupie runtime jednocześnie.
 > Stosuj po wymianie modułu lub awarii sieci PROFINET całej stacji.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*

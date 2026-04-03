@@ -9,12 +9,14 @@ PLC (Programmable Logic Controller) to przemysłowy komputer czasu rzeczywistego
 - Watchdog timer — CPU restartuje się przy zawieszeniu zamiast „wisieć"
 - Brak systemu plików jak Windows — działa natychmiast po włączeniu zasilania
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.2. Co to jest scan cycle i ile trwa?  🔴
 
 Scan cycle to jeden pełny cykl pracy CPU: odczyt wejść → wykonanie programu → zapis wyjść → komunikacja.
 Typowy czas: 1–20ms dla prostych programów. Przy dużych projektach lub Safety może wzrosnąć do 50–100ms.
 W S7-1500 monitorujesz czas cyklu online (Cycle time w diagnostyce CPU). Zbyt długi scan = wolna reakcja na sygnały.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.3. Co to jest OB1, OB35, OB100 — kiedy każdego używasz?
 
 Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system operacyjny CPU w ściśle określonych warunkach.
@@ -31,6 +33,7 @@ Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system 
 - OB86 — rack failure / PROFINET station failure. Wywołany gdy zdalna stacja (ET200SP, napęd) znika z sieci.
 - OB121 / OB122 — błędy programistyczne (np. dostęp do nieistniejącej zmiennej) — ważne przy uruchamianiu nowego kodu.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.4. Co to jest FB, FC, DB — kiedy używasz każdego?  🔴
 - FC (Function) — blok bez pamięci własnej (brak sekcji VAR_STAT). Używasz dla prostych obliczeń, konwersji sygnałów, logiki bez stanu. Może zwracać wartość (Return Value). Ma tylko VAR_INPUT, VAR_OUTPUT, VAR_IN_OUT i VAR_TEMP.
 - FB (Function Block) — ma instancję DB z pamięcią stanu między wywołaniami (sekcja VAR_STAT). Używasz dla sterowania silnikiem, sekwencji, timerów — wszędzie gdzie blok musi "pamiętać". Multi-instance: jeden FB może zawierać instancje innych FB bez osobnych DB.
@@ -43,6 +46,7 @@ Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system 
 
 W TIA Portal: bloki z włączonym *Optimized Block Access* używają wyłącznie nazw symbolicznych — brak adresowania absolutnego (%.0, %DB1.DBX0.0). Standardowe ustawienie dla nowych projektów.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.5. Co to jest UDT i po co go używasz?
 
 UDT (User Data Type) to własny złożony typ danych definiowany raz i wielokrotnie używany w całym projekcie. Przykład: typ `Motor_t` z polami `Speed:REAL`, `Current:REAL`, `Fault:BOOL`, `Running:BOOL`.
@@ -58,6 +62,7 @@ UDT (User Data Type) to własny złożony typ danych definiowany raz i wielokrot
 
 **Wersjonowanie:** W TIA Portal można przypisać UDT do Project Library i wersjonować. Przy zmianie struktury UDT TIA Portal ostrzega o niespójnych instancjach — musisz je zaktualizować (`Update instances`). Ważne w dużych projektach — jedna zmiana UDT bez aktualizacji instancji = błąd kompilacji.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.6. Co to są języki programowania PLC — LAD, FBD, SCL, GRAPH?
 - LAD (Ladder) — graficzny, podobny do schematów przekaźnikowych. Dobry dla logiki binarnej, łatwy dla elektryków. Najczęściej używany.
 - FBD (Function Block Diagram) — bloki połączone liniami. Dobry dla logiki kombinacyjnej i programów Safety w TIA Portal.
@@ -95,12 +100,14 @@ END_CASE;
 - Stary STEP 7 (S7-300/400): mieszanie adresów absolutnych (I0.0, DB1.DBX0.0) i nazw symbolicznych; osobna tablica symboli.
 - W Safety: program F_MAIN w TIA Portal **V18 i starszych** wymaga FBD lub LAD — SCL nie jest certyfikowany dla F-bloków Safety. Od TIA Portal **V19** SCL jest obsługiwany jako język F-bloków Safety. Zawsze sprawdź dopuszczalne języki dla swojej wersji portalu przed użyciem SCL w logice Safety.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.7. Co to jest sygnał 4-20mA i dlaczego nie 0-20mA?
 
 4-20mA to standardowy sygnał analogowy dla czujników przemysłowych. Zakres 4mA (min) do 20mA (max).
 Dlaczego 4 a nie 0: sygnał 0mA jednoznacznie oznacza zerwanie kabla lub awarię zasilania czujnika — łatwa diagnostyka. Przy 0-20mA nie da się odróżnić minimalnej wartości od awarii.
 Sygnał prądowy ma też przewagę nad napięciowym (0-10V): nie spada na rezystancji kabla — można przesyłać na duże odległości bez strat.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.8. Co to jest PROFINET i czym różni się od PROFIBUS?  🔴
 
 PROFINET: Ethernet-based, 100Mbit/s (gigabit w nowych instalacjach), elastyczna topologia (gwiazdka, linia, pierścień), plug-and-play z GSDML, obsługuje PROFIsafe i IRT (250µs, jitter <1µs). Nowy standard dla wszystkich nowych projektów.
@@ -115,6 +122,7 @@ Jeden CPU może być jednocześnie IO-Controller swojej sieci i IO-Device w siec
 
 PROFIBUS analogicznie: DP-Master Class 1 (CPU) → DP-Slave (ET200M/S, napęd z CB DP) → DP-Master Class 2 (PG/PC diagnostyczny).
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.9. Jakie są główne rodziny sterowników PLC Siemens i do jakich zastosowań są dedykowane?
 
 Siemens oferuje różne rodziny sterowników PLC, dostosowane do aplikacji o różnej skali i złożoności, od prostych zadań po najbardziej wymagające systemy.
@@ -184,10 +192,11 @@ HMI (Human-Machine Interface) to panel operatorski umożliwiający wizualizację
 - **Basic Panel (KTP400/700/900/1200 Basic)**: dotykowy lub klawiaturowy, WinCC Basic, od 4” do 12”. Brak trendów i receptur w wersji Basic. Dla prostych wizualizacji jednej maszyny.
 - **Comfort Panel (TP700/900/1200/1500 Comfort)**: WinCC Advanced, pełne trendy, receptury, JavaScript, karty CF/SD. Standard dla maszyn produkcyjnych.
 - **Mobile Panel (KTP700 Mobile)**: kabel lub WiFi. Homologowany dla stref Safety — posiada enabling device (przycisk potwierdzenia do trzymania przy wejściu do strefy niebezpiecznej).
-- **PC-based / IPC (WinCC Unified)**: nowy standard Siemens, HTML5/SVG, OPC UA, skrypty TypeScript. Nie wymaga klasycznych wtyczek. Zastazpuje WinCC RT Advanced w nowych instalacjach.
+- **PC-based / IPC (WinCC Unified)**: nowy standard Siemens, HTML5/SVG, OPC UA, skrypty TypeScript. Nie wymaga klasycznych wtyczek. Zastępuje WinCC RT Advanced w nowych instalacjach.
 
 **Komunikacja:** HMI komunikuje się z PLC przez PROFINET (S7 protocol lub OPC UA) w TIA Portal — wspólna baza tagów synchronizowana automatycznie. Offline = HMI nie potrzebuje PLC do symulacji interfejsu (PLCSIM).
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.13. Co to jest SCADA i czym różni się od HMI?
 
 HMI: lokalne, przy maszynie, obsługuje jeden obiekt/maszynę, czas reakcji wymagany (operator).
@@ -196,11 +205,12 @@ SCADA (Supervisory Control and Data Acquisition): system nadrzędny, monitoruje 
 **Architektura Siemens WinCC:**
 - **WinCC Basic / Advanced**: dla HMI panelów kompilowanych w TIA Portal — nie SCADA, obsługują do kilku sterowników.
 - **WinCC V7.x (SCADA)**: osobne oprogramowanie, serwer OPC DA/UA, historian (archiwum trendów), redundantny serwer Hot Standby (przełączenie <1s), thin clients (Web Navigator przez przeglądarkę), receptury, raporty.
-- **WinCC Unified**: nowy standard oparty na HTML5/SVG/OPC UA, web client bez wtyczek, skrypty TypeScript. Zastazpuje WinCC V7 w nowych instalacjach.
+- **WinCC Unified**: nowy standard oparty na HTML5/SVG/OPC UA, web client bez wtyczek, skrypty TypeScript. Zastępuje WinCC V7 w nowych instalacjach.
 - **WinCC Open Architecture (WinCC OA)**: dla najwyzszych wymagań (100k+ tagów, >100 klientów) — energetyka, infrastruktura.
 
 **Pytanie kontrolne:** *Ile tagów obsługuje WinCC?* — WinCC V7 Comfort: 512 tagów; Professional: 512–unlimited (licencja). WinCC Unified: oparty na połączeniach OPC UA — brak jednej liczby. Nie podawaj liczby bez kontekstu wersji licencji.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.14. Co to jest PID i kiedy go używasz w PLC?
 
 PID (Proportional-Integral-Derivative) to algorytm regulacji zamkniętej utrzymujący zadany setpoint: temperatura, ciśnienie, poziom, prędkość.
@@ -209,6 +219,7 @@ PID (Proportional-Integral-Derivative) to algorytm regulacji zamkniętej utrzymu
 - D — reaguje na szybkość zmiany błędu (tłumi oscylacje)
 W TIA Portal: gotowy blok PID_Compact lub PID_3Step w OB35 (cykliczne przerwanie). W Safety PID nie jest stosowany — logika Safety jest binarna.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.15. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?  🟡
 
 **Enkoder** (przetwornik obrotowo-impulsowy) to czujnik zamieniający ruch mechaniczny (kąt/pozycję) na sygnał elektryczny odczytywany przez napęd lub PLC.
@@ -231,6 +242,7 @@ W TIA Portal: gotowy blok PID_Compact lub PID_3Step w OB35 (cykliczne przerwanie
 
 > 💡 **Na rozmowie:** pytanie o enkodery często pojawia się razem z SLS/SDI — wspomnij że do tych funkcji Safety wymagane są enkodery certyfikowane (HIPERFACE Safety, EnDat Safety).
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.16. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?  🟡
 
 **IO-Link** (IEC 61131-9) to standardowy niskonapięciowy protokół komunikacji punkt-punkt między sterownikiem PLC (IO-Link Master) a inteligentnymi czujnikami/aktuatorami (IO-Link Device). Działa po standardowym 3-żyłowym kablu M12 — bez dodatkowego okablowania.

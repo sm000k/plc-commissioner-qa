@@ -9,25 +9,31 @@ Technologie: **Siemens TIA Portal** (V16–V19), **SIMATIC Safety Integrated**, 
 ## Struktura projektu
 
 ```
-docs/                          ← Aktywne dokumenty
-  qa_draft_v9.md               ← GŁÓWNY DOKUMENT Q&A (bieżący) ✅
-  qa_draft_v8.md               ← Poprzednia wersja (backup)
-  images/safety/               ← 45 PNG z dokumentacji Siemens
-  knowledge_base_controlbyte.md
-  QA_LOG.md
+docs/                                ← Aktywne dokumenty
+  LATEST.md                          ← GŁÓWNY DOKUMENT Q&A (v12, 155 pytań, 20 sekcji) ✅
+  qa_draft_v12.md                    ← Aktualny draft
+  qa_draft_v11.md                    ← Poprzednia wersja
+  chapters/                          ← Rozdziały Q&A (po 1 pliku na sekcję)
+    00_header.md … 20_schematy_elektryczne.md
+  knowledge_base_controlbyte.md      ← Baza wiedzy: transkrypcje ControlByte (52 filmy)
+  knowledge_base_delta_v11.md        ← Delta wiedzy: patch v11
+  images/safety/                     ← 45 PNG z dokumentacji Siemens
+  QA_LOG.md                          ← Log zmian
   slownik_v7.md
-scripts/                       ← Skrypty produkcyjne
+scripts/                             ← Skrypty produkcyjne
+  egzaminator.py                     ← Bot przepytujący (Anthropic API)
+  merge_chapters.py / split_chapters.py
   Get-YouTubeTranscripts.py
   Build-KnowledgeBase.py
   Merge-KnowledgeBase.py
   New-QADocument.ps1
   Read-DocxText.ps1
   _build_selection.py
-sources/pdfs/                  ← Dokumentacja Siemens (PDFy)
-sources/books/                 ← Materiały edukacyjne
-archive/docx/                  ← Stare wersje .docx (v3–v7)
-archive/old-docs/              ← Stare pliki robocze
-transcripts/controlbyte/       ← Transkrypcje YouTube (52 filmy)
+sources/pdfs/                        ← Dokumentacja Siemens (PDFy)
+sources/books/                       ← Materiały edukacyjne
+archive/docx/                        ← Stare wersje .docx (v3–v7)
+archive/old-docs/                    ← Stare pliki robocze
+transcripts/controlbyte/             ← Transkrypcje YouTube (52 filmy)
 ```
 
 ## Źródła wiedzy (PDFy w sources/pdfs/)
@@ -40,15 +46,19 @@ transcripts/controlbyte/       ← Transkrypcje YouTube (52 filmy)
 | `SIMATIC Safety - Konfiguracja i programowanie (2).pdf` | Zaawansowana konfiguracja Safety, programowanie F-bloków |
 | `SIMATIC Safety Integrated – wszystko w jednym sterowniku PLC.pdf` | Koncepcja Safety Integrated, F-CPU, PROFIsafe |
 | `btc.pl-SCL-S7-1200.pdf` | Programowanie S7-1200 w SCL (TIA Portal V13+) |
+| `Sterowniki_PLC.pdf` | Ogólne informacje o sterownikach PLC |
+| `siemens SCL.PDF` | Programowanie w SCL — uzupełnienie |
 
 ## Aktywny dokument Q&A
-- **Bieżący**: `docs/qa_draft_v10.md` — **112 pytań, 19 sekcji** (2026-03-30)
-  - Zawiera PLAN NAUKI (linie 7–85) z tagami 🔴🟡🟢
-  - Embedded: 9 obrazów z `docs/images/safety/` (45 PNG łącznie)
-- **Poprzedni**: `docs/qa_draft_v9.md` — 112 pytań (backup)
+- **Bieżący**: `docs/LATEST.md` = `docs/qa_draft_v12.md` — **155 pytań, 20 sekcji** (2026-04-01)
+  - Zawiera PLAN NAUKI z tagami 🔴🟡🟢
+  - Rozdziały jako osobne pliki: `docs/chapters/00_header.md` … `20_schematy_elektryczne.md`
+  - Bazy wiedzy: `docs/knowledge_base_controlbyte.md`, `docs/knowledge_base_delta_v11.md`
+  - Embedded: obrazy z `docs/images/safety/` (45 PNG łącznie)
+- **Poprzedni**: `docs/qa_draft_v11.md` — backup
 - **Historia**: `archive/docx/` — wersje v3–v7 .docx
 
-Następna wersja: `docs/qa_draft_v11.md`
+Następna wersja: `docs/qa_draft_v13.md`
 
 ## Format dokumentu Q&A
 
@@ -69,15 +79,16 @@ Treść odpowiedzi — definicja + szczegóły.
 ```
 
 **Reguły jakości odpowiedzi:**
-- Odpowiedź = **definicja** (1-2 zdania) + **szczegóły** (bullet list) + **praktyczny przykład** lub **procedura**
-- Podawaj numery parametrów Siemens (np. `p0840`, `r0945`) tam gdzie możliwe
+- **MAX 30 zdań na odpowiedź** — zwięzłe, konkretne, bez lania wody. Definicja (1-2 zd.) + bullet list (3-6 pkt) + praktyka (3-5 kroków)
+- Podawaj numery parametrów Siemens (np. `p0840`, `r0945`) **tylko gdy znasz je ze źródeł**
 - Podawaj normy (EN ISO 13849-1, IEC 61508, IEC 62061, EN 60204-1)
-- Nie fabrykuj danych technicznych — źródłem są PDFs w workspace
-- Używaj terminologii Siemens (nie generycznej): F-CPU, passivation, F-signature, collective signature
+- **NIGDY** nie fabrykuj danych technicznych — źródłem są pliki w workspace (PDFs, chapters, knowledge base)
+- Używaj terminologii Siemens (nie generycznej) — patrz tabela terminologii poniżej
+- Każda odpowiedź MUSI zawierać min. 1 element praktyczny: procedura krok-po-kroku / scenariusz z obiektu / co sprawdzasz w TIA Portal / komenda diagnostyczna
 - Język: **polski**
 - Poziom: szczegółowy, techniczny, gotowy do rozmowy kwalifikacyjnej
 
-## Zakres tematyczny — 19 sekcji
+## Zakres tematyczny — 20 sekcji
 
 1. Podstawy PLC i automatyki
 2. Architektura SIMATIC Safety Integrated
@@ -97,9 +108,8 @@ Treść odpowiedzi — definicja + szczegóły.
 16. Motion Control i SINAMICS — praktyka commissioning
 17. Realne scenariusze commissioning
 18. TIA Portal — zaawansowane funkcje
-19. Słownik pojęć (PLC / Safety / PROFINET / Napędy)
-
-> ⚠️ Sekcja **Elektrotechnika praktyczna** usunięta — zbyt ogólna, wykracza poza zakres rozmowy kwal. PLC/Commissioner.
+19. Commissioning — dodawanie stacji i urządzeń do projektu
+20. Schematy elektryczne — silniki i aparatura łączeniowa
 
 **Tematy priorytetowe do rozszerzenia w kolejnych wersjach:**
 - TIA Portal V19 — nowe funkcje
@@ -109,6 +119,68 @@ Treść odpowiedzi — definicja + szczegóły.
 - IO-Link — czujniki inteligentne
 - OPC UA — integracja MES/SCADA
 - PROFINET TSN (Time Sensitive Networking)
+
+## Terminologia Siemens (używaj ZAWSZE zamiast odpowiedników generycznych)
+
+| ✅ Termin Siemens | ❌ NIE używaj | Kontekst |
+|-------------------|---------------|----------|
+| F-CPU | sterownik bezpieczeństwa | Failsafe CPU z dual-channel processing |
+| passivation | wyłączenie/blokada modułu | Stan błędu F-I/O → substitute values |
+| reintegration | resetowanie/restart modułu | Ręczne potwierdzenie powrotu po passivation |
+| F-signature | suma kontrolna programu | Podpis jednego bloku Safety |
+| collective signature | podpis całości | Podpis CAŁEGO programu Safety |
+| substitute value | wartość domyślna / zastępcza | Wartość wyjścia podczas passivation (zwykle 0) |
+| F-monitoring time | timeout komunikacji | Czas nadzoru PROFIsafe |
+| value status | bit jakości | Kwalifikator poprawności sygnału F-I/O |
+| discrepancy time | czas rozbieżności | Max dozwolona różnica między kanałami 1oo2 |
+| F-address | adres Safety / PROFIsafe | Unikalny adres urządzenia w sieci PROFIsafe |
+| STO / SS1 / SS2 / SOS / SLS / SDI / SBC | bezpieczne zatrzymanie / ograniczenie | Funkcje Safety napędów wg IEC 61800-5-2 |
+| PROFIdrive | protokół napędowy | Standard komunikacji napędów przez PROFINET |
+| telegram (1/20/105/111) | ramka / pakiet danych | Struktura danych PROFIdrive |
+| CU (Control Unit) | jednostka sterująca | Moduł sterujący napędu SINAMICS |
+| AOP / BOP / IOP | panel operatorski napędu | Advanced/Basic/Intelligent Operator Panel |
+| isochronous mode | tryb synchroniczny | Synchronizacja cyklu PLC z cyklem PROFINET |
+| GSDML | plik opisowy urządzenia | GSD Markup Language dla urządzeń PROFINET |
+
+## Polityka anty-halucynacji
+
+> ⛔ **KRYTYCZNE** — te zasady obowiązują przy KAŻDYM generowaniu treści Q&A.
+
+1. **NIGDY nie wymyślaj** numerów parametrów (pXXXX/rXXXX), adresów, zakresów wartości, wersji firmware.
+   - Nie znasz numeru parametru? → napisz `pXXXX (sprawdź w dokumentacji SINAMICS)` zamiast zgadywać.
+   - Nie znasz zakresu wartości? → podaj tylko kierunek (np. „kilkadziesiąt ms", „rzędu sekund") zamiast wymyślać konkretne liczby.
+2. **NIGDY nie fabrykuj** numerów norm, klauzul, artykułów. Podawaj tylko normy z listy poniżej lub znalezione w źródłach.
+3. **Oznaczaj poziom pewności** przy niepewnych faktach:
+   - `[ZWERYFIKOWANE]` — fakt znaleziony w pliku źródłowym workspace (PDF, chapter, knowledge base)
+   - `[PRAWDOPODOBNE]` — fakt z ogólnej wiedzy domenowej, spójny ze źródłami ale nie potwierdzony dosłownie
+   - `⚠️ DO WERYFIKACJI` — fakt niepewny, wymaga sprawdzenia w dokumentacji Siemens
+4. Gdy nie wiesz → powiedz **„Nie znalazłem w źródłach — wymaga weryfikacji w dokumentacji Siemens"** zamiast generować wiarygodnie brzmiącą odpowiedź.
+5. **Normy dozwolone** (nie wymyślaj innych):
+   - Bezpieczeństwo maszyn: EN ISO 13849-1 (PL a–e), IEC 62061 (SIL CL), EN ISO 12100 (ocena ryzyka)
+   - Napędy Safety: IEC 61800-5-2 (STO/SS1/SS2/SOS/SLS/SDI/SBC)
+   - Systemy Safety: IEC 61508 (SIL 1–3), EN 60204-1 (kategorie zatrzymania 0/1/2)
+   - E-Stop: EN ISO 13850, przekaźniki: EN 60947-5-1
+   - Kurtyny: IEC 61496, EN ISO 13855 (odległości bezpieczeństwa)
+   - PLC ogólne: IEC 61131-3 (języki programowania)
+
+## Workflow „source-first" — obowiązkowa kolejność
+
+> Przed wygenerowaniem lub zmodyfikowaniem JAKIEJKOLWIEK odpowiedzi Q&A, ZAWSZE wykonaj:
+
+1. **Odczytaj rozdział** — `docs/chapters/XX_*.md` odpowiadający sekcji pytania
+2. **Sprawdź bazy wiedzy** — `docs/knowledge_base_controlbyte.md` i `docs/knowledge_base_delta_v11.md` (szukaj słów kluczowych z pytania)
+3. **Jeśli brakuje informacji** — dopiero wtedy sięgnij do `sources/pdfs/` (ekstrakcja tekstu z PDF)
+4. **Generuj odpowiedź** — dopiero po zebraniu materiału źródłowego
+5. **Self-check** — sprawdź odpowiedź wg Quality Checklist poniżej
+
+## Quality Checklist — każda odpowiedź musi przejść
+
+- [ ] ✅ **Definicja** — czy odpowiedź zaczyna się od 1-2 zdań definiujących pojęcie?
+- [ ] ✅ **Bullet list** — czy zawiera min. 3 punkty kluczowe ze szczegółami technicznymi?
+- [ ] ✅ **Praktyka** — czy zawiera min. 1 element praktyczny (procedura / scenariusz / diagnostyka / konfiguracja TIA Portal)?
+- [ ] ✅ **Parametry** — czy numery parametrów Siemens (pXXXX) pochodzą ze źródeł, nie są wymyślone?
+- [ ] ✅ **Terminologia** — czy używa terminów Siemens z tabeli powyżej (nie generycznych)?
+- [ ] ✅ **Źródło** — czy podano źródło (PDF, norma, knowledge base) lub oznaczono `⚠️ DO WERYFIKACJI`?
 
 ## Skrypty automatyzacji
 
@@ -131,3 +203,5 @@ Używaj promptów z `.github/prompts/`:
 ## Polityka dokumentacji
 - Log zmian: `docs/QA_LOG.md`
 - Roboczy draft nowej wersji: `docs/qa_draft_v{n}.md`
+- Aktualny dokument zawsze w: `docs/LATEST.md`
+- Rozdziały: `docs/chapters/XX_*.md` (scalane przez `scripts/merge_chapters.py`)

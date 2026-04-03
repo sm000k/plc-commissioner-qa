@@ -15,6 +15,7 @@
 
 **W TIA Portal:** podłączasz jako F-DI z `1oo2 evaluation` lub OSSD bezpośrednio na wejście Safety.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 15.2. Jak działa muting i czym różni się od override?
 
 | Cecha | **Muting** | **Override** |
@@ -31,6 +32,7 @@
 
 > ⚠️ Override jest środkiem **wyłącznie awaryjnym** — musi być rejestrowany (kto, kiedy, ile razy). Nie stosuj jako alternatywy dla prawidłowo działającego muting.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 15.3. Jak podłączasz OSSD (Output Signal Switching Device) kurtyny do modułu F-DI?
 
 **OSSD** to para wyjść kurtyny (OSSD1, OSSD2) — dwa kanały sygnałów bezpieczeństwa z wbudowanym testowaniem impulsowym.
@@ -43,15 +45,16 @@
 
 `Discrepancy time`: dopasuj do specyfikacji kurtyny (zazwyczaj 10–30 ms).
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 15.4. Jakie jest zastosowanie wyjść tranzystorowych z czujników bezpieczeństwa w systemach PLC Safety?
 
 Wyjścia tranzystorowe z czujników bezpieczeństwa, takich jak kurtyny bezpieczeństwa czy skanery, są kluczowe dla systemów PLC Safety, ponieważ umożliwiają dwukanałowe monitorowanie i szybkie wykrywanie awarii.
 - **Podłączenie:** Wyjścia tranzystorowe z czujników bezpieczeństwa podłącza się do wejść bezpieczeństwa sterownika PLC.
 - **Wykrywanie awarii:**
-  - Jeśli jedno z wyjść tranzystorowych ulegnie uszkodzeniu (np. spali się lub będzie miało zwarcie), układ bezpieczeństwa natychmiast wykryje sytuację awaryjną.
+  - Jeśli jedno z wyjść tranzystorowych ulegnie uszkodzeniu (np. spali się lub będzie miało zwarcie), system Safety natychmiast wykryje sytuację awaryjną.
   - Jest to analogiczne do wykrywania rozbieżności sygnału ("discrepancy error") w przypadku styków mechanicznych.
 Praktyczne wskazówki:
-- W przypadku uszkodzenia jednego z wyjść tranzystorowych kurtyny bezpieczeństwa, sterownik safety natychmiast zgłosi błąd, co zapobiega dalszej pracy maszyny w niebezpiecznym stanie.
+- W przypadku uszkodzenia jednego z wyjść tranzystorowych kurtyny bezpieczeństwa, F-CPU natychmiast zgłosi błąd, co zapobiega dalszej pracy maszyny w niebezpiecznym stanie.
 *Źródło: transkrypcje ControlByte*
 
 ### 15.5. Jakie typy elektrygli bezpieczeństwa (door interlocks) istnieją i jak dobirasz odpowiedni Performance Level?  🟡

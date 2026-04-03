@@ -15,6 +15,7 @@
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 6.2. Dlaczego Safe State to nie zawsze wyłączenie?
 
 Bo wyłączenie może być **bardziej niebezpieczne** niż kontynuacja działania:
@@ -26,6 +27,7 @@ Bo wyłączenie może być **bardziej niebezpieczne** niż kontynuacja działani
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 6.3. Jak F-DO substitute value wpływa na Safe State?
 
 Parametr `substitute value` w TIA Portal (właściwości kanału F-DO) określa co wyjście robi przy passivation:
@@ -39,6 +41,7 @@ Parametr `substitute value` w TIA Portal (właściwości kanału F-DO) określa 
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 6.4. Czym różni się STO jako Safe State napędu SINAMICS od zatrzymania programowego (OFF1/OFF2)? 🔴
 STO (Safe Torque Off) jako Safe State napędu oznacza zablokowanie impulsów bramkowania tranzystorów — napęd nie może generować momentu obrotowego, nawet przy zasilaniu energetycznym. Zatrzymanie OFF1/OFF2 to kontrolowane wyhamowanie przez falownik z możliwością ponownego załączenia bez potwierdzenia.
 - STO: brak momentu → wolne wybieganie jeśli nie ma hamulca mechanicznego (niebezpieczne na siłowniku pionowym!)
@@ -47,6 +50,7 @@ STO (Safe Torque Off) jako Safe State napędu oznacza zablokowanie impulsów bra
 - Safe State = STO → w konfiguracji F-DO parametr „substitute value" = 0 dla wyjścia STO
 - Dla osi pionowych (roboty, podnośniki): jako Safe State użyj SS1 (Stop + STO po rampie) lub SBC
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 6.5. Jak konfigurujesz substitute values dla F-DO i jaką wartość wybrać dla zaworu, siłownika i napędu? 🟡
 Substitute value to wartość logiczna wyjścia F-DO nadawana automatycznie podczas passivacji lub gdy F-CPU akceptuje błąd bezpieczeństwa. Konfigurowana w TIA Portal → właściwości modułu F-DO → „Substitute value for outputs".
 - Domyślnie: 0 (false) dla wszystkich kanałów — to zazwyczaj poprawne
@@ -56,3 +60,4 @@ Substitute value to wartość logiczna wyjścia F-DO nadawana automatycznie podc
 - WYJĄTEK: zawór NO (normalnie otwarty) — substitute value = 0 → zawór OTWARTY (niespójne z intencją)
 - Ważna zasada: Zawsze weryfikuj że substitute value 0 odpowiada fizycznie bezpiecznemu stanowi urządzenia
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*

@@ -1141,41 +1141,6 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 
 *Źródło: Siemens SINAMICS G120 Getting Started / Startdrive commissioning guide*
 
-### 11.9. Jakie są możliwości diagnostyki i testowania programów PLC za pomocą języka Python i protokołu OPC UA?
-
-Język Python, w połączeniu z protokołem OPC UA, umożliwia automatyzację testów oprogramowania PLC, co jest szczególnie przydatne w przypadku złożonych projektów, gdzie testy manualne są czasochłonne i podatne na błędy.
-- **Zastosowanie Pythona w automatyce przemysłowej:**
-  - Automatyzacja powtarzalnych zadań na poziomie GUI w środowiskach PLC (np. Codesys).
-  - Komunikacja w protokołach przemysłowych (Modbus, OPC UA).
-  - Programowanie Raspberry Pi.
-  - Testowanie oprogramowania PLC (np. biblioteka Pytest).
-  - Przetwarzanie danych z obiektu (SCADA, systemy chmurowe), generowanie raportów (CSV, wykresy).
-  - Tworzenie aplikacji desktopowych/webowych dla automatyki (Django, Flask).
-- **Testy automatyczne z Pythonem:**
-  - **Cel:** Zautomatyzowanie testów bloków funkcyjnych PLC.
-  - **Zalety:** Powtarzalność, dokładność, oszczędność czasu i zasobów (automatyków).
-  - **Komunikacja:** Protokół OPC UA. Sterownik PLC działa jako serwer, skrypt Python jako klient.
-  - **Wymagane biblioteki Python:**
-    - `opcua`: Do komunikacji z serwerem OPC UA.
-    - `pytest`: Do automatyzacji testów.
-    - `pytest-html`: Do generowania raportów HTML.
-    - `time`: Do generowania opóźnień w skrypcie.
-  - **Struktura testu:**
-    - Plik `opc.py`: Funkcje do łączenia/rozłączania z serwerem OPC UA.
-    - Plik `tags.py`: Definicja zmiennych PLC (np. start, stop, emergency, czujnik, x_sygnalizacja), które będą wymieniane przez OPC UA.
-    - Plik `test_unit.py`: Zawiera funkcje testowe (np. `test_start_button`, `test_stop_button`, `test_emergency_stop`).
-    - **`assert`:** Słowo kluczowe do sprawdzania poprawności wyników testów.
-  - **Przebieg testu:**
-    1. Inicjalizacja (połączenie z serwerem OPC UA, reset tagów).
-    2. Symulacja działania wejść (np. ustawienie `start` na `True`, odczekanie).
-    3. Sprawdzenie stanu wyjść (np. czy `x_sygnalizacja` zmieniła się z `False` na `True`).
-    4. Reset tagów po każdym teście.
-  - **Generowanie raportu:** Komenda `pytest --html=report.html` tworzy plik HTML z wynikami testów.
-Praktyczne wskazówki:
-- Można testować oprogramowanie PLC na wirtualnym sterowniku (SoftPLC) uruchomionym na komputerze PC, bez potrzeby posiadania fizycznego sprzętu.
-- W przypadku błędu w programie PLC, testy automatyczne szybko go wykrywają, co jest informacją dla programisty o konieczności naprawy.
-*Źródło: transkrypcje ControlByte*
-
 ### 11.10. Co to jest ProDiag i jak go używasz do diagnostyki maszyny?  🟢
 
 ProDiag (Process Diagnostics) to mechanizm wbudowany w TIA Portal dla S7-1500 i ET200SP CPU. Pozwala definiować komunikaty diagnostyczne bezpośrednio w kodzie PLC i automatycznie wyświetlać je na HMI jako alarmy z opisem warunku.

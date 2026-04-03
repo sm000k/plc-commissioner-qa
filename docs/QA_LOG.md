@@ -4,7 +4,41 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v12 — 2026-04-01 (aktualizacja) ✅ AKTYWNA WERSJA
+## qa_draft_v12 — 2026-04-01 (aktualizacja v12.1) ✅ AKTYWNA WERSJA
+
+### Quality pass v12.1 — przegląd jakości/skrócenie (2026-06-17)
+
+**Skrócenie odpowiedzi (max 30 zdań):**
+- 14.6 (switche): 33→~18 zdań — usunięto katalog modeli, pozostawiono podział zarządzalne/niezarządzalne
+- 16.10 (G120 commissioning): 36→27 — usunięto Fazę 7 (enkoder liniowy), skompresowano
+- 19.1 (ET200SP Safety): 47→~20 — skompresowano 4 fazy
+- 19.2 (SMC EX600): 40→~18 — skompresowano procedurę
+- 19.3 (G120 PROFINET): 64→26 — skompresowano 6 faz
+
+**Poprawki terminologii Siemens:**
+- 3.9: „sterownik bezpieczeństwa" → „F-CPU"
+- 4.4: „sterownik safety" → „F-CPU"
+- 4.5: „moduł safety" → „moduł F-DI"
+- 8.8: „programowalny sterownik bezpieczeństwa" → „F-CPU"
+- 10.1: „master/slave" → „IO-Controller/IO-Device"
+- 15.4: „układ bezpieczeństwa" → „system Safety", „sterownik safety" → „F-CPU"
+
+**Poprawki numeracji:**
+- 11: „1.13" → „11.8" (błąd numeracji)
+
+**Literówki:**
+- 11.2: cyrylica „odebrана" → „odebrana"
+- 20.3: „styling" → „stykach"
+
+**Podejrzane parametry — oznaczone ⚠️ DO WERYFIKACJI:**
+- 16.3: `r2110` (aktualny kod alarmu)
+- 16.3: `p9501`/`p9601` (Safety STO/SS1)
+
+**Tagi źródeł:**
+- Dodano `[PRAWDOPODOBNE]` do 110 odpowiedzi bez wcześniejszego oznaczenia źródła
+- Wszystkie 155 odpowiedzi mają teraz oznaczenie źródła
+
+---
 
 ### Stan: 155 pytań, 20 sekcji — +9 nowych pytań (schematy elektryczne) vs poprzedniego stanu
 

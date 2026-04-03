@@ -11,6 +11,7 @@ SICAR (Siemens Automation Platform for CAR Plants) to gotowy framework programis
 
 > 💡 Cel: skrócenie czasu programowania przez drag-and-drop gotowych bloków zamiast pisania logiki od zera.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 12.2. Co to są Tec Units i jak z nich korzystasz?  🟢
 
 **Tec Units** to gotowe, parametryzowalne bloki funkcjonalne w SICAR dla typowych urządzeń: silnik, zawór, przenośnik taśmowy, napęd, robot. Każdy zawiera:
@@ -21,6 +22,7 @@ SICAR (Siemens Automation Platform for CAR Plants) to gotowy framework programis
 
 > 💡 Używasz przez drag-and-drop Tec Unit na projekt, ustawiasz parametry (adres I/O, limity, czasy) — gotowe, bez pisania logiki od podstaw.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 12.3. Co to jest SINAMICS Startdrive w TIA Portal?
 
 **SINAMICS Startdrive** to wtyczka do TIA Portal do parametryzacji, uruchamiania i diagnostyki napędów SINAMICS (G120, S120, V90) bezpośrednio z TIA Portal — bez osobnego oprogramowania STARTER.
@@ -31,6 +33,7 @@ SICAR (Siemens Automation Platform for CAR Plants) to gotowy framework programis
 - Diagnostyka błędów (fault codes)
 - Konfiguracja Safety Integrated (STO, SS1, SLS przez PROFIsafe)
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 12.4. Jak konfigurujesz SINAMICS G120 z Safety przez PROFIsafe?  🟡
 
 **Konfiguracja SINAMICS G120 z Safety (w SINAMICS Startdrive):**
@@ -49,3 +52,4 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*

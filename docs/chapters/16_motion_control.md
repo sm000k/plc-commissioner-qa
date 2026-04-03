@@ -17,6 +17,7 @@
 
 **Konfiguracja:** TIA Portal → `Add new object` → `Technology object` → wybierz typ → przypisz napęd SINAMICS przez telegram PROFIdrive `105` / `111`.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 16.2. Jak robisz autotuning napędu G120/V90 w Startdrive?
 
 **Startdrive:** Online → wybierz napęd → `Commissioning` → `Motor identification`
@@ -35,6 +36,7 @@
 
 > 💡 Jeśli napęd jest mechatronicznie połączony z ciężką maszyną: uruchom identyfikację na **biegu jałowym** lub przy odłączonej mechanice, a potem ręcznie dostraj `Kp`.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 16.3. Jakie są najważniejsze parametry SINAMICS G120 które musisz znać?
 
 | Parametr | Opis | Uwaga |
@@ -45,8 +47,8 @@
 | `p0922` | Telegram PROFIdrive | Musi zgadzać się z konfiguracją TIA Portal! |
 | `r0002` | Aktualny status napędu (bitmapa) | Gotowy / praca / błąd / alarm |
 | `r0945[0..7]` | Kody błędów (fault codes) | Pierwsze miejsce diagnostyki po F-alarm |
-| `r2110` | Aktualny kod alarmu (warning) | Nie zatrzymuje napędu |
-| `p9501` / `p9601` | Parametry Safety (STO enable, SS1) | Tylko gdy Safety włączone |
+| `r2110` | Aktualny kod alarmu (warning) | ⚠️ DO WERYFIKACJI — sprawdź w Parameter Manual |
+| `p9501` / `p9601` | Parametry Safety (STO enable, SS1) | ⚠️ DO WERYFIKACJI — zakres p95xx/p96xx poprawny, dokładne numery sprawdź w SINAMICS Safety Function Manual |
 
 > ⚠️ Błędny `p0922` (telegram) = brak komunikacji lub brak danych Safety — **zawsze weryfikuj po podłączeniu** nowego napędu.
 
@@ -64,6 +66,7 @@
 - Na panelu BOP-2: długie wciśnięcie ESC/OK
 - Historia faultów: `r0945[0..7]`
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 16.5. Czym jest SINAMICS G120 i do jakich silników oraz aplikacji jest przeznaczony? 🔴
 
 **SINAMICS G120** to rodzina przemysłowych przemienników częstotliwości (falowników) firmy Siemens przeznaczonych do regulacji prędkości silników indukcyjnych (asynchronicznych) klatkowych w aplikacjach ogólnoprzemysłowych.
@@ -184,86 +187,53 @@ G120 obsługuje kilka metod sterowania silnikiem — dobór zależy od wymagań 
 
 ### 16.10. Jak wygląda pełna procedura commissioning SINAMICS G120 z TIA Portal krok po kroku? 🔴
 
-Poniższa procedura opisuje uruchomienie napędu G120 (CU240E-2 PN + PM240-2) z silnikiem indukcyjnym przez PROFINET od zera do pierwszego uruchomienia silnika.
+Procedura uruchomienia G120 (CU240E-2 PN + PM240-2) z silnikiem indukcyjnym przez PROFINET.
 
 **Faza 1 — Przygotowanie sprzętowe:**
-1. Zamontuj CU na PM (snap-in), podłącz zasilanie 3×400V AC do PM
-2. Podłącz silnik do zacisków U2/V2/W2 (PM), czujnik temperatury PTC/KTY84 do zacisków CU
-3. Podłącz kabel PROFINET (RJ-45) między CU a switchem/PLC
-4. Jeśli Safety: podłącz E-Stop do zacisków STO (DI4/DI5 lub wg schematu STO)
-5. Włącz zasilanie — wyświetlacz BOP-2 powinien pokazać `o` lub kod alarmu (np. A07991 = brak konfiguracji silnika)
+1. Zamontuj CU na PM (snap-in), podłącz 3×400V AC do PM, silnik do U2/V2/W2
+2. Podłącz PTC/KTY84 do CU, kabel PROFINET do switcha/PLC
+3. Jeśli Safety: podłącz E-Stop do zacisków STO (DI4/DI5)
+4. Włącz zasilanie — BOP-2 pokaże `o` lub alarm A07991 (brak konfiguracji)
 
-**Faza 2 — Konfiguracja w Startdrive (TIA Portal):**
-1. TIA Portal → `Add new device` → `Drives` → `SINAMICS G120` → wybierz CU (np. CU240E-2 PN F) i PM (np. PM240-2 / 7,5 kW)
-2. Go online: `Online` → `Connect to device` → sprawdź wersję firmware (wymagane ≥ FW 4.7 dla pełnego Safety)
-3. Wejdź w `Commissioning wizard`:
-   - Wybierz standard silnika (IEC/NEMA), typ (IM/PMSM), dane tabliczkowe: `p0304` (napięcie), `p0305` (prąd znam.), `p0307` (moc), `p0308` (cos φ), `p0310` (f znam.), `p0311` (n znam.)
-   - Wybierz metodę sterowania: `p1300 = 0` (V/f) lub `p1300 = 20` (Vector bez enkod.)
-   - Potwierdź ustawienia → Finish
+**Faza 2 — Konfiguracja w Startdrive:**
+1. TIA Portal → `Add new device` → `SINAMICS G120` → wybierz CU i PM
+2. Commissioning wizard: dane tabliczkowe silnika (`p0304`–`p0311`), metoda sterowania (`p1300`)
+3. Network view: połącz z PLC, ustaw nazwę PROFINET i IP
+4. Wybierz telegram `p0922` (1 = standardowy, 20 = rozszerzony, 352 = Safety)
+5. Compile + Download HW do PLC
 
-**Faza 3 — Konfiguracja sieci PROFINET:**
-1. W TIA Portal → Network view: przeciągnij G120 i połącz z PLC kablem PROFINET
-2. Ustaw nazwę PROFINET (`p8920`) i adres IP (`p8921`) napędu — lub użyj `Assign device name` online
-3. Wybierz telegram: `p0922` — np. `1` (standardowy) lub `20` (rozszerzony)
-4. Skompiluj i załaduj konfigurację HW do PLC
+**Faza 3 — Identyfikacja silnika:**
+1. Statyczna (`p1910 = 1`): pomiar R1, Lσ przy stojącym silniku (~30s)
+2. Opcjonalnie wirująca (`p1960 = 1`): silnik musi się obracać swobodnie — **zabezpiecz strefę**
+3. Sprawdź `r0047 = 0` (brak błędów po identyfikacji)
 
-**Faza 4 — Identyfikacja silnika:**
+**Faza 4 — Test Jog i weryfikacja:**
+1. Startdrive → Control panel → Jog: ustaw 300 rpm, kliknij JOG+
+2. Monitoruj `r0021` (prędkość), `r0027` (prąd) — porównaj z tabliczkowymi
+3. Kierunek odwrotny? → zamień fazy lub `p1821 = 1`
+4. Test STO: aktywuj → `r9722.0 = 1` (STO_Active) → napęd nie generuje momentu
 
-| Krok | Parametr | Wartość | Wynik |
-|------|----------|---------|-------|
-| Statyczna ID | `p1910` | `1` → daj Enable | R1, Lσ zmierzone |
-| Wirująca ID | `p1960` | `1` → daj Enable (silnik musi obracać się swobodnie) | Lm, R2 zmierzone |
-| Optymalizacja reg. | `p1960` | `2` | Kp, Ti regulatora prędkości |
+**Faza 5 — Uruchomienie z PLC przez PROFINET:**
+1. STW1 = `16#047F` (Enable + RUN), HSW = `16384` → 100% prędkości `p2000`
+2. Monitoruj ZSW1 (`r0052`): bit 2 = gotowy, bit 4 = w ruchu
+3. Zapisz do ROM: `p0971 = 1`
 
-**Faza 5 — Test Jog i weryfikacja:**
-1. BOP-2 lub Startdrive → `Control panel` → `Jog`: ustaw prędkość (np. 300 rpm), kliknij JOG+
-2. Obserwuj `r0021` (prędkość aktualna) i `r0027` (prąd aktualny) — porównaj z tabliczkowymi
-3. Sprawdź kierunek obrotu — jeśli odwrotny: zamień fazy U/V lub ustaw `p1821 = 1`
-4. Test E-Stop / STO: usuń sygnał STO → napęd powinien przejść w stan Stop (A01590) → sprawdź `r0899` bit 02
+**Faza 6 — Safety komisjonowanie (jeśli dotyczy):**
+1. Startdrive → Safety Integrated → Start safety commissioning
+2. Test STO z podpisem → Safety checksum (Safety ID) → zmień hasło
 
-**Faza 6 — Parametryzacja PROFINET i test z PLC:**
-1. W programie PLC zapisz słowo sterujące STW1: `16#047E` = Enable + gotowy; `16#047F` = RUN
-2. Ustaw słowo prędkości (HSW): wartość 16384 = 100% prędkości znamionowej (`p2000`)
-3. Monitoruj słowo statusowe ZSW1 (`r0052`) — bit 2 = napęd gotowy, bit 4 = napęd w ruchu
-4. Zapisz parametry do ROM: `p0971 = 1` (zapis trwały) lub przez Startdrive → `Save to device`
-
-**Faza 7 — Napęd liniowy z enkoderem liniowym:**
-
-Gdy G120 napędza oś liniową (pasek zębaty, śruba kulowa, szyna liniowa) z enkoderem liniowym mierzącym prędkość/pozycję bezpośrednio w mm/s zamiast rpm:
-
-| Parametr | Opis | Przykład |
-|----------|------|---------|
-| `p0408` | Ilość impulsów enkodera na obrót (PPR) — dla liniowego: impulsy na mm skoku śruby/paska | Enkoder 1000 imp/mm = `p0408 = 1000` |
-| `p0521` | Licznik mechaniczny (np. skok śruby w mm × 1000) | Śruba 10 mm/obr → `10000` |
-| `p0522` | Mianownik mechaniczny (1 obrót silnika) | `1` |
-| `p2000` | Prędkość referencyjna — w tym przypadku [mm/s] po przeliczeniu | np. `500` (mm/s) |
-
-**Przeliczenie: jak G120 widzi prędkość liniową:**
-- G120 wewnętrznie reguluje w rpm (obroty silnika)
-- Enkoder liniowy z `p0408` dostarcza sprzężenie zwrotne w impulsach/mm
-- Skok śruby lub paska (`p0521`/`p0522`) przelicza rpm → mm/s
-- `r0021` wyświetla prędkość w rpm — przelicz: `v [mm/s] = r0021 × skok_śruby / 60`
-
-**Konfiguracja krok po kroku (śruba kulowa, skok 10 mm/obr, enkoder 2500 PPR):**
-1. `p0400 = 1` — włącz enkoder inkrementalny (HTL/TTL)
-2. `p0408 = 2500` — 2500 impulsów na obrót enkodera
-3. `p0521 = 10`, `p0522 = 1` — skok 10 mm na 1 obrót silnika
-4. `p1300 = 21` — Vector z enkoderem (closed-loop)
-5. `p2000 = 1500` — prędkość referencyjna silnika [rpm] odpowiadająca max prędkości liniowej: `1500 rpm × 10 mm = 25 000 mm/min = 416 mm/s`
-6. W PLC: HSW = `16384` odpowiada `p2000` → przelicz żądaną prędkość liniową na HSW: `HSW = (v_żądana / v_max) × 16384`
-
-> ⚠️ Enkoder liniowy z wyjściem analogowym (np. ±10V) **nie jest** obsługiwany przez standardowe wejście enkodera CU — wymagany moduł SM i inne podejście (zewnętrzne sprzężenie przez AI → p2253 jako setpoint prędkości).
-
-**Kluczowe parametry diagnostyczne:**
-
-| Parametr | Opis |
-|----------|------|
-| `r0945` | Kod ostatniego błędu (Fault code) |
-| `r0021` | Prędkość aktualna silnika [rpm] |
+| Parametr diagnostyczny | Opis |
+|----------------------|------|
+| `r0945` | Kod ostatniego faultu |
+| `r0021` | Prędkość aktualna [rpm] |
 | `r0027` | Prąd aktualny [A] |
 | `r0052` | Słowo statusowe ZSW1 |
 
-> 💡 **Szybki test bez PLC:** Startdrive → Control panel → `Manual` → JOG. Obserwuj `r0021` i przelicz na mm/s ręcznie.
+> ⚠️ **Telegram `p0922`** musi być identyczny w napędzie i DB PLC. Niezgodność = pozornie poprawna komunikacja, ale bity na złych pozycjach.
+
+> ⚠️ Po zmianie parametrów Safety obowiązkowy **Safety Acceptance Test** z raportem.
+
+> 💡 `Take online device as preset` — TIA Portal wczyta konfigurację z istniejącego napędu jako punkt startowy.
 
 *Źródło: Siemens SINAMICS G120 Getting Started, Startdrive commissioning guide*
 
@@ -326,7 +296,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > 💡 **Przelicznik rozdzielczości:** enkoder 1024 PPR z interpolacją ×4 (A, /A, B, /B) daje **4096 kroków/obrót** — to standardowe zachowanie modułu HSC lub SINAMICS przy zliczaniu czterech zboczy.
 
-
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 16.14. Jakie są interfejsy enkoderów i jak konfigurujesz enkoder w SINAMICS i TIA Portal?  🟡
 
 **Przegląd interfejsów:**
@@ -367,6 +337,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > 💡 **HIPERFACE DSL:** jeden kabel do serwosilnika zawiera jednocześnie zasilanie silnika (3 fazy + PE) i sygnał enkodera DSL — brak osobnego kabla enkodera. Stosowany w Sinamics V90 z silnikami 1FK7. Upraszcza montaż ale wymaga specjalnego kabla (Siemens Motion Connect 500).
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 16.15. Czym są silniki IE5 (IPM / synchroniczne z magnesami trwałymi) i dlaczego zastępują klasyczne silniki indukcyjne w nowych projektach?  🟢
 
 **Silniki IE5** *(Ultra-Premium Efficiency)* to silniki synchroniczne z magnesami trwałymi wbudowanymi w wirnik (IPM — Interior Permanent Magnet). Są najwyższą klasą sprawności według IEC 60034-30-1.

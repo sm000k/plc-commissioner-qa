@@ -14,7 +14,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **115 pytań / 19 sekcji.**
+> **113 pytań / 19 sekcji.**
 
 
 ---

@@ -18,6 +18,7 @@
 
 > 💡 Stosujesz gdy awaria pojedynczego kabla nie może zatrzymać produkcji.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 14.2. Co to jest IRT (Isochronous Real-Time) i kiedy jest wymagany?  🟢
 
 <span style="color:#1a5276">**IRT**</span> (Isochronous Real-Time) to tryb PROFINET z deterministyczną synchronizacją cyklu do **250 µs** i jitterem **< 1 µs**, realizowaną sprzętowo (ASIC).
@@ -32,6 +33,7 @@
 - CPU obsługujące IRT (S7-1500 T-CPU lub F-CPU)
 - Telegram 105 (DSC) lub 111 dla SINAMICS S120
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 14.3. Jak diagnostykujesz sieć PROFINET w TIA Portal i PRONETA?  🟡
 
 **Diagnostics w TIA Portal:**
@@ -45,6 +47,7 @@
 
 > 💡 PRONETA jest szczególnie użyteczny gdy **nie masz projektu TIA** ani dostępu do sterownika — np. przy szybkiej diagnozie u klienta lub sprawdzeniu sieci nieznanego systemu.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 14.4. Co to jest Shared Device i kiedy go używasz?
 
 **Shared Device** (PROFINET) to urządzenie I/O równocześnie zarządzane przez **dwa kontrolery** — każdy ma przypisany inny zakres modułów.
@@ -59,6 +62,7 @@
 
 **Konfiguracja:** TIA Portal → właściwości urządzenia → `Advanced Settings` → `Shared Device`
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 14.5. Jak działa Device replacement bez PG (automatic name assignment)?
 
 CPU S7-1500 może automatycznie przypisać nazwę PROFINET nowemu modułowi bez laptopa z TIA Portal.
@@ -73,29 +77,34 @@ CPU S7-1500 może automatycznie przypisać nazwę PROFINET nowemu modułowi bez 
 
 > ⚠️ **Nie działa** jeśli: nowe urządzenie ma inny typ katalogowy, lub topologia sieci jest niejednoznaczna (duplikaty portów).
 
-### 14.6. Jakie są rodzaje i funkcje przemysłowych switchy Ethernet, oraz ich znaczenie w sieciach PROFINET?
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+### 14.6. Jakie są rodzaje i funkcje przemysłowych switchy Ethernet w sieciach PROFINET?
 
-Przemysłowe switche Ethernet są kluczowymi komponentami sieci PROFINET, zapewniającymi niezawodną i stabilną komunikację w trudnych warunkach przemysłowych, z różnymi funkcjonalnościami w zależności od potrzeb aplikacji.
-- **Rodzaje switchy:**
-  - **Niezarządzalne (Plug & Play):** Proste w użyciu, nie wymagają konfiguracji.
-    - **Compaрта ETU-0800/1600:** 8/16 portów Fast Ethernet (10/100 Mb/s), Auto-negocjacja, Full-duplex, Auto-MDI/MDIX. Metalowa obudowa IP30, odporność EMC, redundantne zasilanie 12-48 V DC, styk przekaźnikowy Fault.
-    - **Compaрта LETU-0500:** 5 portów Fast Ethernet, obudowa z poliwęglanu IP30. Wspiera Quality of Service (QoS) dla priorytetów pakietów PROFINET.
-    - **Compaрта EGU-0702-SFP-T:** Gigabitowy (10/100/1000 Mb/s) z 2 portami SFP (światłowód 100/1000). Backplane 14 Gb/s, Jumbo Frames 12.2 KB. Odporność na ekstremalne temperatury (-40 do 75°C).
-    - **Compaрта PGU-1002-SFP-24:** Gigabitowy z 8 portami PoE+ (do 30W/port, budżet 200W) i 2 portami SFP.
-  - **Zarządzalne:** Oferują pełną kontrolę nad siecią, zaawansowane funkcje i diagnostykę.
-    - **Compaрта ETM-0800:** 8 portów Fast Ethernet. Funkcje L2: VLAN, QoS, RSTP (redundancja), kontrola dostępu (Port Access Control), SNMP, LACP (agregacja łączy), IGMP Snooping (kontrola ruchu multicast). Port konsoli RS232, USB do backupu konfiguracji. Wersje T (rozszerzona temp. -40°C) i CP (odporność na korozję).
-    - **Compaрта EGM-1204-SFP:** Gigabitowy z 8 portami RJ45 i 4 slotami SFP. Obsługuje ERPS G.8032 (ring z czasem przełączania <50 ms). Pełen pakiet zarządzania siecią.
-    - **Compaрта CBGM-0602-SFP:** 4 porty Gigabit Ethernet z PoE++ (do 90W/port) i 2 porty SFP. DIP switche do konfiguracji PoE. Wskaźnik obciążenia mocy PoE. Funkcje L2: DHCP Snooping, 802.1X (kontrola dostępu).
-- **Wspólne cechy przemysłowych switchy:**
-  - **Odporność mechaniczna:** Metalowa obudowa (IP30), montaż na szynie DIN.
-  - **Odporność środowiskowa:** Szeroki zakres temperatur pracy (-10 do 65°C, -40 do 75°C), brak wentylatorów.
-  - **Odporność EMC:** Zgodność z normami EN (wyładowania elektrostatyczne, zakłócenia radiowe, szybkie zakłócenia impulsowe, przepięcia, zakłócenia przewodzone).
-  - **Zasilanie:** Redundantne zasilanie DC (np. 12-48 V DC, 48-57 V DC), przekaźnik Fault (sygnalizacja awarii zasilania/urządzenia).
-  - **Architektura:** Non-blocking (wszystkie porty pracują jednocześnie bez blokowania ruchu).
-  - **MAC entries:** Duża liczba wpisów MAC (np. 16k) do obsługi rozbudowanych sieci.
-Praktyczne wskazówki:
-- W sieciach PROFINET, Quality of Service (QoS) w switchach jest kluczowe, aby pakiety PROFINET miały priorytet, nawet przy dużym ruchu.
-- Redundancja zasilania i przekaźnik Fault są ważne dla ciągłości pracy w przemyśle.
+Przemysłowe switche Ethernet zapewniają komunikację PROFINET w trudnych warunkach. Dzielą się na dwie kategorie:
+
+**Niezarządzalne (Plug & Play):**
+- Nie wymagają konfiguracji — podłącz i działa
+- Fast Ethernet (10/100 Mb/s) lub Gigabit (10/100/1000 Mb/s), porty SFP (światłowód)
+- Niektóre wspierają QoS (priorytet pakietów PROFINET) mimo braku konfiguracji
+- Zastosowanie: proste segmenty sieci, rozgałęzienia I/O
+
+**Zarządzalne:**
+- Pełna kontrola: VLAN, QoS, RSTP/MRP (redundancja), SNMP, LACP (agregacja łączy), IGMP Snooping
+- Diagnostyka: web interface, port monitoring, port mirroring
+- Kontrola dostępu: 802.1X, Port Access Control, DHCP Snooping
+- Wersje Gigabit z portami SFP, PoE+ (zasilanie kamer, czytników)
+- **Wymagane** dla topologii pierścieniowych (MRP), IRT, sieci z diagnostyką
+
+**Wspólne cechy przemysłowych switchy:**
+- Metalowa obudowa IP30, montaż DIN, bezwentylatorowe (-40 do 75°C)
+- Redundantne zasilanie DC + styk przekaźnikowy Fault
+- Odporność EMC wg norm EN, architektura non-blocking
+
+**Na co zwracać uwagę przy PROFINET:**
+- QoS musi priorytetyzować ramki PROFINET (VLAN Priority 6/7)
+- Zarządzalny switch = wymagany do MRP, IRT, TSN i diagnostyki PROFINET
+- W Siemens: seria SCALANCE X (XB/XC/XP/XR) — zintegrowana z TIA Portal
+
 *Źródło: transkrypcje ControlByte*
 
 ### 14.7. Co to jest S7 Communication (GET/PUT) i ISO on TCP — kiedy i jak je stosujesz?
@@ -119,6 +128,7 @@ Domyślnie w S7-1500 dostęp PUT/GET z zewnętrznych urządzeń jest **zablokowa
 
 > 💡 Dla nowych integracji z IT preferuj **OPC UA** (TLS 1.2 + certyfikaty). S7/ISO on TCP = szybkie (<1 ms), bez autentykacji. OPC UA = ~10 ms, z szyfrowaniem — wybór dla systemów IT/OT.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 14.8. Co to jest PROFINET TSN (Time Sensitive Networking) i czym różni się od IRT?  🟢
 
 **PROFINET TSN** to następca IRT — stan standaryzacji IEEE 802.1 definiujący determinizm czasowy w standardowym Ethernet na poziomie sprzętowym, ale bez wymogu specjalistycznych ASIC-ów jak w IRT.

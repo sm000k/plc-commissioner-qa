@@ -13,6 +13,7 @@
 
 > ⚠️ **Pułapka Safety + Start:** logika musi wymagać nowego impulsu Start **po** ACK. ACK samo w sobie nie powinno uruchamiać napędów.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 17.2. HMI pokazuje alarm którego nie ma w projekcie TIA Portal — skąd pochodzi?
 
 **Możliwe źródła „obcych" alarmów:**
@@ -25,6 +26,7 @@
 
 > 💡 **Procedura:** TIA Portal → HMI Alarms → Discrete Alarms / Analog Alarms — filtruj po numerze alarmu. Jeśli brak → sprawdź `System alarms → Diagnostic alarms`.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 17.3. Moduł ET200SP nie pojawia się w sieci po podłączeniu — lista kroków diagnostycznych.
 
 - [ ] **Kabel fizyczny:** czy dioda LINK/ACT na porcie modułu lub switcha miga? Zamień kabel.
@@ -37,6 +39,7 @@
 
 > 💡 PRONETA → skan sieci → sprawdź czy moduł odpowiada na ARP — szybki sposób bez TIA Portal.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 17.4. Napęd SINAMICS G120 świeci ciągłym czerwonym LED i nie kasuje się — co robisz?  🟢
 
 Ciągły czerwony RDY LED = aktywny <span style="color:#c0392b">**fault**</span> (F-alarm), nie alarm (A-alarm, który jest żółty).
@@ -52,6 +55,7 @@ Ciągły czerwony RDY LED = aktywny <span style="color:#c0392b">**fault**</span>
 
 > 💡 Jeśli kasowanie przez sieć nie działa: hardware reset — chwilowe odcięcie zasilania 24V Control Unit *(zachowaj 400V Power Module)*.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 17.5. CPU przeszło w STOP podczas produkcji — pierwsze 3 kroki.  🟢
 
 CPU w STOP = zatrzymanie wszystkich wyjść. Prawidłowa kolejność: odczyt → diagnoza → przyczyna → **dopiero wtedy** akcja.
@@ -73,7 +77,7 @@ CPU w STOP = zatrzymanie wszystkich wyjść. Prawidłowa kolejność: odczyt →
 
 > 💡 **Warm restart a STOP:** `Warm restart` (Run) bez zrozumienia przyczyny = maszyna może natychmiast znów wejść w STOP. Jeśli przyczyną jest zwarcie I/O, warm restart tylko powtórzy błąd.
 
-
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 17.6. Po czym poznajesz, że projekt w TIA Portal jest skalowalny?  🟡
 
 Skalowalny projekt TIA Portal to taki, który można rozszerzać (nowe urządzenia, sekcje, osie) bez przepisywania istniejącego kodu — tylko przez parametryzację lub powielanie gotowych wzorców.
@@ -91,6 +95,7 @@ Skalowalny projekt TIA Portal to taki, który można rozszerzać (nowe urządzen
 
 > 💡 **Na rozmowie:** skalowalność = biblioteki + UDT + tablice. Pokaż przykład: "Mamy 12 zaworów w tablicy, dodanie 13. to zmiana jednej stałej `MAX_VALVES`."
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 17.7. Co sprawdzasz na FAT (Factory Acceptance Test) dla instalacji z Safety? 🟡
 FAT (Factory Acceptance Test) to weryfikacja systemu u producenta maszyny przed wysyłką do klienta. Dla Safety obejmuje funkcjonalne testy każdej funkcji bezpieczeństwa zgodnie z wymaganiami normy EN ISO 13849-1 i dokumentacją techniczną.
 - Weryfikacja F-Signatures (F-DB i F-CPU): sprawdź match między TIA Portal a CPU → F-Program → Signature Comparison
@@ -101,6 +106,7 @@ FAT (Factory Acceptance Test) to weryfikacja systemu u producenta maszyny przed 
 - Documented: każdy test zapisany w protokole FAT z datą, podpisem, numerem PO
 - Checklista: F-Version, F-Address, F-Monitoring Time, passivation time, substitute values
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 17.8. Jak realizujesz SAT (Site Acceptance Test) po dostarczeniu maszyny do klienta? 🟡
 SAT (Site Acceptance Test) to weryfikacja systemu na miejscu klienta po instalacji. Różni się od FAT tym, że uwzględnia rzeczywiste środowisko: okablowanie obiektowe, medium procesowe, warunki bezpieczeństwa operacyjnego.
 - Krok 1: Upload projektu z CPU i porównaj z referencją z FAT (Project → Compare)
@@ -111,6 +117,7 @@ SAT (Site Acceptance Test) to weryfikacja systemu na miejscu klienta po instalac
 - Dokumentacja: protokół SAT + podpis inżyniera Safety i przedstawiciela klienta
 - Jeśli F-Signature różni się od FAT → STOP — ktoś zmienił program po FAT, eskalacja
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 17.9. Jak podejść do diagnostyki nieznanego lub legacy projektu TIA Portal, który przejmujesz po raz pierwszy? 🟡
 
 **Scenariusz:** dostajesz maszynę z projektem TIA Portal od innego integratora lub starszą wersję — musisz zrozumieć co robi i ewentualnie poprawić usterki.

@@ -146,7 +146,7 @@ L3 ─┴── KM_R_styk ─┘   (krzyżowe połączenie L1/L3 w KM_R)
 
 **Czas martwy przy zmianie kierunku:**
 - Min. 100–300 ms między wyłączeniem jednego a włączeniem drugiego stycznika
-- Konieczny ze względu na rozpad łuku elektrycznego na styling i demagnetyzację uzwojeń silnika
+- Konieczny ze względu na rozpad łuku elektrycznego na stykach i demagnetyzację uzwojeń silnika
 - Przy PLC: zrealizuj timerem (TOF lub TON)
 
 > ⚠️ **Zmiana pod napięciem:** zmiana kierunku gdy silnik kręci się z pełną prędkością = silny szok mechaniczny + prąd udarowy do 10× I_n. Zawsze zastosuj logikę: STOP → czekaj aż silnik się zatrzyma → START w przeciwnym kierunku (lub hamowanie dynamiczne).

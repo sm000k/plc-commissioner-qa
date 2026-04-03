@@ -13,6 +13,7 @@
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 8.2. Jaka jest różnica między STO a zwykłym wyłączeniem napędu przez PLC?
 
 | Cecha | STO | Wyłączenie programowe |
@@ -25,6 +26,7 @@
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 8.3. Co to jest SS1 i kiedy go używasz zamiast STO?  🔴
 
 <span style="color:#c0392b">**SS1**</span> (Safe Stop 1): napęd hamuje wzdłuż zaprogramowanej rampy do zerowej prędkości, następnie aktywuje STO.
@@ -36,6 +38,7 @@
 
 > ⚠️ Czas hamowania SS1 jest **monitorowany** — jeśli napęd nie zatrzyma się w zadanym czasie → natychmiastowe STO jako zabezpieczenie.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 8.4. Co to są SS2, SOS, SLS, SDI, SBC?  🟢
 
 | Funkcja Safety | Pełna nazwa | Działanie | Kiedy stosujesz |
@@ -46,12 +49,14 @@
 | **SDI** | Safe Direction | Tylko jeden kierunek ruchu dozwolony | Osłona otwarta — oś może jechać tylko od operatora |
 | **SBC** | Safe Brake Control | Certyfikowane sterowanie hamulcem — monitoring prądu uzwojenia | Osie pionowe z hamulcem mechanicznym Safety |
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 8.5. Jak STO jest realizowane sprzętowo — zaciski vs PROFIsafe?
 
 Zaciski hardwarowe (STO1/STO2): bezpośrednie odcięcie sygnałów PWM przez zewnętrzny sygnał 24V z modułu Safety. Szybsze (bez opóźnienia sieci), prostsze, niezależne od komunikacji.
 PROFIsafe: komenda STO przesyłana przez PROFINET. Umożliwia zaawansowane funkcje (SS1, SLS, SDI, diagnostyka przez sieć). Wymaga sprawnego połączenia sieciowego.
 W praktyce: przy G120/S120 można łączyć oba sposoby — PROFIsafe dla zaawansowanych funkcji + zaciski STO jako backup.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 8.6. Co sprawdzasz przy commissioning napędu z STO?
 
 Procedura:
@@ -63,6 +68,7 @@ Procedura:
 - Sprawdzam poprawność adresu PROFIsafe jeśli używany
 - Dokumentuję wyniki z podpisem
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 8.7. Czym różnią się telegramy PROFIdrive 1, 20, 102, 352 i jak dobirasz telegram dla napędu SINAMICS?
 
 Telegram PROFIdrive określa format wymiany danych między CPU a napędem przez PROFINET. Numer musi być zgodny w napędzie (`p0922`) i w konfiguracji Startdrive/TIA Portal.
@@ -81,13 +87,14 @@ Telegram PROFIdrive określa format wymiany danych między CPU a napędem przez 
 - Synchronizacja osi, IRT → Telegram 105
 - Safety (STO/SS1/SLS przez PROFIsafe) → Telegram 352
 
-**Uwaga praktyczna:** Niezgodność telegramu między `p0922` a konfiguracją TIA Portal → napęd nie komunikuje się lub dane są przesuznite — błędne sterowanie bez alarmu. Zawsze weryfikuj `p0922` online po podłączeniu nowego napędu.
+**Uwaga praktyczna:** Niezgodność telegramu między `p0922` a konfiguracją TIA Portal → napęd nie komunikuje się lub dane są przesunięte — błędne sterowanie bez alarmu. Zawsze weryfikuj `p0922` online po podłączeniu nowego napędu.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 8.8. Jakie funkcje bezpieczeństwa są wbudowane w serwowzmacniacz Sinamics V90 i jak należy je podłączyć?
 Serwowzmacniacz Sinamics V90 jest wyposażony w funkcję bezpieczeństwa STO (Safe Torque Off), która zapewnia bezpieczne zdjęcie momentu obrotowego z napędu.
 - Funkcja STO jest realizowana poprzez terminale STO+, STO1 i STO2.
 - Domyślnie terminale te są zmostkowane, co oznacza, że funkcja STO jest nieaktywna w trybie bezpieczeństwa.
-- W docelowej aplikacji sygnały STO należy podłączyć dwukanałowo do układu bezpieczeństwa, takiego jak przekaźnik bezpieczeństwa lub programowalny sterownik bezpieczeństwa (PLC Safety), aby zapewnić bezpieczne zatrzymanie napędu.
+- W docelowej aplikacji sygnały STO należy podłączyć dwukanałowo do układu bezpieczeństwa, takiego jak przekaźnik bezpieczeństwa lub F-CPU (np. S7-1500F), aby zapewnić funkcję STO (Safe Torque Off) napędu.
 *Źródło: transkrypcje ControlByte*
 
 ---

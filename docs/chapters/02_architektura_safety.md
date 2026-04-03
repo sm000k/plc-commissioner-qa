@@ -12,6 +12,7 @@
 **SIMATIC Safety Integrated — jeden PLC, jeden inżyniering, jedna komunikacja:**
 ![SIMATIC Safety Integrated: TIA Portal, F-CPU, ET200 F-I/O, SINAMICS](images/safety/01b_simatic_safety_overview_p2.png)
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.2. Co to jest F-CPU i jak działa dual-channel processing?  🔴
 
 **Dual-channel processing** to architektura, w której ten sam fragment kodu Safety jest wykonywany przez **dwa niezależne kanały obliczeniowe wewnątrz jednego CPU** (dwa osobne rdzenie lub dwa niezależne tory sprzętowe). Oba kanały przetwarzają identyczne dane wejściowe i produkują wyniki. Na końcu każdego cyklu Safety specjalny komparator porównuje wyniki obu kanałów:
@@ -27,6 +28,7 @@
 
 *Certyfikacja (informacyjnie):* F-CPU jest certyfikowany dla SIL 3 / PL e — ta informacja pochodzi z karty katalogowej napędu lub CPU; nie musisz jej znać na pamięć, ale warto wiedzieć że to TÜV zatwierdza architekturę, nie sam Siemens.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.3. Jakie sterowniki Siemens obsługują funkcje Safety?
 
 S7-1500F: CPU 1511F, 1513F, 1515F, 1516F, 1517F, 1518F — Advanced controllers z wbudowanym Safety.
@@ -35,29 +37,34 @@ ET 200SP CPU F: CPU 1510SP F, 1512SP F — zdalny sterownik z Safety, montaż pr
 ET 200pro CPU F: CPU 1516pro F — IP67, bezpośrednio na maszynie.
 Wszystkie programowane w TIA Portal z STEP 7 Safety Advanced lub Safety Basic.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.4. Co to jest F-DB i dlaczego nie można go edytować ręcznie?
 
 F-DB (Fail-safe Data Block) generowany jest automatycznie przez TIA Portal dla każdego bloku Safety. Zawiera: CRC (checksum logiki), F-signature (podpis programu Safety), parametry czasowe.
 Ręczna edycja zniszczyłaby spójność podpisu → F-CPU odmówiłoby uruchomienia Safety. To celowe zabezpieczenie przed nieautoryzowaną modyfikacją.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.5. Co to jest F-signature i collective signature?  🟡
 
 F-signature to unikalny podpis kryptograficzny jednego bloku Safety — zmienia się przy każdej modyfikacji kodu.
 Collective signature (podpis zbiorczy) to podpis CAŁEGO programu Safety złożony ze wszystkich bloków. Widoczny na wyświetlaczu CPU lub w TIA Portal jako ciąg znaków (np. '5CBE6409').
 Przy wgraniu CPU porównuje collective signature — niezgodność → Safety nie uruchamia się.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.6. Jakie są tryby pracy Safety CPU i jak się przełącza?
 
 LOCK — Safety program zablokowany, nie wykonuje się. Wyjścia Safety → wartości zastępcze.
 RUN — Safety program działa normalnie.
 Przełączenie przez TIA Portal (Safety Administration) lub dedykowany sygnał w logice. Po przełączeniu wymagane potwierdzenie (hasło Safety lub ACK). Zmiana trybu jest logowana z datą i użytkownikiem.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.7. Co to jest STEP 7 Safety Advanced vs Safety Basic?
 
 Safety Basic: licencja dla prostszych aplikacji, S7-1200F i ET 200SP F. Ograniczone funkcje, niższy koszt.
 Safety Advanced: pełna licencja dla S7-1500F, wszystkie funkcje Safety, certyfikowane biblioteki funkcji (muting, two-hand, ESTOP), możliwość symulacji w PLCSIM.
 Obydwie są wtyczką do TIA Portal — nie są osobnym oprogramowaniem.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.8. Jakie są podstawowe komponenty i zasady programowania sterowników bezpieczeństwa Pilz PNOZmulti?
 
 Pilz PNOZmulti to programowalny sterownik bezpieczeństwa, który umożliwia łatwe i intuicyjne tworzenie logiki bezpieczeństwa dla maszyn, wykorzystując dedykowane bloki funkcyjne i graficzne środowisko programowania.

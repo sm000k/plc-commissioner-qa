@@ -10,16 +10,6 @@
 
 > **115 pytań / 19 sekcji.** 
 
-### MAPA TEMATYCZNA — który temat jest dla Ciebie najważniejszy?
-
-```
-Pytają głównie o Safety?    → Sekcje 2 → 3 → 4 → 5 → 7 → 9 → 13
-Pytają o napędy?            → Sekcje 8 → 12 → 16
-Pytają o commissioning?     → Sekcje 11 → 17 → 19
-Pytają o roboty ABB?        → Sekcja 10
-Pytają o PROFINET/sieć?     → Sekcje 1.8 → 14
-Pytają o TIA Portal?        → Sekcje 1 → 9 → 18
-```
 
 ---
 

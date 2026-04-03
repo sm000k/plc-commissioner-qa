@@ -1,21 +1,47 @@
 ---
-mode: agent
-description: "Faza 3: Generuj kompletne odpowiedzi Q&A i utwórz gotowy dokument .docx"
-tools: ['read_file', 'file_search', 'run_in_terminal', 'create_file', 'replace_string_in_file']
+agent: agent
+description: "Faza 3: Generuj merytorycznie poprawne odpowiedzi Q&A z obowiązkową weryfikacją źródłową. Use when: generating Q&A answers, writing technical responses about PLC/Safety/SINAMICS/PROFINET, creating new draft versions."
+tools: [read, search, edit, execute]
 ---
 
-# Faza 3 — Generowanie odpowiedzi i dokumentu .docx
+# Faza 3 — Generowanie odpowiedzi Q&A (source-grounded)
 
 ## Twój cel
-Na podstawie pytań z `docs/pytania_draft_v{n}.md` wygeneruj kompletne odpowiedzi, złóż z istniejącym Q&A i uruchom skrypt tworzący `.docx`.
+Na podstawie pytań wygeneruj kompletne, **merytorycznie poprawne** odpowiedzi oparte na materiałach źródłowych z workspace. Złóż z istniejącym Q&A i uruchom skrypt tworzący `.docx`.
 
-## Krok 1 — Odczytaj pytania
+> ⛔ **ZASADA NADRZĘDNA**: Nie generuj ŻADNEJ odpowiedzi bez uprzedniego przeczytania źródeł. Każdy fakt musi mieć oparcie w materiale workspace lub być oznaczony poziomem pewności.
 
-```
-#file:docs/pytania_draft_v7.md
-```
+---
 
-## Krok 2 — Format odpowiedzi (template obligatoryjny)
+## Krok 1 — Odczytaj aktualny dokument Q&A
+
+Odczytaj `docs/LATEST.md` aby poznać bieżący stan dokumentu (wersja, liczba pytań, sekcje).
+
+## Krok 2 — Obowiązkowe czytanie źródeł (SOURCE-FIRST)
+
+> **Dla KAŻDEGO pytania/odpowiedzi** wykonaj przed generowaniem:
+
+### 2a. Odczytaj rozdział
+Odczytaj `docs/chapters/XX_*.md` odpowiadający sekcji pytania. Np. dla pytania z sekcji 7 (PROFIsafe) → odczytaj `docs/chapters/07_profisafe.md`.
+
+### 2b. Przeszukaj bazy wiedzy
+Przeszukaj słowa kluczowe z pytania w:
+- `docs/knowledge_base_controlbyte.md` — baza z transkrypcji ControlByte (52 filmy)
+- `docs/knowledge_base_delta_v11.md` — delta wiedzy z patcha v11
+
+### 2c. Sięgnij do PDF (tylko gdy brakuje informacji)
+Jeśli po krokach 2a-2b nadal brakuje danych → ekstrakcja z `sources/pdfs/`:
+- Safety: `safety_getting_started_en-US.pdf`, `SIMATIC Safety - Konfiguracja i programowanie (2).pdf`
+- E-Stop: `21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en.pdf`
+- Okablowanie: `39198632_Wiring_Example_en.pdf`
+- SCL: `btc.pl-SCL-S7-1200.pdf`, `siemens SCL.PDF`
+
+### 2d. Zanotuj źródła
+Dla każdej odpowiedzi zanotuj skąd wzięto kluczowe fakty (do oznaczenia w odpowiedzi).
+
+---
+
+## Krok 3 — Format odpowiedzi (template obligatoryjny)
 
 Każda odpowiedź **musi** składać się z trzech bloków:
 
@@ -24,13 +50,13 @@ Każda odpowiedź **musi** składać się z trzech bloków:
 
 [DEFINICJA — 1-2 zdania wyjaśniające czym jest X i jak działa]
 
-- [Kluczowy fakt / właściwość 1]
-- [Kluczowy fakt / właściwość 2]
-- [Kluczowy fakt / właściwość 3 — z numerem parametru Siemens jeśli dotyczy]
+- [Kluczowy fakt 1 — ze szczegółem technicznym]
+- [Kluczowy fakt 2 — z numerem parametru Siemens JEŚLI znaleziony w źródłach]
+- [Kluczowy fakt 3 — z odniesieniem do normy JEŚLI dotyczy]
 
-[PRAKTYKA — procedura krok po kroku LUB przykład z TIA Portal LUB realny scenariusz]
+[PRAKTYKA — procedura krok po kroku LUB przykład z TIA Portal LUB realny scenariusz commissioning LUB komenda diagnostyczna]
 
-> Źródło: [nazwa dokumentu / numer Siemens / norma IEC lub EN] *(opcjonalne, gdy znane)*
+> Źródło: [nazwa pliku / norma] | Pewność: [ZWERYFIKOWANE] / [PRAWDOPODOBNE] / ⚠️ DO WERYFIKACJI
 ```
 
 ### Przykład dobrej odpowiedzi:
@@ -38,165 +64,129 @@ Każda odpowiedź **musi** składać się z trzech bloków:
 ```
 ### 3. Co to jest SS1 (Safe Stop 1) i kiedy go używasz zamiast STO?
 
-SS1 (Safe Stop 1) to funkcja Safety napędu SINAMICS która hamuje oś wzdłuż 
-zaprogramowanej rampy prędkości do zatrzymania, a następnie aktywuje STO 
+SS1 (Safe Stop 1) to funkcja Safety napędu SINAMICS która hamuje oś wzdłuż
+zaprogramowanej rampy prędkości do zatrzymania, a następnie aktywuje STO
 (Safe Torque Off). Certyfikowana wg IEC 61800-5-2.
 
 - Czas hamowania monitorowany przez napęd — przekroczenie limitu = natychmiastowe STO
-- Skonfigurowana rampa SS1 musi być krótsza niż czas reakcji Safety wynikający z analizy ryzyka
 - Realizowana przez PROFIsafe (zaawansowana) lub zaciski hardwarowe (prostsza)
-- Parametr p9652 (G120) — czas SS1 ramp, zakres 0–300s
+- Odpowiada kategorii zatrzymania 1 wg EN 60204-1 (kontrolowane hamowanie → odłączenie)
+- Parametr p9652 (G120) — czas SS1 timeout [ZWERYFIKOWANE: SINAMICS Safety Function Manual]
 
-Używasz SS1 zamiast STO gdy natychmiastowe odcięcie momentu (STO) jest niebezpieczne:
-obrabiarka z dużą masą bezwładnościową, winda, dźwig, robot z ciężkim ładunkiem — 
-nagłe odcięcie powoduje zderzenie lub uszkodzenie mechaniki.
+Używasz SS1 zamiast STO gdy natychmiastowe odcięcie momentu jest niebezpieczne:
+obrabiarka z dużą masą bezwładnościową, robot z ciężkim ładunkiem — nagłe odcięcie
+powoduje zderzenie lub uszkodzenie mechaniki.
 
 Procedura testowania SS1 podczas commissioning:
-1. Aktywuj SS1 przez PROFIsafe lub zacisk STO
-2. Zmierz czas hamowania stopwatchem
-3. Zweryfikuj że napęd się zatrzymał przed aktywacją STO (status r9722.3=1)
-4. Sprawdź czy napęd nie może ruszyć bez cofnięcia SS1
+1. Ustaw parametr czasu SS1 w Startdrive lub Safety Wizard
+2. Aktywuj SS1 przez PROFIsafe lub zacisk hardwarowy
+3. Zmierz czas hamowania — musi być krótszy niż skonfigurowany timeout
+4. Zweryfikuj że po zatrzymaniu aktywuje się STO (sprawdź status w Trace)
+5. Sprawdź że napęd nie może ruszyć bez cofnięcia SS1 i ponownego enable
 
-> Źródło: IEC 61800-5-2, Siemens SINAMICS G120 Safety Integrated Function Manual
+> Źródło: IEC 61800-5-2, docs/chapters/08_napedy_safety.md | Pewność: [ZWERYFIKOWANE]
 ```
 
-## Krok 3 — Zasady merytoryczne dla generowania odpowiedzi
+---
 
-### Numery parametrów SINAMICS (używaj gdy pewny)
+## Krok 4 — Zasady merytoryczne (KRYTYCZNE)
+
+### Polityka anty-halucynacji
+1. **NIGDY nie wymyślaj** numerów parametrów (pXXXX/rXXXX). Nie znasz → napisz `pXXXX (sprawdź w dokumentacji SINAMICS)`.
+2. **NIGDY nie fabrykuj** numerów norm, klauzul, artykułów. Dozwolone normy — patrz `copilot-instructions.md`.
+3. **Nie wymyślaj** konkretnych zakresów wartości. Nie znasz → podaj kierunek: „kilkadziesiąt ms", „rzędu sekund".
+4. **Oznaczaj pewność** przy każdej odpowiedzi:
+   - `[ZWERYFIKOWANE]` — fakt znaleziony dosłownie w pliku workspace
+   - `[PRAWDOPODOBNE]` — spójne z wiedzą domenową ale nie potwierdzone w źródłach
+   - `⚠️ DO WERYFIKACJI` — niepewne, wymaga sprawdzenia
+
+### Numery parametrów SINAMICS (sprawdzone — używaj gdy pasują)
+
+**Podstawowe sterowanie:**
 | Parametr | Opis |
 |----------|------|
+| `p0010` | Parametryzacja — filtr grup parametrów (Quick commissioning) |
+| `p0100` | Europa/Ameryka Północna (50Hz/60Hz) |
+| `p0304` | Napięcie znamionowe silnika |
+| `p0305` | Prąd znamionowy silnika |
+| `p0307` | Moc znamionowa silnika |
+| `p0310` | Częstotliwość znamionowa silnika |
+| `p0311` | Prędkość znamionowa silnika |
+| `p0700` | Źródło komend sterujących (0=MOP, 1=BOP, 2=terminal, 6=PROFIdrive) |
 | `p0840` | ON/OFF1 — źródło sygnału start napędu |
+| `p1000` | Źródło zadanej częstotliwości/prędkości |
+| `p1080` | Częstotliwość minimalna |
+| `p1082` | Częstotliwość maksymalna |
 | `p1120` | Ramp-up time [s] |
 | `p1121` | Ramp-down time [s] |
+| `p2051` | Typ telegramu PROFIdrive (1/20/105/111) |
+
+**Diagnostyka:**
+| Parametr | Opis |
+|----------|------|
 | `r0002` | Status napędu (bitmapa) |
 | `r0945[0..7]` | Kody błędów (fault codes) |
 | `r2110` | Aktualny kod alarmu (warning) |
-| `p2051` | Telegram PROFIdrive (1/20/105) |
+| `r0722` | Status PROFIdrive Control Word |
+| `r0947` | Fault timestamp |
+
+**Safety Integrated:**
+| Parametr | Opis |
+|----------|------|
 | `p9501` | Safety STO enable |
-| `p9601` | Safety SS1 ramp time |
-| `p9652` | SS1 timeout |
+| `p9601` | Safety SS1 enable |
+| `p9652` | SS1 timeout / ramp time |
+| `p9801` | Safety hasło (password) |
+| `p9802` | Safety acceptance test — data |
+| `r9722` | Status Safety funkcji (bitmapa) |
+| `r9773` | PROFIsafe address |
 
-### Normy — używaj właściwych oznaczeń
-- Bezpieczeństwo maszyn: **EN ISO 13849-1** (PL a-e), **IEC 62061** (SIL)
-- Napędy Safety: **IEC 61800-5-2** (STO/SS1/SS2/SOS/SLS/SDI/SBC)
-- Systemy Safety: **IEC 61508** (SIL 1-3), **EN 60204-1** (kategorie zatrzymania 0/1/2)
-- E-Stop: **EN ISO 13850**, przekaźniki bezpieczeństwa: **EN 60947-5-1**
+### Terminologia Siemens
+Patrz tabela w `copilot-instructions.md` — używaj ZAWSZE terminów Siemens zamiast generycznych.
 
-### Terminologia Siemens (używaj ZAWSZE)
-| ✅ Poprawnie | ❌ Niepoprawnie |
-|-------------|----------------|
-| F-CPU | sterownik bezpieczeństwa |
-| passivation | wyłączenie/blokada modułu |
-| F-signature | suma kontrolna programu |
-| collective signature | podpis całości |
-| reintegration | resetowanie modułu |
-| substitute value | wartość domyślna |
-| F-monitoring time | timeout komunikacji |
-| value status | bit jakości |
-
-## Krok 4 — Złóż pełne Q&A
-
-Weź istniejące pytania i odpowiedzi z v6 + nowe pytania z `docs/pytania_draft_v7.md` i złóż kompletny draft w `docs/qa_draft_v7.md`.
-
-Struktura pliku `docs/qa_draft_v7.md`:
-
-```markdown
-# KOMPENDIUM Q&A
-### PLC Programmer / Commissioner / Automatyk
-### Siemens TIA Portal · Safety PLC · ET200 · Napędy SINAMICS · Robot ABB · SICAR
-### Pytania + odpowiedzi zweryfikowane pod kątem rozmów kwalifikacyjnych.
-### Źródła: Siemens Application Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated dokumentacja.
----
-
-## 1. PODSTAWY PLC I AUTOMATYKI
-### 1. Co to jest PLC i czym różni się od zwykłego komputera?
-[treść odpowiedzi]
-
-[... dalsze sekcje 2–18 ...]
+### Normy — dozwolone (nie wymyślaj innych)
+- **EN ISO 13849-1** (PL a-e), **IEC 62061** (SIL CL), **EN ISO 12100** (ocena ryzyka)
+- **IEC 61800-5-2** (STO/SS1/SS2/SOS/SLS/SDI/SBC)
+- **IEC 61508** (SIL 1-3), **EN 60204-1** (kategorie zatrzymania 0/1/2)
+- **EN ISO 13850** (E-Stop), **EN 60947-5-1** (przekaźniki)
+- **IEC 61496** (kurtyny), **EN ISO 13855** (odległości bezpieczeństwa)
+- **IEC 61131-3** (języki programowania PLC)
 
 ---
 
-## 19. SŁOWNIK POJĘĆ — PLC / Safety / PROFINET / Napędy
+## Krok 5 — Quality Gate (self-check po generowaniu)
 
-Słownik zawiera **pełne definicje** (2–4 zdania) wszystkich kluczowych pojęć
-używanych w komisjonowaniu systemów Siemens. W odróżnieniu od ściągi — każde
-hasło wyjaśnia kontekst użycia i praktyczne znaczenie.
+Po wygenerowaniu KAŻDEJ odpowiedzi, zweryfikuj:
 
-### Podstawy PLC
+- [ ] ✅ **Definicja** — czy odpowiedź zaczyna się od 1-2 zdań definiujących pojęcie?
+- [ ] ✅ **Bullet list** — czy zawiera min. 3 punkty kluczowe ze szczegółami technicznymi?
+- [ ] ✅ **Praktyka** — czy zawiera min. 1 element praktyczny (procedura / scenariusz / diagnostyka / konfiguracja TIA Portal)?
+- [ ] ✅ **Parametry** — czy KAŻDY numer parametru (pXXXX) pochodzi z tabeli powyżej lub ze źródła? Jeśli nie → usuń lub oznacz `⚠️ DO WERYFIKACJI`.
+- [ ] ✅ **Terminologia** — czy używa terminów Siemens (F-CPU, passivation, reintegration, substitute value, F-monitoring time)?
+- [ ] ✅ **Źródło** — czy podano source (PDF, chapter, knowledge base, norma) i poziom pewności?
+- [ ] ✅ **Bez halucynacji** — czy żaden fakt nie jest wymyślony „bo dobrze brzmi"?
 
-**Scan cycle** — jeden pełny cykl wykonania programu CPU: odczyt wejść →
-wykonanie programu → zapis wyjść → obsługa komunikacji. Czas cyklu wynosi
-typowo 1–20 ms; przy dużych projektach Safety może wzrosnąć do 50–100 ms.
-Zbyt długi scan cycle = opóźniona reakcja na sygnały bezpieczeństwa.
-
-**OB (Organization Block)** — blok organizacyjny w TIA Portal definiujący
-punkt wywołania programu. OB1 = główny cykl, OB35 = przerwanie cykliczne
-(np. co 100 ms), OB100 = zimny start, F_MAIN = Safety OB.
-
-**FB (Function Block)** — blok funkcjonalny z własną pamięcią instancji (IDB).
-Zachowuje stan między wywołaniami — używany dla silników, sekwencji, timerów.
-Każde wywołanie FB wymaga odrębnej instancji DB.
-
-**FC (Function)** — blok bez pamięci własnej. Używany dla obliczeń
-jednorazowych, konwersji sygnałów, logiki bezstanowej. Tańszy pamięciowo
-niż FB.
-
-**DB (Data Block)** — blok danych. Globalny DB: dostępny z całego programu.
-Instancja DB: dedykowana pamięć jednego FB, tworzona automatycznie.
-
-**UDT (User Data Type)** — użytkowniczy typ złożony (np. `Motor_t` z polami
-Speed:REAL, Fault:BOOL). Wymusza spójną strukturę dla wielu identycznych
-urządzeń; jeden FB + UDT zastępuje N osobnych bloków.
-
-**Tag (zmienna PLC)** — nazwy symboliczne adresów I/O, DB, merkerów
-w tablicy tagów TIA Portal. Tagi globalne dostępne z całego projektu;
-lokalne tylko w bloku.
+**Jeśli którykolwiek punkt nie przechodzi → popraw odpowiedź przed włączeniem do draftu.**
 
 ---
 
-### Architektura Safety
+## Krok 6 — Złóż pełne Q&A
 
-**F-CPU (Fail-safe CPU)** — sterownik Siemens z certyfikowanym podwójnym
-kanałem obliczeniowym (dual-channel processing). Oba kanały wykonują te same
-obliczenia równolegle; rozbieżność wyników → przejście w bezpieczny stan.
-Certyfikat TÜV: SIL 3 / PL e.
+Weź istniejące pytania z `docs/LATEST.md` + nowe odpowiedzi i złóż kompletny draft:
 
-**F-signature** — kryptograficzny podpis jednego bloku Safety generowany
-przez TIA Portal podczas kompilacji. Zmienia się przy każdej modyfikacji kodu.
-Przechowywany w F-DB — nie można go edytować ręcznie.
+1. Skopiuj aktualny `docs/LATEST.md` → `docs/qa_draft_v{n+1}.md`
+2. Wstaw nowe pytania w odpowiednie sekcje (zachowaj numerację)
+3. Przenumeruj jeśli trzeba
+4. Uruchom `python scripts/merge_chapters.py` jeśli edytowałeś chapters osobno
+5. Zaktualizuj header (wersja, data, liczba pytań)
+6. Zaktualizuj `docs/QA_LOG.md`
 
-**Collective signature (podpis zbiorczy)** — unikalny podpis całego programu
-Safety złożony ze wszystkich F-signatur. Widoczny na wyświetlaczu CPU.
-Niezgodność collective signature po wgraniu → Safety nie uruchamia się.
+## Krok 7 — Generuj .docx
 
-**F-DB (Fail-safe Data Block)** — blok danych generowany automatycznie przez
-TIA Portal dla każdego bloku Safety. Zawiera CRC, F-signature i parametry
-czasowe. Ręczna edycja zniszczyłaby spójność i uniemożliwiłaby uruchomienie
-Safety.
-
-**Safety Integrated** — koncepcja Siemens: funkcje bezpieczeństwa (failsafe)
-i funkcje standardowe w jednym fizycznym CPU, jednym projekcie TIA Portal,
-przez jedną sieć PROFINET/PROFIsafe.
-
-**LOCK / RUN (Safety CPU)** — tryby pracy Safety runtime. LOCK: program
-Safety zablokowany, wyjścia Safety → wartości zastępcze. RUN: Safety wykonuje
-się normalnie. Zmiana trybu wymaga hasła Safety i jest logowana.
-
-**F-OB (Safety Main OB)** — organizacyjny blok Safety wywoływany osobnym
-cyklem F-CPU. Odpowiednik OB1 dla programu failsafe. W TIA Portal widoczny
-jako np. `Main_Safety_RTG1`.
-
----
-
-### Moduły F-DI / F-DO
-
-**Passivation** — stan błędu modułu F-I/O: wyjścia przyjmują substitute value
-(zwykle 0), wejścia raportowane są do F-CPU jako 0. Wyzwalana przez: urwanie
-kabla, discrepancy timeout, utratę PROFIsafe, błąd wewnętrzny modułu.
-
-**Reintegration** — ręczne potwierdzenie (ACK) powrotu modułu do normalnej
-pracy po usunięciu błędu i passivation. Wymaga impulsu ACK_NEC — moduł nie
-wraca automatycznie (zasada „no silent recovery").
+```powershell
+cd "c:\automation\rozmowa_kwal"
+& "scripts\New-QADocument.ps1" -InputFile "docs\qa_draft_v{n+1}.md"
+```
 
 **ACK_REQ (Acknowledgement Required)** — wyjście bloku F ustawiane
 automatycznie gdy moduł wymaga potwierdzenia po błędzie (widoczne

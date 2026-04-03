@@ -78,15 +78,15 @@
 - [3.6. Co to jest pm switching i pp switching — różnica?](#36-co-to-jest-pm-switching-i-pp-switching-różnica)
 - [3.7. Co to jest F-PM-E i do czego służy?](#37-co-to-jest-f-pm-e-i-do-czego-służy)
 - [3.8. Jak bezpiecznie wyłączyć standardowe moduły wyjść przez Safety?](#38-jak-bezpiecznie-wyłączyć-standardowe-moduły-wyjść-przez-safety)
-- [3.9. Jak sterownik bezpieczeństwa reaguje na typowe awarie wejść dwukanałowych (1oo2)?](#39-jak-sterownik-bezpieczeństwa-reaguje-na-typowe-awarie-wejść-dwukanałowych-1oo2)
+- [3.9. Jak F-CPU reaguje na typowe awarie wejść dwukanałowych (1oo2)?](#39-jak-sterownik-bezpieczeństwa-reaguje-na-typowe-awarie-wejść-dwukanałowych-1oo2)
 - [3.10. Jakie parametry są kluczowe przy konfiguracji wejść dwukanałowych w sterowniku bezpieczeństwa?](#310-jakie-parametry-są-kluczowe-przy-konfiguracji-wejść-dwukanałowych-w-sterowniku-bezpieczeństwa)
 
 **4. STRUKTURY GŁOSOWANIA — 1oo1/1oo2/2oo2/2oo3**
 - [4.1. Wyjaśnij notację XooY i podaj przykład każdej architektury.](#41-wyjaśnij-notację-xooy-i-podaj-przykład-każdej-architektury)
 - [4.2. Kiedy wybierasz 1oo2 a kiedy 2oo2?](#42-kiedy-wybierasz-1oo2-a-kiedy-2oo2)
 - [4.3. Jak 1oo2 jest realizowane w module F-DI Siemens?](#43-jak-1oo2-jest-realizowane-w-module-f-di-siemens)
-- [4.4. Jak sterownik safety reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?](#44-jak-sterownik-safety-reaguje-na-błąd-rozbieżności-sygnału-discrepancy-failure-w-konfiguracji-1oo2)
-- [4.5. Jakie są scenariusze awaryjne wykrywane przez moduł safety w układzie dwukanałowym 1oo2?](#45-jakie-są-scenariusze-awaryjne-wykrywane-przez-moduł-safety-w-układzie-dwukanałowym-1oo2)
+- [4.4. Jak F-CPU reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?](#44-jak-sterownik-safety-reaguje-na-błąd-rozbieżności-sygnału-discrepancy-failure-w-konfiguracji-1oo2)
+- [4.5. Jakie są scenariusze awaryjne wykrywane przez moduł F-DI w układzie dwukanałowym 1oo2?](#45-jakie-są-scenariusze-awaryjne-wykrywane-przez-moduł-safety-w-układzie-dwukanałowym-1oo2)
 - [4.6. Jak parametr "Reintegration after discrepancy error" wpływa na obsługę błędu rozbieżności sygnału?](#46-jak-parametr-reintegration-after-discrepancy-error-wpływa-na-obsługę-błędu-rozbieżności-sygnału)
 - [4.7. Co to jest czas rozbieżności (discrepancy time) w F-DI 1oo2 i co się dzieje gdy zostanie przekroczony?](#47-co-to-jest-czas-rozbieżności-discrepancy-time-w-f-di-1oo2-i-co-się-dzieje-gdy-zostanie-przekroczony)
 - [4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2?](#48-jak-moduł-f-di-et200sp-wykrywa-zwarcie-między-kanałami-cross-circuit-detection-w-obwodzie-1oo2)

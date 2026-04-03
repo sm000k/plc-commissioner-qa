@@ -19,6 +19,7 @@ Biblioteki TIA Portal umożliwiają wielokrotne użycie i wersjonowanie bloków,
 
 > 💡 **Wersjonowanie:** zmiana w Global Library (nowa wersja FB) → w każdym projekcie znajdziesz alert "Update available" — aktualizujesz selektywnie, nie przez przypadek.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 18.2. Jak robisz partial download żeby nie resetować całego CPU?
 
 TIA Portal rozróżnia typy downloadów — wybierz najmniej inwazyjny dla sytuacji:
@@ -39,6 +40,7 @@ TIA Portal rozróżnia typy downloadów — wybierz najmniej inwazyjny dla sytua
 
 > 💡 **Sprawdź przed:** `Online & Diagnostics → Compare` — zidentyfikuj różnice. Nieoczekiwane zmiany (np. ktoś edytował online) staną się widoczne zanim je nadpiszesz.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 18.3. Do czego służy OPC UA w TIA Portal i jak go aktywujesz?
 
 **OPC UA** (Open Platform Communications Unified Architecture) to otwarte, bezpieczne API do integracji PLC z systemami SCADA, MES, ERP, chmurą i IT (Python, C#, Java). Kluczowe zalety nad S7-Protocol/Modbus: standaryzacja, szyfrowanie TLS 1.2, certyfikaty X.509, model obiektowy (nodes, methods, events).
@@ -60,6 +62,7 @@ TIA Portal rozróżnia typy downloadów — wybierz najmniej inwazyjny dla sytua
 
 > 💡 **Security w produkcji:** zawsze włącz `Basic256Sha256` + certyfikaty. OPC UA bez szyfrowania to otwarta furtka do odczytu (i zapisu!) wszystkich tagów PLC.
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 18.4. Czym jest SIMATIC ProDiag i jak konfigurujesz pierwsze monitory diagnostyczne? 🟡
 ProDiag (Process Diagnostics) to narzędzie TIA Portal do tworzenia automatycznej diagnostyki maszynowej generując alarmy HMI wprost z warunków logicznych PLC bez programowania w blokach.
 - Dostępny od: TIA Portal V14 SP1, dla S7-1500 i ET200SP z CPU
@@ -73,3 +76,4 @@ ProDiag (Process Diagnostics) to narzędzie TIA Portal do tworzenia automatyczne
 
 ---
 
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*

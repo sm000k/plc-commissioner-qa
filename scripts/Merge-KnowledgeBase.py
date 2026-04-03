@@ -1,6 +1,6 @@
 """
 Merge-KnowledgeBase.py
-Scala wiedzę z knowledge_base_controlbyte.md do qa_draft_v7.md
+Scala wiedzę z knowledge_base_controlbyte.md do qa_draft_v10.md
 przy użyciu Gemini jako inteligentnego redaktora.
 """
 
@@ -10,9 +10,9 @@ import sys
 import time
 from pathlib import Path
 
-QA_DRAFT = Path("docs/qa_draft_v7.md")
+QA_DRAFT = Path("docs/qa_draft_v10.md")
 KNOWLEDGE_BASE = Path("docs/knowledge_base_controlbyte.md")
-OUTPUT_FILE = Path("docs/qa_draft_v8.md")
+OUTPUT_FILE = Path("docs/qa_draft_v11.md")
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_MODEL = "gemini-2.5-flash"
@@ -21,7 +21,7 @@ PROMPT = """Jesteś redaktorem kompendium Q&A dla inżyniera PLC/Commissioner (S
 
 ZADANIE: Połącz dwa dokumenty w jeden zaktualizowany plik.
 
-DOKUMENT A — "qa_draft_v7.md" (istniejące kompendium, ~120 pytań):
+DOKUMENT A — "qa_draft_v10.md" (istniejące kompendium, 113 pytań):
 {qa_draft}
 
 ---
@@ -60,7 +60,7 @@ INSTRUKCJE SCALANIA:
 
 5. **Numeracja** — kontynuuj istniejące numery. Np. jeśli sekcja 1 ma pytania 1.1–1.6, nowe pytania to 1.7, 1.8 itd.
 
-6. **Na końcu** — zaktualizuj nagłówek dokumentu, zmieniając "v7" na "v8" i dodając wzmiankę o transkrypcjach ControlByte.
+6. **Na końcu** — zaktualizuj nagłówek dokumentu, zmieniając "v10" na "v11" i dodając wzmiankę o nowych transkrypcjach ControlByte.
 
 Zwróć TYLKO treść zaktualizowanego pliku Markdown, bez żadnych komentarzy czy wyjaśnień.
 """
@@ -120,7 +120,7 @@ def main():
     print("\n[1/3] Ładowanie dokumentów...")
     qa_draft = load_file(QA_DRAFT)
     knowledge_base = load_file(KNOWLEDGE_BASE)
-    print(f"  qa_draft_v7.md: {len(qa_draft) // 1000}K znaków")
+    print(f"  qa_draft_v10.md: {len(qa_draft) // 1000}K znaków")
     print(f"  knowledge_base: {len(knowledge_base) // 1000}K znaków")
 
     print("\n[2/3] Scalanie przez Gemini...")
@@ -139,7 +139,7 @@ def main():
     orig_q = qa_draft.count("### ")
     new_q = questions - orig_q
     print(f"  Przyrost: +{new_q} nowych pytań (było {orig_q}, teraz {questions})")
-    print("\nGotowe! Zaktualizowane kompendium: docs/qa_draft_v8.md")
+    print("\nGotowe! Zaktualizowane kompendium: docs/qa_draft_v11.md")
 
 
 if __name__ == "__main__":
