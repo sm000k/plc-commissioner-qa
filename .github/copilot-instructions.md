@@ -32,8 +32,8 @@ Nie czytaj `LATEST.md` ani `qa_draft_v*.md` w całości. Czytaj tylko potrzebną
 ### Zasada: aktualizuj nagłówek z datą i wersją
 Przy KAŻDEJ edycji dokumentu Q&A → zaktualizuj nagłówek w `docs/chapters/00_header.md`:
 - Tytuł: `# KOMPENDIUM Q&A — v{WERSJA}`
-- Linia wersji: `### Wersja: v{WERSJA} | Data: {RRRR-MM-DD} | Pytania: {LICZBA}`
-- Data = dzień ostatniej edycji, wersja = bieżąca wersja z QA_LOG.md
+- Linia wersji: `### Wersja: v{WERSJA} | Data: {RRRR-MM-DD HH:MM} | Pytania: {LICZBA}`
+- Data+godzina = moment ostatniej edycji (pobierz przez `[DateTime]::Now.ToString("yyyy-MM-dd HH:mm")`), wersja = bieżąca wersja z QA_LOG.md
 
 ## Struktura projektu
 
