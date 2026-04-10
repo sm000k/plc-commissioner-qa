@@ -29,6 +29,12 @@ Przy zadaniach obejmujących >1 sekcję lub >3 pytania — **ZAWSZE** utwórz to
 ### Zasada: duży plik = czytaj fragmentami
 Nie czytaj `LATEST.md` ani `qa_draft_v*.md` w całości. Czytaj tylko potrzebną sekcję (po numerze linii lub przez grep). Bazy wiedzy przeszukuj po słowach kluczowych, nie ładuj w całości.
 
+### Zasada: aktualizuj nagłówek z datą i wersją
+Przy KAŻDEJ edycji dokumentu Q&A → zaktualizuj nagłówek w `docs/chapters/00_header.md`:
+- Tytuł: `# KOMPENDIUM Q&A — v{WERSJA}`
+- Linia wersji: `### Wersja: v{WERSJA} | Data: {RRRR-MM-DD} | Pytania: {LICZBA}`
+- Data = dzień ostatniej edycji, wersja = bieżąca wersja z QA_LOG.md
+
 ## Struktura projektu
 
 ```
