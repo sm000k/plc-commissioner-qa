@@ -1643,7 +1643,7 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 
 **4. Test I/O (najdłuższa faza):**
 - Watch Table **wejścia**: aktywuj każdy czujnik ręcznie → weryfikuj w PLC.
-- Watch Table **wyjścia** (Force): wymuś wyjście → sprawdź fizycznie czy zawór/przekaźnik zadziałał. Maszyna w trybie bezpiecznym!
+- Watch Table **wyjścia** (Force): wymuś wyjście pojedynczo → sprawdź fizycznie czy zawór/przekaźnik zadziałał. Safety jeszcze nie jest przetestowane — upewnij się że **nikt nie jest w strefie zagrożenia** przed forsowaniem.
 - Kanały 1oo2: testuj każdy osobno — odłącz jeden → passivation w ramach `discrepancy time`.
 
 **5. Safety — testy wg Safety Matrix (PO testach I/O):**
