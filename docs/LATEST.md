@@ -1633,8 +1633,8 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 
 **2. Weryfikacja sprzętu (BEZ napięcia):**
 - Ciągłość PE multimetrem (<0,1 Ω wg EN 60204-1).
-- **Pomiar izolacji megaomomierzem** (500 VDC) kabli — PRZED podłączeniem modułów PLC. Zwarcie = spalony moduł.
-- Oględziny szafy: montaż, oznaczenia kabli, zasilanie 24 VDC i VS*.
+- Oględziny szafy: montaż, oznaczenia kabli, zasilanie 24 VDC i VS*. Wizualnie sprawdź czy kable nie są uszkodzone, zaciski dokręcone.
+- Ciągłość PE multimetrem (<0,1 Ω wg EN 60204-1) — to robi elektryk, ale commissioner powinien zweryfikować protokół pomiarów przed załączeniem.
 
 **3. Download:**
 - Załącz 24 VDC → Go Online → **najpierw HW Config** (bez programu — wyłapiesz problemy z modułami).
