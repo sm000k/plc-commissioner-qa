@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.2 | Data: 2026-04-10 13:39 | Pytania: 155
+### Wersja: v12.2 | Data: 2026-04-10 15:54 | Pytania: 151
 
 ---
 
@@ -50,13 +50,11 @@
 - [1.9. Jakie są główne rodziny sterowników PLC Siemens i do jakich zastosowań są dedykowane?](#19-jakie-są-główne-rodziny-sterowników-plc-siemens-i-do-jakich-zastosowań-są-dedykowane)
 - [1.10. Jakie są kluczowe aspekty pamięci sterownika PLC Siemens S7-1200/1500?](#110-jakie-są-kluczowe-aspekty-pamięci-sterownika-plc-siemens-s7-12001500)
 - [1.11. Jakie są warianty CPU S7-1200 i jakie mają możliwości rozbudowy?](#111-jakie-są-warianty-cpu-s7-1200-i-jakie-mają-możliwości-rozbudowy)
-- [1.12. Co to jest HMI i do czego służy w automatyce?](#112-co-to-jest-hmi-i-do-czego-służy-w-automatyce)
-- [1.13. Co to jest SCADA i czym różni się od HMI?](#113-co-to-jest-scada-i-czym-różni-się-od-hmi)
-- [1.14. Co to jest PID i kiedy go używasz w PLC?](#114-co-to-jest-pid-i-kiedy-go-używasz-w-plc)
-- [1.15. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?](#115-czym-jest-enkoder-i-jaka-jest-różnica-między-inkrementalnym-a-absolutnym)
-- [1.16. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?](#116-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc)
-- [1.17. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?](#117-co-to-jest-przerzutnik-sr-i-rs-w-tia-portal-i-jaka-jest-różnica-w-priorytecie)
-- [1.18. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?](#118-czym-różni-się-dominacja-set-od-dominacji-reset-w-układzie-samopodtrzymania-lad)
+- [1.12. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?](#112-czym-jest-enkoder-i-jaka-jest-różnica-między-inkrementalnym-a-absolutnym)
+- [1.13. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?](#113-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc)
+- [1.14. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?](#114-co-to-jest-przerzutnik-sr-i-rs-w-tia-portal-i-jaka-jest-różnica-w-priorytecie)
+- [1.15. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?](#115-czym-różni-się-dominacja-set-od-dominacji-reset-w-układzie-samopodtrzymania-lad)
+- [1.16. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?](#116-jaką-typową-pułapkę-w-obwodzie-samopodtrzymania-lad-pokazuje-zadanie-znajdź-różnice)
 
 **2. ARCHITEKTURA SIMATIC SAFETY INTEGRATED**
 - [2.1. Co to jest SIMATIC Safety Integrated i co oznacza 'wszystko w jednym sterowniku'?](#21-co-to-jest-simatic-safety-integrated-i-co-oznacza-wszystko-w-jednym-sterowniku)
@@ -149,6 +147,7 @@
 - [11.6. Jak reagować gdy moduł F świeci błędem którego nie możesz skasować?](#116-jak-reagować-gdy-moduł-f-świeci-błędem-którego-nie-możesz-skasować)
 - [11.7. Jak wygląda typowy workflow pierwszego commissioning z TIA Portal — od projektu do działającej maszyny?](#117-jak-wygląda-typowy-workflow-pierwszego-commissioning-z-tia-portal-od-projektu-do-działającej-maszyny)
 - [1.13. Jakie są etapy uruchomienia napędu SINAMICS G120 — od sprzętu do pierwszego ruchu?](#113-jakie-są-etapy-uruchomienia-napędu-sinamics-g120-od-sprzętu-do-pierwszego-ruchu)
+- [11.9. Co to jest commissioning i jak przeprowadzić pełne uruchomienie instalacji — od fazy offline do RUN z Safety i Safety Matrix?](#119-co-to-jest-commissioning-i-jak-przeprowadzić-pełne-uruchomienie-instalacji-od-fazy-offline-do-run-z-safety-i-safety-matrix)
 - [11.10. Co to jest ProDiag i jak go używasz do diagnostyki maszyny?](#1110-co-to-jest-prodiag-i-jak-go-używasz-do-diagnostyki-maszyny)
 
 **12. SICAR I NAPĘDY SINAMICS**
@@ -236,7 +235,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **146 pytań / 19 sekcji.**
+> **150 pytań / 20 sekcji.**
 
 
 ---
@@ -453,43 +452,7 @@ Rodzina S7-1200 to kompaktowe sterowniki montowane na szynie DIN, programowane w
 
 *Źródło: dane katalogowe Siemens S7-1200 System Manual*
 
-### 1.12. Co to jest HMI i do czego służy w automatyce?
-
-HMI (Human-Machine Interface) to panel operatorski umożliwiający wizualizację procesu, sterowanie, podgląd alarmów i trendów. Wyświetla: stany I/O, alarmy, trendy (wykresy wartości analogowych w czasie), tryby pracy maszyny, parametry produkcji.
-
-**Typy panelów Siemens:**
-- **Basic Panel (KTP400/700/900/1200 Basic)**: dotykowy lub klawiaturowy, WinCC Basic, od 4” do 12”. Brak trendów i receptur w wersji Basic. Dla prostych wizualizacji jednej maszyny.
-- **Comfort Panel (TP700/900/1200/1500 Comfort)**: WinCC Advanced, pełne trendy, receptury, JavaScript, karty CF/SD. Standard dla maszyn produkcyjnych.
-- **Mobile Panel (KTP700 Mobile)**: kabel lub WiFi. Homologowany dla stref Safety — posiada enabling device (przycisk potwierdzenia do trzymania przy wejściu do strefy niebezpiecznej).
-- **PC-based / IPC (WinCC Unified)**: nowy standard Siemens, HTML5/SVG, OPC UA, skrypty TypeScript. Nie wymaga klasycznych wtyczek. Zastępuje WinCC RT Advanced w nowych instalacjach.
-
-**Komunikacja:** HMI komunikuje się z PLC przez PROFINET (S7 protocol lub OPC UA) w TIA Portal — wspólna baza tagów synchronizowana automatycznie. Offline = HMI nie potrzebuje PLC do symulacji interfejsu (PLCSIM).
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.13. Co to jest SCADA i czym różni się od HMI?
-
-HMI: lokalne, przy maszynie, obsługuje jeden obiekt/maszynę, czas reakcji wymagany (operator).
-SCADA (Supervisory Control and Data Acquisition): system nadrzędny, monitoruje i archiwizuje dane z wielu maszyn/stacji jednocześnie, na serwerze z komputerami PC. Nie steruje bezpośrednio w czasie rzeczywistym — nadzoruje, raportuje, alarmuje.
-
-**Architektura Siemens WinCC:**
-- **WinCC Basic / Advanced**: dla HMI panelów kompilowanych w TIA Portal — nie SCADA, obsługują do kilku sterowników.
-- **WinCC V7.x (SCADA)**: osobne oprogramowanie, serwer OPC DA/UA, historian (archiwum trendów), redundantny serwer Hot Standby (przełączenie <1s), thin clients (Web Navigator przez przeglądarkę), receptury, raporty.
-- **WinCC Unified**: nowy standard oparty na HTML5/SVG/OPC UA, web client bez wtyczek, skrypty TypeScript. Zastępuje WinCC V7 w nowych instalacjach.
-- **WinCC Open Architecture (WinCC OA)**: dla najwyzszych wymagań (100k+ tagów, >100 klientów) — energetyka, infrastruktura.
-
-**Pytanie kontrolne:** *Ile tagów obsługuje WinCC?* — Zależy od produktu i licencji: WinCC (TIA Portal) Basic: 256 Power Tags; Comfort: 2048; Professional: 512–4096+ (zależnie od licencji). WinCC V7.x (SCADA): 128 do unlimited (osobne licencje). Nie podawaj liczby bez kontekstu wersji i licencji.
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.14. Co to jest PID i kiedy go używasz w PLC?
-
-PID (Proportional-Integral-Derivative) to algorytm regulacji zamkniętej utrzymujący zadany setpoint: temperatura, ciśnienie, poziom, prędkość.
-- P — reaguje proporcjonalnie do aktualnego błędu
-- I — eliminuje uchyb ustalony (sumuje błąd w czasie)
-- D — reaguje na szybkość zmiany błędu (tłumi oscylacje)
-W TIA Portal: gotowy blok PID_Compact lub PID_3Step w OB35 (cykliczne przerwanie). W Safety PID nie jest stosowany — logika Safety jest binarna.
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.15. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?  🟡
+### 1.12. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?  🟡
 
 **Enkoder** (przetwornik obrotowo-impulsowy) to czujnik zamieniający ruch mechaniczny (kąt/pozycję) na sygnał elektryczny odczytywany przez napęd lub PLC.
 
@@ -512,7 +475,7 @@ W TIA Portal: gotowy blok PID_Compact lub PID_3Step w OB35 (cykliczne przerwanie
 > 💡 **Na rozmowie:** pytanie o enkodery często pojawia się razem z SLS/SDI — wspomnij że do tych funkcji Safety wymagane są enkodery certyfikowane (HIPERFACE Safety, EnDat Safety).
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.16. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?  🟡
+### 1.13. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?  🟡
 
 **IO-Link** (IEC 61131-9) to standardowy niskonapięciowy protokół komunikacji punkt-punkt między sterownikiem PLC (IO-Link Master) a inteligentnymi czujnikami/aktuatorami (IO-Link Device). Działa po standardowym 3-żyłowym kablu M12 — bez dodatkowego okablowania.
 
@@ -544,7 +507,7 @@ Po wymianie uszkodzonego czujnika IO-Link Master automatycznie wgrywa zapisane p
 
 *Źródło: Siemens ET200SP IO-Link Master product documentation*
 
-### 1.17. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?  🟢
+### 1.14. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?  🟢
 
 **Przerzutniki bistabilne SR i RS** to elementy PLC zapamiętujące stan (bit) po zaniku sygnału sterującego. Różnią się zachowaniem gdy **S i R są aktywne jednocześnie** — wtedy priorytet decyduje o stanie wyjścia.
 
@@ -591,7 +554,7 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 
 ---
 
-### 1.18. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
+### 1.15. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
 
 **Dominacja** określa, który sygnał wygrywa gdy jednocześnie wciśniemy START i STOP. Jest to praktyczny odpowiednik priorytetu przerzutnika SR/RS, widoczny bezpośrednio w schemacie drabinkowym.
 
@@ -635,7 +598,7 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 
 ---
 
-### 1.19. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?  🔴
+### 1.16. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?  🔴
 
 **Pułapka samopodtrzymania** polega na błędnym umieszczeniu styku samopodtrzymania (Lampka) tak, że **omija on przycisk STOP** — wciśnięcie STOP nie wyłącza cewki, bo prąd płynie alternatywną ścieżką.
 
@@ -1656,6 +1619,64 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 > ⚠️ **Fault `F07801`** (przetężenie) przy starcie → silnik za mały do PM lub zbyt krótki czas rampy (`p1120`).
 
 *Źródło: Siemens SINAMICS G120 Getting Started / Startdrive commissioning guide*
+
+### 11.9. Co to jest commissioning i jak przeprowadzić pełne uruchomienie instalacji — od fazy offline do RUN z Safety i Safety Matrix?  🔴
+
+Commissioning (uruchomienie) to proces przejścia od gotowego projektu w TIA Portal do działającej maszyny na obiekcie. Obejmuje weryfikację sprzętu, wgranie oprogramowania, testy I/O, uruchomienie Safety i napędów oraz formalne odbiory (FAT/SAT).
+
+**Faza 1 — Przygotowanie offline (przed wyjazdem na obiekt):**
+1. Zweryfikuj projekt w TIA Portal: wersja firmware CPU = fizyczny sterownik, adresy IP nie kolidują, wszystkie moduły skonfigurowane w `Devices & Networks`.
+2. Skompiluj program Standard i Safety — usuń błędy kompilacji.
+3. Przygotuj <span style="color:#c0392b">**Safety Matrix**</span> — tabelę zależności: wiersze = wyzwalacze (E-Stop, kurtyna, krańcówka), kolumny = funkcje Safety (STO napędu, zawór, ryglowanie). Każde przecięcie = `Active` / `Not active`. Matrix generuje automatycznie F-bloki po kompilacji.
+4. Wygeneruj <span style="color:#c0392b">**collective signature**</span> programu Safety — zapisz wartość referencyjną do dokumentacji.
+5. Przygotuj Watch Tables z kluczowymi zmiennymi do testów I/O.
+6. Sprawdź listę materiałową: numery katalogowe modułów w projekcie = fizycznie zamówione (rewizja HW!).
+
+**Faza 2 — Weryfikacja sprzętu na obiekcie:**
+1. Sprawdź montaż: szyna DIN, zasilacze, moduły I/O w poprawnych slotach, kable oznaczone zgodnie ze schematem.
+2. Pomiar izolacji kabli sygnałowych (megaomomierz) — **przed podłączeniem do modułów**.
+3. Sprawdź zasilanie 24 VDC na modułach, zasilanie `VS*` dla modułów F-DI.
+4. Zweryfikuj `F-Address` na modułach F (DIP switch lub elektroniczny) — zgodność z projektem TIA Portal.
+
+**Faza 3 — Pierwsze połączenie i Download:**
+1. Podłącz laptop przez PROFINET (lub USB PG) → TIA Portal → `Online → Go online`.
+2. `Download to device → Hardware and software → All` — pierwsze wgranie.
+3. Jeśli CPU w STOP po Download → `Diagnostics buffer` — sprawdź przyczynę (najczęściej: niezgodność adresacji, brakujący moduł, błąd F-Address).
+4. `Assign PROFIsafe address` dla każdego modułu F — diody LED migają zielono jako potwierdzenie identyfikacji.
+5. `Assign device name` dla napędów PROFINET (SINAMICS, ET200) — nazwa urządzenia musi być **identyczna** jak w projekcie.
+
+**Faza 4 — Test I/O i okablowania:**
+1. Watch Table: monitoruj wejścia fizyczne — aktywuj czujniki ręcznie, weryfikuj czy sygnał dociera do PLC.
+2. Force Values (przy wyłączonej maszynie): wymuś wyjścia → sprawdź czy odpowiedni zawór/przekaźnik zadziałał.
+3. Sprawdź sygnały dwukanałowe (1oo2) — oba kanały muszą reagować, `discrepancy time` ustawiony poprawnie.
+
+**Faza 5 — Uruchomienie Safety:**
+1. Wgraj program Safety → F-CPU przechodzi w tryb **RUN Safety**.
+2. Sprawdź <span style="color:#c0392b">**collective signature**</span> online vs wartość referencyjna z fazy offline — muszą być identyczne.
+3. Test każdego E-Stop fizycznie: wciśnij → CPU pasywuje wyjścia → `substitute values` = 0 → zwolnij → ACK → restart.
+4. Test kurtyn bezpieczeństwa: przerwij wiązkę → passivation → ACK → reintegration.
+5. Test `discrepancy`: symuluj opóźnienie jednego kanału 1oo2 powyżej `discrepancy time` → passivation.
+6. Weryfikacja Safety Matrix: dla każdego wiersza (wyzwalacza) sprawdź, czy odpowiednie kolumny (funkcje Safety) reagują zgodnie z matrycą.
+7. Test napędów Safety: sprawdź STO, SS1, SLS każdej osi — porównaj zachowanie z Safety Matrix.
+
+**Faza 6 — Uruchomienie napędów i sekwencji:**
+1. Quick Commissioning napędów (np. SINAMICS G120: `p0010 = 1` → dane z tabliczki → `p3900 = 1`).
+2. Identyfikacja silnika (`p1910`) → optymalizacja regulatora (`p1960`).
+3. Test ruchu w trybie Jog (wolna prędkość) → weryfikacja kierunku obrotu.
+4. Uruchomienie sekwencji w trybie krokowym (Step mode) → weryfikacja logiki programu.
+
+**Faza 7 — Dokumentacja i odbiór:**
+1. Wygeneruj Safety Report z TIA Portal (F-Signature, Collective Signature).
+2. Wypełnij protokół FAT/SAT: każdy E-Stop, kurtyna, napęd Safety — data, wynik, podpis.
+3. Zapisz backup projektu z CPU (Upload) jako wersja referencyjna po commissioning.
+
+> 💡 **Safety Matrix** pełni podwójną rolę: (1) narzędzie projektowania logiki Safety w TIA Portal, (2) dokumentacja do FAT/SAT — klient i rzeczoznawca widzą tabelę zależności zamiast kodu LAD/FBD.
+
+> ⚠️ **Nigdy nie pomijaj fazy offline** — wykrycie błędu adresacji na obiekcie kosztuje godziny, w biurze — minuty.
+
+> ⚠️ Po każdej zmianie programu Safety na obiekcie → nowa `F-signature` → powtórz testy dotkniętych funkcji → zaktualizuj dokumentację.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i źródeł w workspace*
 
 ### 11.10. Co to jest ProDiag i jak go używasz do diagnostyki maszyny?  🟢
 
