@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.2 | Data: 2026-04-10 16:04 | Pytania: 151
+### Wersja: v12.2 | Data: 2026-04-10 16:15 | Pytania: 151
 
 ---
 
@@ -1622,74 +1622,42 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 
 ### 11.9. Co to jest commissioning i jak przeprowadzić pełne uruchomienie instalacji — od fazy offline do RUN z Safety i Safety Matrix?  🔴
 
-**Commissioning** to proces uruchomienia maszyny/instalacji — od pustego sterownika do produkcji. Nie jest to „wgranie programu i kliknięcie RUN". To systematyczna weryfikacja **każdego obwodu** (elektrycznego, pneumatycznego, komunikacyjnego) zanim wpuścisz sygnał na maszynę. Błąd w commissioning = uszkodzony sprzęt, opóźnienie projektu, a przy Safety — zagrożenie życia.
+**Commissioning** to systematyczne uruchomienie maszyny — od projektu do produkcji. Nie „wgranie programu", a weryfikacja każdego obwodu zanim podasz napięcie. Kolejność faz jest kluczowa:
 
-**FAZA OFFLINE — w biurze, przed wyjazdem na obiekt:**
+**1. Offline (biuro):**
+- Przeczytaj **schematy elektryczne** — zidentyfikuj obwody mocy, sterowania i Safety. Bez schematów nie wiesz co podłączasz.
+- Weryfikacja TIA Portal: numery katalogowe modułów = BOM, adresy IP/nazwy PROFINET spisane w tabeli, firmware CPU = fizyczny sterownik.
+- Kompilacja Standard + Safety — zero błędów i ostrzeżeń.
+- **<span style="color:#c0392b">Safety Matrix</span>** — tabela przyczyn × skutków (wiersze: E-Stop, kurtyna, krańcówka; kolumny: STO napędu, zawór, ryglowanie). Generuje F-bloki automatycznie i służy jako dokument testowy na FAT/SAT.
+- Zapisz <span style="color:#c0392b">**collective signature**</span> — referencja do porównania po Download.
 
-Offline to fundament — 80% problemów na obiekcie wynika z błędów, które dało się złapać w biurze.
-1. **Schematy elektryczne** — przeczytaj ZANIM otworzysz TIA Portal. Zidentyfikuj: obwody mocy (silniki, styczniki, zabezpieczenia), obwody sterowania (I/O PLC), obwody Safety (dwukanałowe, E-Stop, kurtyny). Bez schematów nie wiesz CO podłączasz i GDZIE.
-2. **Weryfikacja projektu TIA Portal:**
-   - `Devices & Networks` — porównaj konfigurację modułów z listą materiałową (BOM) i schematami. Numer katalogowy w projekcie = fizyczny moduł? Rewizja HW się zgadza?
-   - Adresy IP i nazwy PROFINET — spisz tabelę: CPU, ET200, napędy, HMI. Na obiekcie nie masz czasu na szukanie kolizji IP.
-   - Wersja firmware CPU w projekcie vs fizyczny sterownik — niezgodność = Download się nie powiedzie.
-3. **Kompilacja Standard + Safety** — zero błędów, zero ostrzeżeń. Ostrzeżenie ignorowane w biurze = fault na obiekcie.
-4. **Safety Matrix (matryca przyczyn i skutków):**
-   - Tabela: **wiersze = przyczyny** (E-Stop strefa A, E-Stop strefa B, kurtyna 1, krańcówka drzwi) × **kolumny = skutki** (STO napęd 1, STO napęd 2, zawór bezpieczeństwa, ryglowanie).
-   - W TIA Portal: `Safety Administration → Safety Matrix` — definiujesz przecięcia `Active`/`Not active`. Po kompilacji TIA generuje F-bloki automatycznie.
-   - Safety Matrix to jednocześnie **narzędzie projektowe** i **dokument testowy** — na FAT/SAT klient i rzeczoznawca widzą tabelę, nie kod LAD.
-   - Bez matrycy nie wiesz CO testować na obiekcie — nie ma systematycznego przejścia przez wszystkie kombinacje przyczyna→skutek.
-5. **Zapisz <span style="color:#c0392b">collective signature</span>** — wartość referencyjna do porównania po Download na obiekcie.
+**2. Weryfikacja sprzętu (BEZ napięcia):**
+- Ciągłość PE multimetrem (<0,1 Ω wg EN 60204-1).
+- **Pomiar izolacji megaomomierzem** (500 VDC) kabli — PRZED podłączeniem modułów PLC. Zwarcie = spalony moduł.
+- Oględziny szafy: montaż, oznaczenia kabli, zasilanie 24 VDC i VS*.
 
-**FAZA NA OBIEKCIE — weryfikacja sprzętu (BEZ NAPIĘCIA):**
+**3. Download:**
+- Załącz 24 VDC → Go Online → **najpierw HW Config** (bez programu — wyłapiesz problemy z modułami).
+- `Assign device name` (PROFINET) + `Assign PROFIsafe address` (moduły F).
+- Download pełny → CPU w RUN. Jeśli STOP → Diagnostics buffer — nie restartuj bez diagnozy.
 
-> ⚠️ **Zasada nr 1 commissioning: nigdy nie podawaj napięcia na coś, czego nie sprawdziłeś.**
+**4. Test I/O (najdłuższa faza):**
+- Watch Table **wejścia**: aktywuj każdy czujnik ręcznie → weryfikuj w PLC.
+- Watch Table **wyjścia** (Force): wymuś wyjście → sprawdź fizycznie czy zawór/przekaźnik zadziałał. Maszyna w trybie bezpiecznym!
+- Kanały 1oo2: testuj każdy osobno — odłącz jeden → passivation w ramach `discrepancy time`.
 
-1. **Oględziny szafy sterowniczej:** montaż na szynie DIN poprawny? Korytka kablowe zamknięte? Kable oznaczone zgodnie ze schematem? Czy elektryk nie zamienił faz?
-2. **Ciągłość PE (uziemienie):** zmierz rezystancję PE multimetrem od szyny PE szafy do każdego urządzenia w terenie — norma EN 60204-1 wymaga <0,1 Ω.
-3. **Pomiar izolacji megaomomierzem** (500 VDC) — **przed podłączeniem modułów PLC**. Mierzysz kabel, nie elektronikę. Zwarcie w kablu przy podanym napięciu = spalony moduł za kilka tysięcy euro.
-4. **Weryfikacja zasilania:** zmierz napięcie na zasilaczu 24 VDC (bez obciążenia i pod obciążeniem). Sprawdź osobno zasilanie CPU, I/O i VS* (zasilanie impulsowe modułów F-DI).
+**5. Safety — testy wg Safety Matrix (PO testach I/O):**
+- Sprawdź `collective signature` online = offline.
+- **Wiersz po wierszu matrycy:** E-Stop strefa A → wciśnij → czy KAŻDY skutek z kolumny zadziałał (STO napęd 1 ✓, zawór ✓). Kurtyna → przerwij → skutki ✓. Krańcówka drzwi → otwórz → skutki ✓.
+- Po każdym teście: zwolnij → ACK → <span style="color:#c0392b">**reintegration**</span>.
+- Test napędów Safety: STO, SS1, SLS każdej osi.
+- **Dokumentuj** każdy test: data, wynik PASS/FAIL, podpis — bez tego FAT nie przechodzi.
 
-**FAZA NA OBIEKCIE — pierwsze załączenie i Download:**
+**6. Napędy i sekwencje:**
+- Quick Commissioning (G120: `p0010=1` → tabliczka → `p3900=1`), identyfikacja silnika (`p1910`), Jog → kierunek obrotu.
+- Sekwencje w trybie Step — krok po kroku.
 
-1. **Załącz zasilanie 24 VDC** — obserwuj LED na modułach. Wszystkie powinny mrugać (brak konfiguracji) lub świecić pomarańczowo (bus error — normalne przed Download).
-2. **Podłącz laptop → Go Online** → `Accessible devices` — sprawdź czy CPU odpowiada.
-3. **Download: HW Config FIRST** — wgraj **najpierw konfigurację sprzętową**, nie cały program. Pozwala to zidentyfikować problemy z modułami zanim uruchomisz logikę.
-4. **Assign device name** (PROFINET) — dla ET200, napędów, HMI. Nazwa w urządzeniu musi odpowiadać 1:1 nazwie w projekcie — **wielkość liter ma znaczenie**.
-5. **Assign PROFIsafe address** — dla modułów F. Identyfikacja: diody migają zielono → potwierdź → zapisz.
-6. **Download pełny** (Standard + Safety) → CPU → RUN.
-7. Jeśli CPU w STOP → **Diagnostics buffer** — ostatni wpis = przyczyna. Nie uruchamiaj ponownie bez diagnozy.
-
-**FAZA TESTÓW I/O — sygnał po sygnale:**
-
-Najważniejsza i najdłuższa faza. Każdy sygnał weryfikujesz **ręcznie** — czujnik po czujniku, wyjście po wyjściu.
-1. **Watch Table — wejścia:** aktywuj fizycznie każdy czujnik (ręką, magnesem, miarką) → sprawdź w Watch Table czy PLC widzi zmianę stanu. Niezgodność = kabel podłączony do złego kanału lub uszkodzony.
-2. **Watch Table — wyjścia (Force):** wymuś wyjście w Watch Table → idź do szafy/maszyny → sprawdź czy zawór/przekaźnik/stycznik zadziałał. **Maszyna MUSI być w trybie bezpiecznym** — nikt w strefie niebezpiecznej.
-3. **Sygnały dwukanałowe (1oo2):** testuj KAŻDY kanał osobno — oba muszą reagować. Odłącz jeden kabel → moduł F musi wykryć `discrepancy` w ustawionym czasie → <span style="color:#c0392b">**passivation**</span>.
-4. **Sygnały analogowe:** sprawdź zakres (4–20 mA / 0–10 V), kalibrację, poprawność skalowania w programie (`NORM_X` / `SCALE_X`).
-
-**FAZA SAFETY — systematyczne testy wg Safety Matrix:**
-
-> ⚠️ **Testy Safety przeprowadzasz PO testach I/O** — nie ma sensu testować E-Stop jeśli nie wiesz czy sygnał dochodzi do PLC.
-
-1. **Sprawdź `collective signature`** online vs wartość referencyjna z fazy offline — jeśli różna → ktoś zmienił program → STOP, eskalacja.
-2. **Testuj wiersz po wierszu Safety Matrix:**
-   - Wiersz „E-Stop strefa A" → wciśnij fizycznie → sprawdź KAŻDY skutek z kolumny: STO napędu 1 ✓, STO napędu 2 ✓, zawór bezp. ✓ — zgodnie z matrycą.
-   - Wiersz „Kurtyna 1" → przerwij wiązkę → sprawdź skutki.
-   - Wiersz „Krańcówka drzwi" → otwórz drzwi → sprawdź skutki.
-3. **Test powrotu:** po każdym teście → zwolnij wyzwalacz → ACK → sprawdź poprawną <span style="color:#c0392b">**reintegration**</span>.
-4. **Test discrepancy:** dla każdego wejścia 1oo2 — odłącz JEDEN kanał → passivation musi nastąpić w ramach `discrepancy time`.
-5. **Test napędów Safety:** STO (natychmiastowe odcięcie momentu), SS1 (hamowanie rampą + STO), SLS (ograniczenie prędkości) — dla KAŻDEJ osi. Porównaj z Safety Matrix.
-6. **Zmierz i zapisz czas reakcji** — od wyzwalacza do zatrzymania. Porównaj z wartością z oceny ryzyka (EN ISO 13849-1).
-7. **Dokumentuj KAŻDY test:** data, kto testował, wynik PASS/FAIL, podpis. Bez dokumentacji = FAT/SAT nie przechodzi.
-
-**FAZA NAPĘDÓW I SEKWENCJI:**
-1. Quick Commissioning napędów (SINAMICS G120: `p0010 = 1` → dane z tabliczki silnika → `p3900 = 1`).
-2. Identyfikacja silnika (`p1910`) → sprawdź kierunek obrotu w Jog (wolna prędkość!).
-3. Sekwencje w trybie Step — krok po kroku weryfikuj logikę programu.
-
-> 💡 **Na rozmowie:** commissioning to nie „wgranie programu" — to systematyczna weryfikacja KAŻDEGO obwodu od kabla do logiki. Pokaż że znasz kolejność: schematy → pomiary bez napięcia → HW config → I/O test → Safety wg matrycy → napędy → dokumentacja.
-
-> ⚠️ **Złota zasada:** nigdy nie omijaj fazy — spalony moduł za 2000€ przez brak pomiaru izolacji; passivation której nie rozumiesz bo nie testowałeś I/O; FAT odrzucony bo brak dokumentacji testów Safety.
+> 💡 **Na rozmowie:** pokaż że znasz kolejność: schematy → pomiary bez napięcia → HW config → I/O → Safety wg matrycy → napędy → dokumentacja. Commissioning to nie programowanie — to weryfikacja.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i źródeł w workspace*
 
