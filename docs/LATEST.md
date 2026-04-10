@@ -1622,7 +1622,7 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 
 ### 11.9. Co to jest commissioning i jak przeprowadzić pełne uruchomienie instalacji — od fazy offline do RUN z Safety i Safety Matrix?  🔴
 
-**Commissioning** to systematyczne uruchomienie maszyny — od projektu do produkcji. Nie „wgranie programu", a weryfikacja każdego obwodu zanim podasz napięcie. Kolejność faz jest kluczowa:
+**Commissioning** to systematyczne uruchomienie maszyny — od projektu do produkcji. Nie „wgranie programu", a weryfikacja każdego obwodu zanim podasz napięcie. Na obiekcie pracujesz z elektrykami i mechanikami — ty weryfikujesz sygnały, elektryk naprawia kable, mechanik ustawia czujniki. Kolejność faz jest kluczowa:
 
 **1. Offline (biuro):**
 - Przeczytaj **schematy elektryczne** — zidentyfikuj obwody mocy, sterowania i Safety. Bez schematów nie wiesz co podłączasz.
@@ -1632,19 +1632,20 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 - Zapisz <span style="color:#c0392b">**collective signature**</span> — referencja do porównania po Download.
 
 **2. Weryfikacja sprzętu (BEZ napięcia):**
-- Ciągłość PE multimetrem (<0,1 Ω wg EN 60204-1).
-- Oględziny szafy: montaż, oznaczenia kabli, zasilanie 24 VDC i VS*. Wizualnie sprawdź czy kable nie są uszkodzone, zaciski dokręcone.
-- Ciągłość PE multimetrem (<0,1 Ω wg EN 60204-1) — to robi elektryk, ale commissioner powinien zweryfikować protokół pomiarów przed załączeniem.
+- Oględziny szafy: montaż, oznaczenia kabli, zaciski dokręcone, zasilanie 24 VDC i VS* poprawnie podłączone.
+- Zweryfikuj protokół pomiarów PE od elektryka (<0,1 Ω wg EN 60204-1) — musisz go mieć PRZED załączeniem.
 
-**3. Download:**
-- Załącz 24 VDC → Go Online → **najpierw HW Config** (bez programu — wyłapiesz problemy z modułami).
+**3. Pierwsze załączenie i Download:**
+- Załącz 24 VDC → **PRONETA** — skan sieci PROFINET: sprawdź czy wszystkie urządzenia odpowiadają, czy nie ma duplikatów nazw/IP. Bez tego lecisz na ślepo.
+- Go Online → **najpierw HW Config** (bez programu — wyłapiesz problemy z modułami). Jeśli moduł ma inną rewizję HW niż w projekcie → zaktualizuj konfigurację.
 - `Assign device name` (PROFINET) + `Assign PROFIsafe address` (moduły F).
 - Download pełny → CPU w RUN. Jeśli STOP → Diagnostics buffer — nie restartuj bez diagnozy.
 
-**4. Test I/O (najdłuższa faza):**
-- Watch Table **wejścia**: aktywuj każdy czujnik ręcznie → weryfikuj w PLC.
+**4. Test I/O (najdłuższa faza — robisz z elektrykiem):**
+- Watch Table **wejścia**: aktywuj każdy czujnik ręcznie → weryfikuj w PLC. Niezgodność → elektryk sprawdza kabel, ty wskazujesz który kanał.
 - Watch Table **wyjścia** (Force): wymuś wyjście pojedynczo → sprawdź fizycznie czy zawór/przekaźnik zadziałał. Safety jeszcze nie jest przetestowane — upewnij się że **nikt nie jest w strefie zagrożenia** przed forsowaniem.
 - Kanały 1oo2: testuj każdy osobno — odłącz jeden → passivation w ramach `discrepancy time`.
+- Na obiekcie ZAWSZE są niezgodności: kabel w złym kanale, czujnik w złej pozycji, moduł o innym numerze katalogowym. To normalne — naprawiasz na bieżąco.
 
 **5. Safety — testy wg Safety Matrix (PO testach I/O):**
 - Sprawdź `collective signature` online = offline.
@@ -1657,7 +1658,10 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 - Quick Commissioning (G120: `p0010=1` → tabliczka → `p3900=1`), identyfikacja silnika (`p1910`), Jog → kierunek obrotu.
 - Sekwencje w trybie Step — krok po kroku.
 
-> 💡 **Na rozmowie:** pokaż że znasz kolejność: schematy → pomiary bez napięcia → HW config → I/O → Safety wg matrycy → napędy → dokumentacja. Commissioning to nie programowanie — to weryfikacja.
+**7. Backup i przekazanie:**
+- Upload projektu z CPU → zapisz jako referencja po commissioning. Bez backupu nie masz punktu odniesienia.
+
+> 💡 **Na rozmowie:** pokaż że znasz kolejność: schematy → oględziny → PRONETA → HW config → I/O z elektrykiem → Safety wg matrycy → napędy → backup. I że wiesz, że na obiekcie nigdy nie jest 1:1 z projektem.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i źródeł w workspace*
 
