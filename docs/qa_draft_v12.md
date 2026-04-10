@@ -1,4 +1,4 @@
-﻿# KOMPENDIUM Q&A — v12.2
+﻿# KOMPENDIUM Q&A — v12.3
 
 ### PLC Programmer / Commissioner / Automatyk
 
@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.2 | Data: 2026-04-10 13:39 | Pytania: 155
+### Wersja: v12.3 | Data: 2026-04-10 17:45 | Pytania: 155
 
 ---
 
@@ -26,7 +26,7 @@
 - [9. TIA PORTAL — SAFETY PRAKTYKA](#9-tia-portal-safety-praktyka)
 - [10. ROBOT ABB IRC5 — INTEGRACJA Z PLC](#10-robot-abb-irc5-integracja-z-plc)
 - [11. COMMISSIONING I DIAGNOSTYKA](#11-commissioning-i-diagnostyka)
-- [12. SICAR I NAPĘDY SINAMICS](#12-sicar-i-napędy-sinamics)
+- [12. NAPĘDY SINAMICS](#12-napędy-sinamics)
 - [13. E-STOP — NORMY, IMPLEMENTACJA I OBLICZENIA BEZPIECZEŃSTWA](#13-e-stop-normy-implementacja-i-obliczenia-bezpieczeństwa)
 - [14. PROFINET — TOPOLOGIA, DIAGNOSTYKA I ZAAWANSOWANE FUNKCJE](#14-profinet-topologia-diagnostyka-i-zaawansowane-funkcje)
 - [15. KURTYNY BEZPIECZEŃSTWA I MUTING](#15-kurtyny-bezpieczeństwa-i-muting)
@@ -34,7 +34,8 @@
 - [17. REALNE SCENARIUSZE COMMISSIONING](#17-realne-scenariusze-commissioning)
 - [18. TIA PORTAL — ZAAWANSOWANE FUNKCJE](#18-tia-portal-zaawansowane-funkcje)
 - [19. COMMISSIONING — DODAWANIE STACJI I URZĄDZEŃ DO PROJEKTU](#19-commissioning-dodawanie-stacji-i-urządzeń-do-projektu)
-- [20. SCHEMATY ELEKTRYCZNE — SILNIKI I APARATURA ŁĄCZENIOWA](#20-schematy-elektryczne-silniki-i-aparatura-łączeniowa)
+- [20. SCHEMATY ELEKTRYCZNE — CZYTANIE, ANALIZA I PRAKTYKA COMMISSIONING](#20-schematy-elektryczne-czytanie-analiza-i-praktyka-commissioning)
+- [21. SICAR@TIA — STANDARD AUTOMATYKI AUTOMOTIVE](#21-sicartia-standard-automatyki-automotive)
 
 ### Pytania
 
@@ -50,13 +51,11 @@
 - [1.9. Jakie są główne rodziny sterowników PLC Siemens i do jakich zastosowań są dedykowane?](#19-jakie-są-główne-rodziny-sterowników-plc-siemens-i-do-jakich-zastosowań-są-dedykowane)
 - [1.10. Jakie są kluczowe aspekty pamięci sterownika PLC Siemens S7-1200/1500?](#110-jakie-są-kluczowe-aspekty-pamięci-sterownika-plc-siemens-s7-12001500)
 - [1.11. Jakie są warianty CPU S7-1200 i jakie mają możliwości rozbudowy?](#111-jakie-są-warianty-cpu-s7-1200-i-jakie-mają-możliwości-rozbudowy)
-- [1.12. Co to jest HMI i do czego służy w automatyce?](#112-co-to-jest-hmi-i-do-czego-służy-w-automatyce)
-- [1.13. Co to jest SCADA i czym różni się od HMI?](#113-co-to-jest-scada-i-czym-różni-się-od-hmi)
-- [1.14. Co to jest PID i kiedy go używasz w PLC?](#114-co-to-jest-pid-i-kiedy-go-używasz-w-plc)
-- [1.15. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?](#115-czym-jest-enkoder-i-jaka-jest-różnica-między-inkrementalnym-a-absolutnym)
-- [1.16. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?](#116-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc)
-- [1.17. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?](#117-co-to-jest-przerzutnik-sr-i-rs-w-tia-portal-i-jaka-jest-różnica-w-priorytecie)
-- [1.18. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?](#118-czym-różni-się-dominacja-set-od-dominacji-reset-w-układzie-samopodtrzymania-lad)
+- [1.12. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?](#112-czym-jest-enkoder-i-jaka-jest-różnica-między-inkrementalnym-a-absolutnym)
+- [1.13. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?](#113-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc)
+- [1.14. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?](#114-co-to-jest-przerzutnik-sr-i-rs-w-tia-portal-i-jaka-jest-różnica-w-priorytecie)
+- [1.15. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?](#115-czym-różni-się-dominacja-set-od-dominacji-reset-w-układzie-samopodtrzymania-lad)
+- [1.16. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?](#116-jaką-typową-pułapkę-w-obwodzie-samopodtrzymania-lad-pokazuje-zadanie-znajdź-różnice)
 
 **2. ARCHITEKTURA SIMATIC SAFETY INTEGRATED**
 - [2.1. Co to jest SIMATIC Safety Integrated i co oznacza 'wszystko w jednym sterowniku'?](#21-co-to-jest-simatic-safety-integrated-i-co-oznacza-wszystko-w-jednym-sterowniku)
@@ -78,24 +77,24 @@
 - [3.6. Co to jest pm switching i pp switching — różnica?](#36-co-to-jest-pm-switching-i-pp-switching-różnica)
 - [3.7. Co to jest F-PM-E i do czego służy?](#37-co-to-jest-f-pm-e-i-do-czego-służy)
 - [3.8. Jak bezpiecznie wyłączyć standardowe moduły wyjść przez Safety?](#38-jak-bezpiecznie-wyłączyć-standardowe-moduły-wyjść-przez-safety)
-- [3.9. Jak F-CPU reaguje na typowe awarie wejść dwukanałowych (1oo2)?](#39-jak-sterownik-bezpieczeństwa-reaguje-na-typowe-awarie-wejść-dwukanałowych-1oo2)
+- [3.9. Jak F-CPU reaguje na typowe awarie wejść dwukanałowych (1oo2)?](#39-jak-f-cpu-reaguje-na-typowe-awarie-wejść-dwukanałowych-1oo2)
 - [3.10. Jakie parametry są kluczowe przy konfiguracji wejść dwukanałowych w sterowniku bezpieczeństwa?](#310-jakie-parametry-są-kluczowe-przy-konfiguracji-wejść-dwukanałowych-w-sterowniku-bezpieczeństwa)
 
 **4. STRUKTURY GŁOSOWANIA — 1oo1/1oo2/2oo2/2oo3**
 - [4.1. Wyjaśnij notację XooY i podaj przykład każdej architektury.](#41-wyjaśnij-notację-xooy-i-podaj-przykład-każdej-architektury)
 - [4.2. Kiedy wybierasz 1oo2 a kiedy 2oo2?](#42-kiedy-wybierasz-1oo2-a-kiedy-2oo2)
 - [4.3. Jak 1oo2 jest realizowane w module F-DI Siemens?](#43-jak-1oo2-jest-realizowane-w-module-f-di-siemens)
-- [4.4. Jak F-CPU reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?](#44-jak-sterownik-safety-reaguje-na-błąd-rozbieżności-sygnału-discrepancy-failure-w-konfiguracji-1oo2)
-- [4.5. Jakie są scenariusze awaryjne wykrywane przez moduł F-DI w układzie dwukanałowym 1oo2?](#45-jakie-są-scenariusze-awaryjne-wykrywane-przez-moduł-safety-w-układzie-dwukanałowym-1oo2)
+- [4.4. Jak F-CPU reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?](#44-jak-f-cpu-reaguje-na-błąd-rozbieżności-sygnału-discrepancy-failure-w-konfiguracji-1oo2)
+- [4.5. Jakie są scenariusze awaryjne wykrywane przez moduł F-DI w układzie dwukanałowym 1oo2?](#45-jakie-są-scenariusze-awaryjne-wykrywane-przez-moduł-f-di-w-układzie-dwukanałowym-1oo2)
 - [4.6. Jak parametr "Reintegration after discrepancy error" wpływa na obsługę błędu rozbieżności sygnału?](#46-jak-parametr-reintegration-after-discrepancy-error-wpływa-na-obsługę-błędu-rozbieżności-sygnału)
-- [4.7. Co to jest czas rozbieżności (discrepancy time) w F-DI 1oo2 i co się dzieje gdy zostanie przekroczony?](#47-co-to-jest-czas-rozbieżności-discrepancy-time-w-f-di-1oo2-i-co-się-dzieje-gdy-zostanie-przekroczony)
+- [4.7. Co to jest discrepancy time (czas rozbieżności) w F-DI 1oo2 i co się dzieje gdy zostanie przekroczony?](#47-co-to-jest-discrepancy-time-czas-rozbieżności-w-f-di-1oo2-i-co-się-dzieje-gdy-zostanie-przekroczony)
 - [4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2?](#48-jak-moduł-f-di-et200sp-wykrywa-zwarcie-między-kanałami-cross-circuit-detection-w-obwodzie-1oo2)
 
 **5. PASSIVATION, REINTEGRATION, ACK**
 - [5.1. Co to jest passivation i co się dzieje z wyjściami/wejściami?](#51-co-to-jest-passivation-i-co-się-dzieje-z-wyjściamiwejściami)
 - [5.2. Dlaczego moduł nie wraca automatycznie po usunięciu błędu?](#52-dlaczego-moduł-nie-wraca-automatycznie-po-usunięciu-błędu)
 - [5.3. Moduł nie wychodzi z passivation — co sprawdzasz?](#53-moduł-nie-wychodzi-z-passivation-co-sprawdzasz)
-- [5.4. Co to jest ACK_REQ i ACK_NEC w praktyce?](#54-co-to-jest-ack-req-i-ack-nec-w-praktyce)
+- [5.4. Co to jest ACK_REQ, ACK_NEC i ACK_REI w praktyce?](#54-co-to-jest-ack_req-ack_nec-i-ack_rei-w-praktyce)
 
 **6. SAFE STATE — BEZPIECZNY STAN**
 - [6.1. Co to jest Safe State i kto go definiuje?](#61-co-to-jest-safe-state-i-kto-go-definiuje)
@@ -148,18 +147,17 @@
 - [11.5. Jakie są najczęstsze przyczyny passivation F-DI w praktyce?](#115-jakie-są-najczęstsze-przyczyny-passivation-f-di-w-praktyce)
 - [11.6. Jak reagować gdy moduł F świeci błędem którego nie możesz skasować?](#116-jak-reagować-gdy-moduł-f-świeci-błędem-którego-nie-możesz-skasować)
 - [11.7. Jak wygląda typowy workflow pierwszego commissioning z TIA Portal — od projektu do działającej maszyny?](#117-jak-wygląda-typowy-workflow-pierwszego-commissioning-z-tia-portal-od-projektu-do-działającej-maszyny)
-- [1.13. Jakie są etapy uruchomienia napędu SINAMICS G120 — od sprzętu do pierwszego ruchu?](#113-jakie-są-etapy-uruchomienia-napędu-sinamics-g120-od-sprzętu-do-pierwszego-ruchu)
+- [11.8. Jakie są etapy uruchomienia napędu SINAMICS G120 — od sprzętu do pierwszego ruchu?](#118-jakie-są-etapy-uruchomienia-napędu-sinamics-g120-od-sprzętu-do-pierwszego-ruchu)
+- [11.9. Co to jest commissioning i jak przeprowadzić pełne uruchomienie instalacji — od fazy offline do RUN z Safety i Safety Matrix?](#119-co-to-jest-commissioning-i-jak-przeprowadzić-pełne-uruchomienie-instalacji-od-fazy-offline-do-run-z-safety-i-safety-matrix)
 - [11.10. Co to jest ProDiag i jak go używasz do diagnostyki maszyny?](#1110-co-to-jest-prodiag-i-jak-go-używasz-do-diagnostyki-maszyny)
 
-**12. SICAR I NAPĘDY SINAMICS**
-- [12.1. Co to jest SICAR i gdzie jest używany?](#121-co-to-jest-sicar-i-gdzie-jest-używany)
-- [12.2. Co to są Tec Units i jak z nich korzystasz?](#122-co-to-są-tec-units-i-jak-z-nich-korzystasz)
-- [12.3. Co to jest SINAMICS Startdrive w TIA Portal?](#123-co-to-jest-sinamics-startdrive-w-tia-portal)
-- [12.4. Jak konfigurujesz SINAMICS G120 z Safety przez PROFIsafe?](#124-jak-konfigurujesz-sinamics-g120-z-safety-przez-profisafe)
+**12. NAPĘDY SINAMICS**
+- [12.1. Co to jest SINAMICS Startdrive w TIA Portal?](#121-co-to-jest-sinamics-startdrive-w-tia-portal)
+- [12.2. Jak konfigurujesz SINAMICS G120 z Safety przez PROFIsafe?](#122-jak-konfigurujesz-sinamics-g120-z-safety-przez-profisafe)
 
 **13. E-STOP — NORMY, IMPLEMENTACJA I OBLICZENIA BEZPIECZEŃSTWA**
 - [13.1. Jakie są kategorie zatrzymania wg EN 60204-1 i jak wpływają na wybór STO vs SS1?](#131-jakie-są-kategorie-zatrzymania-wg-en-60204-1-i-jak-wpływają-na-wybór-sto-vs-ss1)
-- [13.2. Co to jest LSafe_EStop i gdzie go znajdziesz w TIA Portal?](#132-co-to-jest-lsafe-estop-i-gdzie-go-znajdziesz-w-tia-portal)
+- [13.2. Co to jest LSafe_EStop i gdzie go znajdziesz w TIA Portal?](#132-co-to-jest-lsafe_estop-i-gdzie-go-znajdziesz-w-tia-portal)
 - [13.3. Co to jest feedback circuit (obwód sprzężenia zwrotnego styczników) i dlaczego jest wymagany dla SIL 3 / PL e?](#133-co-to-jest-feedback-circuit-obwód-sprzężenia-zwrotnego-styczników-i-dlaczego-jest-wymagany-dla-sil-3-pl-e)
 - [13.4. Co to są CCF (Common Cause Failure) i jakie środki są wymagane dla Cat.4?](#134-co-to-są-ccf-common-cause-failure-i-jakie-środki-są-wymagane-dla-cat4)
 - [13.5. Czy można łączyć przyciski e-stop szeregowo do jednego wejścia F-DI?](#135-czy-można-łączyć-przyciski-e-stop-szeregowo-do-jednego-wejścia-f-di)
@@ -170,7 +168,7 @@
 - [14.3. Jak diagnostykujesz sieć PROFINET w TIA Portal i PRONETA?](#143-jak-diagnostykujesz-sieć-profinet-w-tia-portal-i-proneta)
 - [14.4. Co to jest Shared Device i kiedy go używasz?](#144-co-to-jest-shared-device-i-kiedy-go-używasz)
 - [14.5. Jak działa Device replacement bez PG (automatic name assignment)?](#145-jak-działa-device-replacement-bez-pg-automatic-name-assignment)
-- [14.6. Jakie są rodzaje i funkcje przemysłowych switchy Ethernet, oraz ich znaczenie w sieciach PROFINET?](#146-jakie-są-rodzaje-i-funkcje-przemysłowych-switchy-ethernet-oraz-ich-znaczenie-w-sieciach-profinet)
+- [14.6. Jakie są rodzaje i funkcje przemysłowych switchy Ethernet w sieciach PROFINET?](#146-jakie-są-rodzaje-i-funkcje-przemysłowych-switchy-ethernet-w-sieciach-profinet)
 - [14.7. Co to jest S7 Communication (GET/PUT) i ISO on TCP — kiedy i jak je stosujesz?](#147-co-to-jest-s7-communication-getput-i-iso-on-tcp-kiedy-i-jak-je-stosujesz)
 - [14.8. Co to jest PROFINET TSN (Time Sensitive Networking) i czym różni się od IRT?](#148-co-to-jest-profinet-tsn-time-sensitive-networking-i-czym-różni-się-od-irt)
 
@@ -193,8 +191,8 @@
 - [16.8. Jakie tryby sterowania oferuje SINAMICS G120 i czym się różnią?](#168-jakie-tryby-sterowania-oferuje-sinamics-g120-i-czym-się-różnią)
 - [16.9. Jak przebiega procedura identyfikacji silnika (Motor ID) w SINAMICS G120 i dlaczego jest niezbędna?](#169-jak-przebiega-procedura-identyfikacji-silnika-motor-id-w-sinamics-g120-i-dlaczego-jest-niezbędna)
 - [16.10. Jak wygląda pełna procedura commissioning SINAMICS G120 z TIA Portal krok po kroku?](#1610-jak-wygląda-pełna-procedura-commissioning-sinamics-g120-z-tia-portal-krok-po-kroku)
-- [16.11. Do czego służy blok funkcyjny MC_MoveJog w TIA Portal i jakie są jego podstawowe parametry wejściowe?](#1611-do-czego-służy-blok-funkcyjny-mc-movejog-w-tia-portal-i-jakie-są-jego-podstawowe-parametry-wejściowe)
-- [16.12. Jakie są kluczowe cechy i zachowania bloku MC_MoveJog podczas pracy?](#1612-jakie-są-kluczowe-cechy-i-zachowania-bloku-mc-movejog-podczas-pracy)
+- [16.11. Do czego służy blok funkcyjny MC_MoveJog w TIA Portal i jakie są jego podstawowe parametry wejściowe?](#1611-do-czego-służy-blok-funkcyjny-mc_movejog-w-tia-portal-i-jakie-są-jego-podstawowe-parametry-wejściowe)
+- [16.12. Jakie są kluczowe cechy i zachowania bloku MC_MoveJog podczas pracy?](#1612-jakie-są-kluczowe-cechy-i-zachowania-bloku-mc_movejog-podczas-pracy)
 - [16.13. Jakie są parametry enkoderów inkrementalnych i absolutnych — rozdzielczość, co mogą i czego nie mogą?](#1613-jakie-są-parametry-enkoderów-inkrementalnych-i-absolutnych-rozdzielczość-co-mogą-i-czego-nie-mogą)
 - [16.14. Jakie są interfejsy enkoderów i jak konfigurujesz enkoder w SINAMICS i TIA Portal?](#1614-jakie-są-interfejsy-enkoderów-i-jak-konfigurujesz-enkoder-w-sinamics-i-tia-portal)
 - [16.15. Czym są silniki IE5 (IPM / synchroniczne z magnesami trwałymi) i dlaczego zastępują klasyczne silniki indukcyjne w nowych projektach?](#1615-czym-są-silniki-ie5-ipm-synchroniczne-z-magnesami-trwałymi-i-dlaczego-zastępują-klasyczne-silniki-indukcyjne-w-nowych-projektach)
@@ -217,26 +215,32 @@
 - [18.4. Czym jest SIMATIC ProDiag i jak konfigurujesz pierwsze monitory diagnostyczne?](#184-czym-jest-simatic-prodiag-i-jak-konfigurujesz-pierwsze-monitory-diagnostyczne)
 
 **19. COMMISSIONING — DODAWANIE STACJI I URZĄDZEŃ DO PROJEKTU**
-
-**20. SCHEMATY ELEKTRYCZNE — SILNIKI I APARATURA ŁĄCZENIOWA**
-- [20.1. Co to jest silnik Dahlander (6 wyprowadzeń) i jak uzyskuje się dwa zakresy prędkości?](#201-co-to-jest-silnik-dahlander-6-wyprowadzeń-i-jak-uzyskuje-się-dwa-zakresy-prędkości)
-- [20.2. Jak działa rozruch gwiazda-trójkąt (Y/Δ) i kiedy go stosujemy?](#202-jak-działa-rozruch-gwiazda-trójkąt-yδ-i-kiedy-go-stosujemy)
-- [20.3. Jak realizuje się zmianę kierunku obrotów silnika asynchronicznego?](#203-jak-realizuje-się-zmianę-kierunku-obrotów-silnika-asynchronicznego)
-- [20.4. Czym jest przekaźnik termiczny (bimetalowy) i jak go dobierasz do silnika?](#204-czym-jest-przekaźnik-termiczny-bimetalowy-i-jak-go-dobierasz-do-silnika)
-- [20.5. Co to jest aparat różnicowoprądowy (RCD/RCCB) i czym różni się od bezpiecznika nadprądowego?](#205-co-to-jest-aparat-różnicowoprądowy-rcdrccb-i-czym-różni-się-od-bezpiecznika-nadprądowego)
-- [20.6. Na czym polega blokada elektryczna i mechaniczna między dwoma stycznikami?](#206-na-czym-polega-blokada-elektryczna-i-mechaniczna-między-dwoma-stycznikami)
-- [20.7. Czym różni się wyłącznik silnikowy (3RV) od bezpiecznika wkładkowego (wkładka topikowa)?](#207-czym-różni-się-wyłącznik-silnikowy-3rv-od-bezpiecznika-wkładkowego-wkładka-topikowa)
-- [20.8. Co to jest układ samopodtrzymania w schemacie elektrycznym i jak go realizujesz?](#208-co-to-jest-układ-samopodtrzymania-w-schemacie-elektrycznym-i-jak-go-realizujesz)
-- [20.9. Jak wygląda typowy schemat rozruchu Y/Δ sterowanego przez PLC — kolejność wyjść i blokady?](#209-jak-wygląda-typowy-schemat-rozruchu-yδ-sterowanego-przez-plc-kolejność-wyjść-i-blokady)
 - [19.1. Jak krok po kroku dodajesz nową wyspę sygnałową ET200SP Safety (F-peripheral) do istniejącego projektu?](#191-jak-krok-po-kroku-dodajesz-nową-wyspę-sygnałową-et200sp-safety-f-peripheral-do-istniejącego-projektu)
 - [19.2. Jak dodajesz wyspę pneumatyczną SMC (seria EX600) do projektu TIA Portal przez PROFINET?](#192-jak-dodajesz-wyspę-pneumatyczną-smc-seria-ex600-do-projektu-tia-portal-przez-profinet)
 - [19.3. Jak krok po kroku dodajesz napęd SINAMICS G120 przez PROFINET do projektu TIA Portal?](#193-jak-krok-po-kroku-dodajesz-napęd-sinamics-g120-przez-profinet-do-projektu-tia-portal)
+
+**20. SCHEMATY ELEKTRYCZNE — CZYTANIE, ANALIZA I PRAKTYKA COMMISSIONING**
+- [20.1. Co to jest schemat elektryczny i jakie rodzaje schematów spotykasz na obiekcie?](#201-co-to-jest-schemat-elektryczny-i-jakie-rodzaje-schematów-spotykasz-na-obiekcie)
+- [20.2. Jak czytasz schemat rozruchu gwiazda-trójkąt (Y/Δ) i jakie elementy musisz na nim zidentyfikować?](#202-jak-czytasz-schemat-rozruchu-gwiazda-trójkąt-yδ-i-jakie-elementy-musisz-na-nim-zidentyfikować)
+- [20.3. Jak czytasz schemat rewersji silnika (zmiana kierunku obrotów) i co MUSISZ sprawdzić?](#203-jak-czytasz-schemat-rewersji-silnika-zmiana-kierunku-obrotów-i-co-musisz-sprawdzić)
+- [20.4. Co to jest układ samopodtrzymania na schemacie i jak go rozpoznajesz?](#204-co-to-jest-układ-samopodtrzymania-na-schemacie-i-jak-go-rozpoznajesz)
+- [20.5. Jak czytasz schemat Dahlandera (silnik dwubiegowy) i czym różni się od Y/Δ na schemacie?](#205-jak-czytasz-schemat-dahlandera-silnik-dwubiegowy-i-czym-różni-się-od-yδ-na-schemacie)
+- [20.6. Jak wygląda na schemacie blokada elektryczna i mechaniczna między stycznikami i po co ją sprawdzasz?](#206-jak-wygląda-na-schemacie-blokada-elektryczna-i-mechaniczna-między-stycznikami-i-po-co-ją-sprawdzasz)
+- [20.7. Jak na schemacie rozpoznajesz obwód bezpieczeństwa (Safety) i czym różni się od standardowego obwodu sterowania?](#207-jak-na-schemacie-rozpoznajesz-obwód-bezpieczeństwa-safety-i-czym-różni-się-od-standardowego-obwodu-sterowania)
+
+**21. SICAR@TIA — STANDARD AUTOMATYKI AUTOMOTIVE**
+- [21.1. Co to jest SICAR@TIA i do czego służy?](#211-co-to-jest-sicartia-i-do-czego-służy)
+- [21.2. Jak wygląda struktura programu PLC w SICAR?](#212-jak-wygląda-struktura-programu-plc-w-sicar)
+- [21.3. Jakie tryby pracy (Operation Modes) obsługuje SICAR i jak je uruchamiasz?](#213-jakie-tryby-pracy-operation-modes-obsługuje-sicar-i-jak-je-uruchamiasz)
+- [21.4. Jak działa sterowanie sekwencyjne (Sequence Control) w SICAR?](#214-jak-działa-sterowanie-sekwencyjne-sequence-control-w-sicar)
+- [21.5. Co to są Tec Units w SICAR i jak ich używasz?](#215-co-to-są-tec-units-w-sicar-i-jak-ich-używasz)
+- [21.6. Jak działa synchronizacja i diagnostyka w SICAR DiagAddOn?](#216-jak-działa-synchronizacja-i-diagnostyka-w-sicar-diagaddon)
 
 ---
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **146 pytań / 19 sekcji.**
+> **155 pytań / 21 sekcji.**
 
 
 ---
@@ -453,43 +457,7 @@ Rodzina S7-1200 to kompaktowe sterowniki montowane na szynie DIN, programowane w
 
 *Źródło: dane katalogowe Siemens S7-1200 System Manual*
 
-### 1.12. Co to jest HMI i do czego służy w automatyce?
-
-HMI (Human-Machine Interface) to panel operatorski umożliwiający wizualizację procesu, sterowanie, podgląd alarmów i trendów. Wyświetla: stany I/O, alarmy, trendy (wykresy wartości analogowych w czasie), tryby pracy maszyny, parametry produkcji.
-
-**Typy panelów Siemens:**
-- **Basic Panel (KTP400/700/900/1200 Basic)**: dotykowy lub klawiaturowy, WinCC Basic, od 4” do 12”. Brak trendów i receptur w wersji Basic. Dla prostych wizualizacji jednej maszyny.
-- **Comfort Panel (TP700/900/1200/1500 Comfort)**: WinCC Advanced, pełne trendy, receptury, JavaScript, karty CF/SD. Standard dla maszyn produkcyjnych.
-- **Mobile Panel (KTP700 Mobile)**: kabel lub WiFi. Homologowany dla stref Safety — posiada enabling device (przycisk potwierdzenia do trzymania przy wejściu do strefy niebezpiecznej).
-- **PC-based / IPC (WinCC Unified)**: nowy standard Siemens, HTML5/SVG, OPC UA, skrypty TypeScript. Nie wymaga klasycznych wtyczek. Zastępuje WinCC RT Advanced w nowych instalacjach.
-
-**Komunikacja:** HMI komunikuje się z PLC przez PROFINET (S7 protocol lub OPC UA) w TIA Portal — wspólna baza tagów synchronizowana automatycznie. Offline = HMI nie potrzebuje PLC do symulacji interfejsu (PLCSIM).
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.13. Co to jest SCADA i czym różni się od HMI?
-
-HMI: lokalne, przy maszynie, obsługuje jeden obiekt/maszynę, czas reakcji wymagany (operator).
-SCADA (Supervisory Control and Data Acquisition): system nadrzędny, monitoruje i archiwizuje dane z wielu maszyn/stacji jednocześnie, na serwerze z komputerami PC. Nie steruje bezpośrednio w czasie rzeczywistym — nadzoruje, raportuje, alarmuje.
-
-**Architektura Siemens WinCC:**
-- **WinCC Basic / Advanced**: dla HMI panelów kompilowanych w TIA Portal — nie SCADA, obsługują do kilku sterowników.
-- **WinCC V7.x (SCADA)**: osobne oprogramowanie, serwer OPC DA/UA, historian (archiwum trendów), redundantny serwer Hot Standby (przełączenie <1s), thin clients (Web Navigator przez przeglądarkę), receptury, raporty.
-- **WinCC Unified**: nowy standard oparty na HTML5/SVG/OPC UA, web client bez wtyczek, skrypty TypeScript. Zastępuje WinCC V7 w nowych instalacjach.
-- **WinCC Open Architecture (WinCC OA)**: dla najwyzszych wymagań (100k+ tagów, >100 klientów) — energetyka, infrastruktura.
-
-**Pytanie kontrolne:** *Ile tagów obsługuje WinCC?* — Zależy od produktu i licencji: WinCC (TIA Portal) Basic: 256 Power Tags; Comfort: 2048; Professional: 512–4096+ (zależnie od licencji). WinCC V7.x (SCADA): 128 do unlimited (osobne licencje). Nie podawaj liczby bez kontekstu wersji i licencji.
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.14. Co to jest PID i kiedy go używasz w PLC?
-
-PID (Proportional-Integral-Derivative) to algorytm regulacji zamkniętej utrzymujący zadany setpoint: temperatura, ciśnienie, poziom, prędkość.
-- P — reaguje proporcjonalnie do aktualnego błędu
-- I — eliminuje uchyb ustalony (sumuje błąd w czasie)
-- D — reaguje na szybkość zmiany błędu (tłumi oscylacje)
-W TIA Portal: gotowy blok PID_Compact lub PID_3Step w OB35 (cykliczne przerwanie). W Safety PID nie jest stosowany — logika Safety jest binarna.
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.15. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?  🟡
+### 1.12. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?  🟡
 
 **Enkoder** (przetwornik obrotowo-impulsowy) to czujnik zamieniający ruch mechaniczny (kąt/pozycję) na sygnał elektryczny odczytywany przez napęd lub PLC.
 
@@ -512,7 +480,7 @@ W TIA Portal: gotowy blok PID_Compact lub PID_3Step w OB35 (cykliczne przerwanie
 > 💡 **Na rozmowie:** pytanie o enkodery często pojawia się razem z SLS/SDI — wspomnij że do tych funkcji Safety wymagane są enkodery certyfikowane (HIPERFACE Safety, EnDat Safety).
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.16. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?  🟡
+### 1.13. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?  🟡
 
 **IO-Link** (IEC 61131-9) to standardowy niskonapięciowy protokół komunikacji punkt-punkt między sterownikiem PLC (IO-Link Master) a inteligentnymi czujnikami/aktuatorami (IO-Link Device). Działa po standardowym 3-żyłowym kablu M12 — bez dodatkowego okablowania.
 
@@ -544,7 +512,7 @@ Po wymianie uszkodzonego czujnika IO-Link Master automatycznie wgrywa zapisane p
 
 *Źródło: Siemens ET200SP IO-Link Master product documentation*
 
-### 1.17. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?  🟢
+### 1.14. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?  🟢
 
 **Przerzutniki bistabilne SR i RS** to elementy PLC zapamiętujące stan (bit) po zaniku sygnału sterującego. Różnią się zachowaniem gdy **S i R są aktywne jednocześnie** — wtedy priorytet decyduje o stanie wyjścia.
 
@@ -591,7 +559,7 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 
 ---
 
-### 1.18. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
+### 1.15. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
 
 **Dominacja** określa, który sygnał wygrywa gdy jednocześnie wciśniemy START i STOP. Jest to praktyczny odpowiednik priorytetu przerzutnika SR/RS, widoczny bezpośrednio w schemacie drabinkowym.
 
@@ -635,7 +603,7 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 
 ---
 
-### 1.19. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?  🔴
+### 1.16. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?  🔴
 
 **Pułapka samopodtrzymania** polega na błędnym umieszczeniu styku samopodtrzymania (Lampka) tak, że **omija on przycisk STOP** — wciśnięcie STOP nie wyłącza cewki, bo prąd płynie alternatywną ścieżką.
 
@@ -1657,6 +1625,51 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 
 *Źródło: Siemens SINAMICS G120 Getting Started / Startdrive commissioning guide*
 
+### 11.9. Co to jest commissioning i jak przeprowadzić pełne uruchomienie instalacji — od fazy offline do RUN z Safety i Safety Matrix?  🔴
+
+**Commissioning** to systematyczne uruchomienie maszyny — od projektu do produkcji. Nie „wgranie programu", a weryfikacja każdego obwodu zanim podasz napięcie. Na obiekcie pracujesz z elektrykami i mechanikami — ty weryfikujesz sygnały, elektryk naprawia kable, mechanik ustawia czujniki. Kolejność faz jest kluczowa:
+
+**1. Offline (biuro):**
+- Przeczytaj **schematy elektryczne** — zidentyfikuj obwody mocy, sterowania i Safety. Bez schematów nie wiesz co podłączasz.
+- Weryfikacja TIA Portal: numery katalogowe modułów = BOM, adresy IP/nazwy PROFINET spisane w tabeli, firmware CPU = fizyczny sterownik.
+- Kompilacja Standard + Safety — zero błędów i ostrzeżeń.
+- **<span style="color:#c0392b">Safety Matrix</span>** — tabela przyczyn × skutków (wiersze: E-Stop, kurtyna, krańcówka; kolumny: STO napędu, zawór, ryglowanie). Generuje F-bloki automatycznie i służy jako dokument testowy na FAT/SAT.
+- Zapisz <span style="color:#c0392b">**collective signature**</span> — referencja do porównania po Download.
+
+**2. Weryfikacja sprzętu (BEZ napięcia):**
+- Oględziny szafy: montaż, oznaczenia kabli, zaciski dokręcone, zasilanie 24 VDC i VS* poprawnie podłączone.
+- Zweryfikuj protokół pomiarów PE od elektryka (<0,1 Ω wg EN 60204-1) — musisz go mieć PRZED załączeniem.
+
+**3. Pierwsze załączenie i Download:**
+- Załącz 24 VDC → **PRONETA** — skan sieci PROFINET: sprawdź czy wszystkie urządzenia odpowiadają, czy nie ma duplikatów nazw/IP. Bez tego lecisz na ślepo.
+- Go Online → **najpierw HW Config** (bez programu — wyłapiesz problemy z modułami). Jeśli moduł ma inną rewizję HW niż w projekcie → zaktualizuj konfigurację.
+- `Assign device name` (PROFINET) + `Assign PROFIsafe address` (moduły F).
+- Download pełny → CPU w RUN. Jeśli STOP → Diagnostics buffer — nie restartuj bez diagnozy.
+
+**4. Test I/O (najdłuższa faza — robisz z elektrykiem):**
+- Watch Table **wejścia**: aktywuj każdy czujnik ręcznie → weryfikuj w PLC. Niezgodność → elektryk sprawdza kabel, ty wskazujesz który kanał.
+- Watch Table **wyjścia** (Force): wymuś wyjście pojedynczo → sprawdź fizycznie czy zawór/przekaźnik zadziałał. Safety jeszcze nie jest przetestowane — upewnij się że **nikt nie jest w strefie zagrożenia** przed forsowaniem.
+- Kanały 1oo2: testuj każdy osobno — odłącz jeden → passivation w ramach `discrepancy time`.
+- Na obiekcie ZAWSZE są niezgodności: kabel w złym kanale, czujnik w złej pozycji, moduł o innym numerze katalogowym. To normalne — naprawiasz na bieżąco.
+
+**5. Safety — testy wg Safety Matrix (PO testach I/O):**
+- Sprawdź `collective signature` online = offline.
+- **Wiersz po wierszu matrycy:** E-Stop strefa A → wciśnij → czy KAŻDY skutek z kolumny zadziałał (STO napęd 1 ✓, zawór ✓). Kurtyna → przerwij → skutki ✓. Krańcówka drzwi → otwórz → skutki ✓.
+- Po każdym teście: zwolnij → ACK → <span style="color:#c0392b">**reintegration**</span>.
+- Test napędów Safety: STO, SS1, SLS każdej osi.
+- **Dokumentuj** każdy test: data, wynik PASS/FAIL, podpis — bez tego FAT nie przechodzi.
+
+**6. Napędy i sekwencje:**
+- Quick Commissioning (G120: `p0010=1` → tabliczka → `p3900=1`), identyfikacja silnika (`p1910`), Jog → kierunek obrotu.
+- Sekwencje w trybie Step — krok po kroku.
+
+**7. Backup i przekazanie:**
+- Upload projektu z CPU → zapisz jako referencja po commissioning. Bez backupu nie masz punktu odniesienia.
+
+> 💡 **Na rozmowie:** pokaż że znasz kolejność: schematy → oględziny → PRONETA → HW config → I/O z elektrykiem → Safety wg matrycy → napędy → backup. I że wiesz, że na obiekcie nigdy nie jest 1:1 z projektem.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i źródeł w workspace*
+
 ### 11.10. Co to jest ProDiag i jak go używasz do diagnostyki maszyny?  🟢
 
 ProDiag (Process Diagnostics) to mechanizm wbudowany w TIA Portal dla S7-1500 i ET200SP CPU. Pozwala definiować komunikaty diagnostyczne bezpośrednio w kodzie PLC i automatycznie wyświetlać je na HMI jako alarmy z opisem warunku.
@@ -1681,32 +1694,9 @@ ProDiag (Process Diagnostics) to mechanizm wbudowany w TIA Portal dla S7-1500 i 
 ---
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-## 12. SICAR I NAPĘDY SINAMICS
+## 12. NAPĘDY SINAMICS
 
-### 12.1. Co to jest SICAR i gdzie jest używany?  🟢
-
-SICAR (Siemens Automation Platform for CAR Plants) to gotowy framework programistyczny Siemensa dla branży **automotive** (fabryki: Toyota, Tesla, BMW, VW). Oparty na TIA Portal.
-
-**Zawartość SICAR:**
-- Szablony PLC i HMI
-- Biblioteki **Tec Units** — gotowe bloki dla silników, zaworów, napędów, robotów
-- Wzorce alarmów i **ProDiag** dla diagnostyki
-
-> 💡 Cel: skrócenie czasu programowania przez drag-and-drop gotowych bloków zamiast pisania logiki od zera.
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 12.2. Co to są Tec Units i jak z nich korzystasz?  🟢
-
-**Tec Units** to gotowe, parametryzowalne bloki funkcjonalne w SICAR dla typowych urządzeń: silnik, zawór, przenośnik taśmowy, napęd, robot. Każdy zawiera:
-- FB PLC z logiką
-- Ekrany HMI
-- Definicje alarmów
-- Obsługę trybów (Auto / Manual / Local)
-
-> 💡 Używasz przez drag-and-drop Tec Unit na projekt, ustawiasz parametry (adres I/O, limity, czasy) — gotowe, bez pisania logiki od podstaw.
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 12.3. Co to jest SINAMICS Startdrive w TIA Portal?
+### 12.1. Co to jest SINAMICS Startdrive w TIA Portal?
 
 **SINAMICS Startdrive** to wtyczka do TIA Portal do parametryzacji, uruchamiania i diagnostyki napędów SINAMICS (G120, S120, V90) bezpośrednio z TIA Portal — bez osobnego oprogramowania STARTER.
 
@@ -1717,7 +1707,7 @@ SICAR (Siemens Automation Platform for CAR Plants) to gotowy framework programis
 - Konfiguracja Safety Integrated (STO, SS1, SLS przez PROFIsafe)
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 12.4. Jak konfigurujesz SINAMICS G120 z Safety przez PROFIsafe?  🟡
+### 12.2. Jak konfigurujesz SINAMICS G120 z Safety przez PROFIsafe?  🟡
 
 **Konfiguracja SINAMICS G120 z Safety (w SINAMICS Startdrive):**
 
@@ -3111,3 +3101,156 @@ Obwód cewki KM_R:  ──[S2 START_R]──[NC KM_F]──(Cewka KM_R)
 > 💡 **Schemat Safety jest dowodem** — audytor TÜV/UDT porównuje schemat z fizycznym okablowaniem i konfiguracją TIA Portal. Niezgodność = blokada odbioru maszyny.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej, EN 60204-1, IEC 62061*
+## 21. SICAR@TIA — STANDARD AUTOMATYKI AUTOMOTIVE
+
+### 21.1. Co to jest SICAR@TIA i do czego służy?  🟢
+
+**SICAR@TIA** (Siemens Automation Platform for CAR Plants) to gotowa platforma automatyki Siemensa przeznaczona do **sterowania sekwencyjnego** w fabrykach automotive (linie spawalnicze, montażowe, klejenie, studwelding). Składa się ze skoordynowanego oprogramowania PLC (S7-1500/1500F) i HMI (WinCC Advanced).
+
+**Dwa pakiety oprogramowania:**
+- **SICAR@TIA** — bazowy pakiet: tryby pracy (operation modes), interfejs HMI, dane produkcyjne, Tec Units, diagnostyka fieldbusowa, PLC Webserver z topologią sieci
+- **DiagAddOn** — rozszerzenie: sterowanie sekwencyjne (255 sekwencji × 228 kroków), diagnostyka online kroków w LAD/STL na HMI, ekrany ruchów ręcznych, synchronizacja, historia komunikatów, RSS-Feed
+
+**Główna korzyść:** ujednolicona filozofia obsługi i diagnostyki na wszystkich liniach — maintenance z różnych fabryk i dostawców szybko lokalizuje błędy, bo interfejs i struktura programu są wszędzie takie same.
+
+**Wymagane licencje:** TIA Step7 Professional + WinCC Advanced + opcjonalnie TIA Safety Advanced. DiagAddOn nie wymaga osobnej licencji.
+
+> 💡 Na rozmowie podkreśl: SICAR to nie biblioteka bloków — to **cały framework** z ustalonym standardem folderów, nazewnictwa, trybów pracy i diagnostyki. Programista nie buduje struktury od zera, tylko programuje sekwencje w gotowym szkielecie.
+
+*[ZWERYFIKOWANE] — źródło: 10_Introduction SICAR@TIA DiagAddOn, Edition 2022-04*
+
+### 21.2. Jak wygląda struktura programu PLC w SICAR?  🟡
+
+Program PLC w SICAR ma **ściśle zdefiniowaną strukturę folderów** — każdy projekt wygląda tak samo, co ułatwia orientację na nowej linii:
+
+**Foldery bazowe (00–07)** — wspólne dla wszystkich projektów:
+- **00_Organization blocks** — OB1 (Main), OB cykliczne
+- **01_Initialization** — FC1981 (CallInit) z blokiem GlobalInfo_FB — tu ustawiasz liczbę HMI i OPModes
+- **02_HMI_OperationModes** — FC1983 (bazowy) i FC983 (DiagAddOn) — wywołania paneli i trybów pracy
+- **04_User** — folder na bloki użytkownika (kopie z 08_Zz jeśli trzeba zmodyfikować)
+- **07_Diagnosis** — diagnostyka PROFINET, alarmy systemowe
+
+**Folder 08_ZzComponents** — gotowe komponenty (napędy, roboty):
+- Prefix „Zz" = bloki **których NIE WOLNO modyfikować**
+- Jeśli musisz zmienić blok → kopiujesz go do **04_User** z własnym wersjonowaniem
+
+**Folder 10_Sequence & Messageblocks** — tu programujesz sekwencje linii:
+- Podział na OPMode areas: `++0` (globalne komunikaty), `++1` (area 1), `++2`…`++8`
+- Nazewnictwo stacji: `++1.010 FX1` = OPMode area 1, stacja 10, Fixture 1; `++1.020 IR1` = area 1, stacja 20, Robot 1
+
+**Zasoby systemowe (nie wolno zmieniać):**
+- FB/FC/DB 900–1299, UDT 900–999 — zarezerwowane dla DiagAddOn
+- MB1 = clock memory byte, MB2 = system memory byte — obowiązkowe w konfiguracji PLC
+
+> 💡 Na rozmowie: „Kiedy dostaję nowy projekt SICAR, zaczynam od 10_Sequence — tam jest logika linii. Foldery 00–07 to szkielet, 08_Zz to gotowe komponenty — tych nie ruszam."
+
+*[ZWERYFIKOWANE] — źródło: 10_Introduction sekcja 6 Structure PLC-program, 40_User_Guideline sekcja 1.1*
+
+### 21.3. Jakie tryby pracy (Operation Modes) obsługuje SICAR i jak je uruchamiasz?  🟡
+
+SICAR zarządza do **8 niezależnych obszarów trybów pracy** (OPMode areas) na jednym PLC. Każdy area może działać w innym trybie jednocześnie (np. area 1 w Auto, area 3 w Manual).
+
+**Trzy tryby pracy:**
+- **Automatic** — sekwencje wykonują się automatycznie; spełnienie warunku `transAuto = 1` → przejście do następnego kroku
+- **Inching (krokowy)** — jak Auto, ale krok po kroku z potwierdzeniem; można krokować jedną sekwencję lub wszystkie w area
+- **Manual** — ruchy ręczne przez ekrany ruchów (movement screens) na HMI; przycisk ruchu → interlock + limit sprawdzane dla danego kroku
+
+**Warunki uruchomienia trybu (memory word MW10–MW24 per area):**
+- `M x.0` = E-Stop aktywny (wymagany dla WSZYSTKICH trybów)
+- `M x.1` = drzwi Safety zamknięte (wymagany dla Auto i Inching)
+- `M x.2` = warunki bazowe Manual OK
+- `M x.4` = warunki bazowe ogólne OK
+
+**Procedura przełączenia (np. Manual → Auto):**
+1. Naciśnij przycisk „AUTO" w nagłówku WinCC
+2. Potwierdź zmianę (popup lub bez — zależy od stałej `WITH_POPUP`)
+3. Przycisk „AUTO" miga → naciśnij „START" (lub klucz zewnętrzny)
+4. Trzymaj „START" aż przycisk przestanie migać → tryb aktywny
+
+**Funkcje specjalne (dostępne w Auto):**
+- **Stop** — zatrzymanie sekwencji natychmiast (`DBB24=0`) lub po bieżącym kroku (`DBB24=255`)
+- **Initial Position** — żądanie pozycji wyjściowej przed startem
+- **Stop End of Cycle** — zatrzymanie po zakończeniu cyklu
+- **Empty Line** / **Ghost Run** — praca bez detali / symulacja
+
+> 💡 Na commissioning: zawsze zaczynaj od Manual → sprawdź każdy ruch osobno → przełącz na Inching → dopiero potem Auto.
+
+*[ZWERYFIKOWANE] — źródło: 31_Initialization and Operation modes, Edition 2022-07*
+
+### 21.4. Jak działa sterowanie sekwencyjne (Sequence Control) w SICAR?  🔴
+
+Sterowanie sekwencyjne to serce SICAR — blok **FB1000** zarządza do 255 sekwencji równolegle, każda do 228 kroków. Struktura jest liniowa (z możliwością rozgałęzień).
+
+**Numeracja bloków — prosta reguła (numer sekwencji + 1000):**
+- Sekwencja 4 → FC1004 (wywołanie + wyjścia), FB1004 (logika kroków), DB1004 (dane sekwencji)
+
+**Budowa bloku sekwencji (FB100x):**
+- **Network 1: Branch distributor** — skok do aktywnego kroku (programowany w STL: `JU PERM`, `JU S001`, `JU S002`…)
+- **Permanent step (PERM)** — warunki obowiązujące dla WSZYSTKICH kroków (np. crash interlocks wspólne dla całej sekwencji)
+- **Selective steps (S001, S002…)** — warunki konkretnego kroku, wykonywany jest tylko aktywny krok
+
+**Każdy krok (selective step) ma dwie części:**
+1. **Interlock (ILOCK)** — warunki bezpieczeństwa / crash interlocks (czy ruch jest bezpieczny?)
+2. **Transition / Limit** — w Auto: `transAuto` = warunek przejścia do następnego kroku; w Manual: `limitManual` = feedback że ruch się zakończył
+
+**Kluczowe zmienne w #sequence:**
+- `ilockManual` / `ilockAuto` — interlocki per tryb
+- `transAuto` — warunek przejścia (Auto)
+- `limitManual` — feedback ruchu (Manual)
+- `twdSetpoint` — czas watchdog (monitoring)
+- `setError` — natychmiastowy błąd
+- `motionButton` — przycisk ruchu z ekranu HMI (Manual)
+
+**Wyjścia (akcje)** programujesz w **FC100x** — po wywołaniu FC998 używasz flag kroków z DB do sterowania Tec Units i napędami.
+
+**Reguła diagnostyki:** w blokach sekwencji (FB/FC 1001–1255) wolno używać **tylko** wejść/wyjść, merkerów i bitów z **nieoptymalizowanych** DB — inaczej DiagAddOn nie pokaże diagnostyki na HMI.
+
+> 💡 Na rozmowie: „W SICAR nie piszę sterownika od zera — programuję warunki interlocków i tranzycji per krok. FB1000 sam zarządza przełączaniem kroków, synchronizacją i diagnostyką."
+
+*[ZWERYFIKOWANE] — źródło: 34_1 Sequence- and messageblocks, Edition 2022-06*
+
+### 21.5. Co to są Tec Units w SICAR i jak ich używasz?  🟢
+
+**Tec Units** to gotowe, parametryzowalne bloki funkcjonalne w folderze **08_ZzComponents** dla typowych urządzeń na linii: silnik, zawór, napęd SINAMICS, robot (ABB IRC5, KUKA KRC4, FANUC R-30iB, Yaskawa YRC1000).
+
+**Każdy Tec Unit zawiera:**
+- FB z logiką sterowania (tryby Auto/Manual/Local)
+- Ekrany HMI
+- Definicje alarmów
+- Interfejs do sekwencji (wywoływany z FC100x po flagach kroków)
+
+**Zasada „Zz":** bloki w folderach z prefixem „Zz" **nie wolno modyfikować**. Jeśli musisz zmienić Tec Unit → kopiujesz do **04_User** i kontynuujesz jako blok użytkownika z własnym wersjonowaniem w bibliotece.
+
+**Typowe wywołanie w programie:**
+1. W sekwencji FC1004, po wyjściu kroku (step flag z DB1004), wywołujesz Tec Unit napędu lub zaworu
+2. Tec Unit sam obsługuje logikę ruchu, feedback, alarmy i ekran HMI
+
+> 💡 Na linii spawalniczej typowe Tec Units: interfejs robota (goProcess/goAck), napęd podnośnika/przenośnika, zawory pneumatyczne gripperów, czujniki RFID do identyfikacji karoserii.
+
+*[ZWERYFIKOWANE] — źródło: 10_Introduction sekcja 6.1.3, 40_User_Guideline sekcja Configuration of movements*
+
+### 21.6. Jak działa synchronizacja i diagnostyka w SICAR DiagAddOn?  🟡
+
+**Synchronizacja** rozwiązuje kluczowy problem: po ręcznych ruchach (Manual) lub awarii — jak wrócić do produkcji automatycznej bez resetowania całej linii?
+
+**Mechanizm:**
+1. Po wybraniu trybu OFF, naciśnij „Synchronize" (dla jednej sekwencji lub wszystkich)
+2. DiagAddOn analizuje KAŻDY krok sekwencji sprawdzając: `ilockAuto = 1` AND `transAuto = 0`
+3. Jeśli dokładnie **jeden krok** spełnia ten warunek → sekwencja jest zsynchronizowana do tego kroku
+4. Przełączasz na Auto → produkcja kontynuuje natychmiast od zsynchronizowanego kroku
+
+**Diagnostyka na HMI (DiagAddOn):**
+- Ekran diagnostyczny pokazuje **online** stan każdego bloku sekwencji: aktywny krok, warunki interlocków i tranzycji w formie LAD/STL
+- **Watchdog time** (`twdSetpoint`) — monitoring czasu kroku; po przekroczeniu → diagnostyka automatycznie pokazuje, który warunek (interlock/transition) nie jest spełniony
+- **Automatyczny pomiar watchdog** — przy pierwszym przebiegu Auto system sam mierzy i zapisuje czasy kroków
+- **Message blocks** — komunikaty alarmowe z kategoryzacją i historią, wyświetlane na dedykowanym ekranie HMI
+- **Cross reference** — z ekranu diagnostycznego możesz przejść bezpośrednio do szczegółów blokującego warunku
+
+**Narzędzie DiagGen:**
+- Generator danych diagnostycznych uruchamiany na PG/PC
+- Wykorzystuje TIA Openness do przygotowania danych dla ekranów DiagAddOn na HMI
+- Uruchamiasz po zmianach w blokach sekwencji → regeneruje powiązania krok↔HMI
+
+> 💡 Na rozmowie: „Największa wartość DiagAddOn to diagnostyka — maintenance widzi online na HMI, który dokładnie warunek w którym kroku blokuje sekwencję. Nie muszą otwierać TIA Portal."
+
+*[ZWERYFIKOWANE] — źródło: 10_Introduction sekcja 1.2.2 DiagAddOn for PLC, 34_1 Sequence- and messageblocks sekcja Watchdog/Synchronization*

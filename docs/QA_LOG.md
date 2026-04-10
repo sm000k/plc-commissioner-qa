@@ -4,7 +4,23 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v12 — 2026-04-01 (aktualizacja v12.2) ✅ AKTYWNA WERSJA
+## qa_draft_v12 — 2026-04-01 (aktualizacja v12.3) ✅ AKTYWNA WERSJA
+
+### v12.3 — Nowy rozdział 21: SICAR@TIA (2026-04-10)
+
+**Zmiany strukturalne:**
+- Wydzielono SICAR z sekcji 12 do osobnego rozdziału **21. SICAR@TIA — Standard automatyki automotive**
+- Sekcja 12 przemianowana na **NAPĘDY SINAMICS** (tylko 12.1 Startdrive, 12.2 G120 Safety)
+
+**Nowe pytania (6):**
+- §21.1: Co to jest SICAR@TIA i do czego służy? — pakiety SICAR@TIA + DiagAddOn, licencje, korzyści
+- §21.2: Struktura programu PLC w SICAR — foldery 00-07, 08_ZzComponents, 10_Sequence, zasoby systemowe
+- §21.3: Tryby pracy (Operation Modes) — Auto/Inching/Manual, memory words MW10-MW24, procedura przełączania, funkcje specjalne
+- §21.4: Sterowanie sekwencyjne (Sequence Control) — FB1000, branch distributor, PERM/selective steps, zmienne #sequence
+- §21.5: Tec Units — zasada „Zz", wywołanie z sekwencji, typowe Tec Units na linii
+- §21.6: Synchronizacja i diagnostyka DiagAddOn — mechanizm sync, watchdog, DiagGen, diagnostyka online
+
+**Źródła:** 10_Introduction.pdf, 31_Initialization and Operation modes.pdf, 34_1 Sequence- and messageblocks.pdf, 40_User_Guideline.pdf (SICAR@TIA DiagAddOn, Edition 2022)
 
 ### Quality pass v12.2 — pełny przegląd merytoryczny (2026-04-10)
 

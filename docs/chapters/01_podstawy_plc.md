@@ -199,43 +199,7 @@ Rodzina S7-1200 to kompaktowe sterowniki montowane na szynie DIN, programowane w
 
 *Źródło: dane katalogowe Siemens S7-1200 System Manual*
 
-### 1.12. Co to jest HMI i do czego służy w automatyce?
-
-HMI (Human-Machine Interface) to panel operatorski umożliwiający wizualizację procesu, sterowanie, podgląd alarmów i trendów. Wyświetla: stany I/O, alarmy, trendy (wykresy wartości analogowych w czasie), tryby pracy maszyny, parametry produkcji.
-
-**Typy panelów Siemens:**
-- **Basic Panel (KTP400/700/900/1200 Basic)**: dotykowy lub klawiaturowy, WinCC Basic, od 4” do 12”. Brak trendów i receptur w wersji Basic. Dla prostych wizualizacji jednej maszyny.
-- **Comfort Panel (TP700/900/1200/1500 Comfort)**: WinCC Advanced, pełne trendy, receptury, JavaScript, karty CF/SD. Standard dla maszyn produkcyjnych.
-- **Mobile Panel (KTP700 Mobile)**: kabel lub WiFi. Homologowany dla stref Safety — posiada enabling device (przycisk potwierdzenia do trzymania przy wejściu do strefy niebezpiecznej).
-- **PC-based / IPC (WinCC Unified)**: nowy standard Siemens, HTML5/SVG, OPC UA, skrypty TypeScript. Nie wymaga klasycznych wtyczek. Zastępuje WinCC RT Advanced w nowych instalacjach.
-
-**Komunikacja:** HMI komunikuje się z PLC przez PROFINET (S7 protocol lub OPC UA) w TIA Portal — wspólna baza tagów synchronizowana automatycznie. Offline = HMI nie potrzebuje PLC do symulacji interfejsu (PLCSIM).
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.13. Co to jest SCADA i czym różni się od HMI?
-
-HMI: lokalne, przy maszynie, obsługuje jeden obiekt/maszynę, czas reakcji wymagany (operator).
-SCADA (Supervisory Control and Data Acquisition): system nadrzędny, monitoruje i archiwizuje dane z wielu maszyn/stacji jednocześnie, na serwerze z komputerami PC. Nie steruje bezpośrednio w czasie rzeczywistym — nadzoruje, raportuje, alarmuje.
-
-**Architektura Siemens WinCC:**
-- **WinCC Basic / Advanced**: dla HMI panelów kompilowanych w TIA Portal — nie SCADA, obsługują do kilku sterowników.
-- **WinCC V7.x (SCADA)**: osobne oprogramowanie, serwer OPC DA/UA, historian (archiwum trendów), redundantny serwer Hot Standby (przełączenie <1s), thin clients (Web Navigator przez przeglądarkę), receptury, raporty.
-- **WinCC Unified**: nowy standard oparty na HTML5/SVG/OPC UA, web client bez wtyczek, skrypty TypeScript. Zastępuje WinCC V7 w nowych instalacjach.
-- **WinCC Open Architecture (WinCC OA)**: dla najwyzszych wymagań (100k+ tagów, >100 klientów) — energetyka, infrastruktura.
-
-**Pytanie kontrolne:** *Ile tagów obsługuje WinCC?* — Zależy od produktu i licencji: WinCC (TIA Portal) Basic: 256 Power Tags; Comfort: 2048; Professional: 512–4096+ (zależnie od licencji). WinCC V7.x (SCADA): 128 do unlimited (osobne licencje). Nie podawaj liczby bez kontekstu wersji i licencji.
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.14. Co to jest PID i kiedy go używasz w PLC?
-
-PID (Proportional-Integral-Derivative) to algorytm regulacji zamkniętej utrzymujący zadany setpoint: temperatura, ciśnienie, poziom, prędkość.
-- P — reaguje proporcjonalnie do aktualnego błędu
-- I — eliminuje uchyb ustalony (sumuje błąd w czasie)
-- D — reaguje na szybkość zmiany błędu (tłumi oscylacje)
-W TIA Portal: gotowy blok PID_Compact lub PID_3Step w OB35 (cykliczne przerwanie). W Safety PID nie jest stosowany — logika Safety jest binarna.
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.15. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?  🟡
+### 1.12. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?  🟡
 
 **Enkoder** (przetwornik obrotowo-impulsowy) to czujnik zamieniający ruch mechaniczny (kąt/pozycję) na sygnał elektryczny odczytywany przez napęd lub PLC.
 
@@ -258,7 +222,7 @@ W TIA Portal: gotowy blok PID_Compact lub PID_3Step w OB35 (cykliczne przerwanie
 > 💡 **Na rozmowie:** pytanie o enkodery często pojawia się razem z SLS/SDI — wspomnij że do tych funkcji Safety wymagane są enkodery certyfikowane (HIPERFACE Safety, EnDat Safety).
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 1.16. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?  🟡
+### 1.13. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?  🟡
 
 **IO-Link** (IEC 61131-9) to standardowy niskonapięciowy protokół komunikacji punkt-punkt między sterownikiem PLC (IO-Link Master) a inteligentnymi czujnikami/aktuatorami (IO-Link Device). Działa po standardowym 3-żyłowym kablu M12 — bez dodatkowego okablowania.
 
@@ -290,7 +254,7 @@ Po wymianie uszkodzonego czujnika IO-Link Master automatycznie wgrywa zapisane p
 
 *Źródło: Siemens ET200SP IO-Link Master product documentation*
 
-### 1.17. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?  🟢
+### 1.14. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?  🟢
 
 **Przerzutniki bistabilne SR i RS** to elementy PLC zapamiętujące stan (bit) po zaniku sygnału sterującego. Różnią się zachowaniem gdy **S i R są aktywne jednocześnie** — wtedy priorytet decyduje o stanie wyjścia.
 
@@ -337,7 +301,7 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 
 ---
 
-### 1.18. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
+### 1.15. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
 
 **Dominacja** określa, który sygnał wygrywa gdy jednocześnie wciśniemy START i STOP. Jest to praktyczny odpowiednik priorytetu przerzutnika SR/RS, widoczny bezpośrednio w schemacie drabinkowym.
 
@@ -381,7 +345,7 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 
 ---
 
-### 1.19. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?  🔴
+### 1.16. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?  🔴
 
 **Pułapka samopodtrzymania** polega na błędnym umieszczeniu styku samopodtrzymania (Lampka) tak, że **omija on przycisk STOP** — wciśnięcie STOP nie wyłącza cewki, bo prąd płynie alternatywną ścieżką.
 

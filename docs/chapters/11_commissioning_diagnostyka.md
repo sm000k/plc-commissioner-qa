@@ -179,6 +179,51 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 
 *Źródło: Siemens SINAMICS G120 Getting Started / Startdrive commissioning guide*
 
+### 11.9. Co to jest commissioning i jak przeprowadzić pełne uruchomienie instalacji — od fazy offline do RUN z Safety i Safety Matrix?  🔴
+
+**Commissioning** to systematyczne uruchomienie maszyny — od projektu do produkcji. Nie „wgranie programu", a weryfikacja każdego obwodu zanim podasz napięcie. Na obiekcie pracujesz z elektrykami i mechanikami — ty weryfikujesz sygnały, elektryk naprawia kable, mechanik ustawia czujniki. Kolejność faz jest kluczowa:
+
+**1. Offline (biuro):**
+- Przeczytaj **schematy elektryczne** — zidentyfikuj obwody mocy, sterowania i Safety. Bez schematów nie wiesz co podłączasz.
+- Weryfikacja TIA Portal: numery katalogowe modułów = BOM, adresy IP/nazwy PROFINET spisane w tabeli, firmware CPU = fizyczny sterownik.
+- Kompilacja Standard + Safety — zero błędów i ostrzeżeń.
+- **<span style="color:#c0392b">Safety Matrix</span>** — tabela przyczyn × skutków (wiersze: E-Stop, kurtyna, krańcówka; kolumny: STO napędu, zawór, ryglowanie). Generuje F-bloki automatycznie i służy jako dokument testowy na FAT/SAT.
+- Zapisz <span style="color:#c0392b">**collective signature**</span> — referencja do porównania po Download.
+
+**2. Weryfikacja sprzętu (BEZ napięcia):**
+- Oględziny szafy: montaż, oznaczenia kabli, zaciski dokręcone, zasilanie 24 VDC i VS* poprawnie podłączone.
+- Zweryfikuj protokół pomiarów PE od elektryka (<0,1 Ω wg EN 60204-1) — musisz go mieć PRZED załączeniem.
+
+**3. Pierwsze załączenie i Download:**
+- Załącz 24 VDC → **PRONETA** — skan sieci PROFINET: sprawdź czy wszystkie urządzenia odpowiadają, czy nie ma duplikatów nazw/IP. Bez tego lecisz na ślepo.
+- Go Online → **najpierw HW Config** (bez programu — wyłapiesz problemy z modułami). Jeśli moduł ma inną rewizję HW niż w projekcie → zaktualizuj konfigurację.
+- `Assign device name` (PROFINET) + `Assign PROFIsafe address` (moduły F).
+- Download pełny → CPU w RUN. Jeśli STOP → Diagnostics buffer — nie restartuj bez diagnozy.
+
+**4. Test I/O (najdłuższa faza — robisz z elektrykiem):**
+- Watch Table **wejścia**: aktywuj każdy czujnik ręcznie → weryfikuj w PLC. Niezgodność → elektryk sprawdza kabel, ty wskazujesz który kanał.
+- Watch Table **wyjścia** (Force): wymuś wyjście pojedynczo → sprawdź fizycznie czy zawór/przekaźnik zadziałał. Safety jeszcze nie jest przetestowane — upewnij się że **nikt nie jest w strefie zagrożenia** przed forsowaniem.
+- Kanały 1oo2: testuj każdy osobno — odłącz jeden → passivation w ramach `discrepancy time`.
+- Na obiekcie ZAWSZE są niezgodności: kabel w złym kanale, czujnik w złej pozycji, moduł o innym numerze katalogowym. To normalne — naprawiasz na bieżąco.
+
+**5. Safety — testy wg Safety Matrix (PO testach I/O):**
+- Sprawdź `collective signature` online = offline.
+- **Wiersz po wierszu matrycy:** E-Stop strefa A → wciśnij → czy KAŻDY skutek z kolumny zadziałał (STO napęd 1 ✓, zawór ✓). Kurtyna → przerwij → skutki ✓. Krańcówka drzwi → otwórz → skutki ✓.
+- Po każdym teście: zwolnij → ACK → <span style="color:#c0392b">**reintegration**</span>.
+- Test napędów Safety: STO, SS1, SLS każdej osi.
+- **Dokumentuj** każdy test: data, wynik PASS/FAIL, podpis — bez tego FAT nie przechodzi.
+
+**6. Napędy i sekwencje:**
+- Quick Commissioning (G120: `p0010=1` → tabliczka → `p3900=1`), identyfikacja silnika (`p1910`), Jog → kierunek obrotu.
+- Sekwencje w trybie Step — krok po kroku.
+
+**7. Backup i przekazanie:**
+- Upload projektu z CPU → zapisz jako referencja po commissioning. Bez backupu nie masz punktu odniesienia.
+
+> 💡 **Na rozmowie:** pokaż że znasz kolejność: schematy → oględziny → PRONETA → HW config → I/O z elektrykiem → Safety wg matrycy → napędy → backup. I że wiesz, że na obiekcie nigdy nie jest 1:1 z projektem.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i źródeł w workspace*
+
 ### 11.10. Co to jest ProDiag i jak go używasz do diagnostyki maszyny?  🟢
 
 ProDiag (Process Diagnostics) to mechanizm wbudowany w TIA Portal dla S7-1500 i ET200SP CPU. Pozwala definiować komunikaty diagnostyczne bezpośrednio w kodzie PLC i automatycznie wyświetlać je na HMI jako alarmy z opisem warunku.
