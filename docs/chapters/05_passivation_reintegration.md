@@ -29,7 +29,7 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 1. Usuwasz przyczynę błędu *(naprawiasz kabel, naprawiasz czujnik)*
 2. Moduł ustawia `ACK_REQ = TRUE` → widoczny w Watch Table
 3. Operator naciska **"Reset Safety"** na HMI/kasecie
-4. Generowany jest impuls na `ACK_NEC` *(zbocze narastające, 1 cykl PLC)*
+4. Generowany jest impuls na `ACK_REI` *(zbocze narastające, 1 cykl PLC)* — zmienna reintegracji F-I/O
 5. Moduł reintegruje się → `PASS_OUT = FALSE`
 
 ---
@@ -40,8 +40,8 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 **Checklista:**
 - [ ] Błąd fizyczny faktycznie usunięty? *(sprawdź kabel / czujnik multimetrem)*
 - [ ] Brak aktywnych błędów w diagnostyce TIA Portal?
-- [ ] Sygnał `ACK_NEC` podany jako **impuls** *(zbocze)*, nie poziom stały?
-- [ ] F-CPU w trybie **RUN Safety** *(nie `LOCK`)*?
+- [ ] Sygnał `ACK_REI` (reintegracja F-I/O) podany jako **impuls** *(zbocze)*, nie poziom stały?
+- [ ] F-CPU w trybie **Safety mode activated** *(nie deactivated)*?
 - [ ] `F-monitoring time` nie przekroczony *(przeciążona sieć PROFINET)*?
 - [ ] Brak drugiego ukrytego błędu na innym kanale modułu?
 
@@ -51,12 +51,13 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 ---
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 5.4. Co to jest ACK_REQ i ACK_NEC w praktyce?  🔴
+### 5.4. Co to jest ACK_REQ, ACK_NEC i ACK_REI w praktyce?  🔴
 
-| Zmienna | Kierunek | Opis |
-|---------|----------|------|
-| `ACK_REQ` | Wyjście bloku F | Auto `TRUE` gdy moduł wymaga resetu — widoczny w Watch Table |
-| `ACK_NEC` | Wejście bloku F | Impuls *(zbocze narastające)* potwierdzający usunięcie błędu |
+| Zmienna | Kierunek | Kontekst | Opis |
+|---------|----------|----------|------|
+| `ACK_REQ` | Wyjście bloku F | F-FB / F-I/O | Auto `TRUE` gdy moduł/blok wymaga resetu — widoczny w Watch Table |
+| `ACK_NEC` | Wejście bloku F | Safety-FB (ESTOP1, Two-hand, GuardMonitoring) | Impuls *(zbocze narastające)* potwierdzający usunięcie błędu w logice Safety |
+| `ACK_REI` | Wejście F-I/O DB | Reintegracja modułów F-I/O po passivation | Impuls reintegracji konkretnego modułu F-I/O |
 
 **Schemat logiki Reset Safety (LAD):**
 ```

@@ -47,7 +47,7 @@ Ciągły czerwony RDY LED = aktywny <span style="color:#c0392b">**fault**</span>
 **Procedura diagnostyki:**
 1. Odczytaj kod: `r0945[0]` w Startdrive (online) lub na panelu BOP-2 → zapisz `r0945[0..7]`
 2. Sprawdź w Parameter Manual: każdy `Fxxxxx` ma opis przyczyny i działania korygującego
-3. Najczęstsze: `F30001` (doziemienie wyjścia), `F07800-F07802` (temperatura silnika), `F30002` (przetężenie DC-bus), `F30004` (przekroczenie prędkości)
+3. Najczęstsze: `F30001` (przetężenie wyjścia / overcurrent), `F07800-F07802` (temperatura silnika), `F30002` (przepięcie / nadnapięcie DC-bus — overvoltage), `F30004` (przegrzanie radiatora — overtemperature heatsink)
 
 > ⚠️ Jeśli fault **kasuje się ale wraca natychmiast**: przyczyna fizyczna wciąż aktywna — nie idź dalej bez usunięcia przyczyny.
 

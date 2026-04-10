@@ -30,7 +30,7 @@
 
 **Wymagania IRT:**
 - Zarządzane switche Siemens (np. SCALANCE X) lub topologia gwiazdki bez zewnętrznych switchów
-- CPU obsługujące IRT (S7-1500 T-CPU lub F-CPU)
+- CPU obsługujące IRT (S7-1500 — większość modeli z interfejsem PN/DP, w tym standardowe, T-CPU i F-CPU)
 - Telegram 105 (DSC) lub 111 dla SINAMICS S120
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
@@ -142,7 +142,7 @@ Domyślnie w S7-1500 dostęp PUT/GET z zewnętrznych urządzeń jest **zablokowa
 | Jitter | < 1 µs | < 1 µs |
 | Switche | Tylko SCALANCE X (Siemens) | Dowolny switch TSN-compliant (multi-vendor) |
 | Topologia | Gwiazdka lub linia (bez obcych switchów) | Elastyczna, mieszana |
-| Telegram | 102, 105 (S120) | Nowe (PROFINET IRT podzbiór TSN) |
+| Telegram | 102, 105 (S120) | Te same (102, 105, 111) — zmiana na warstwie transportowej, nie aplikacji |
 
 **Mechanizmy TSN (IEEE 802.1):**
 - **802.1AS** — synchronizacja czasu gPTP *(generalized Precision Time Protocol)* z dokładnością < 1 µs

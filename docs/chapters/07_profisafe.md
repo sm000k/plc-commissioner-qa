@@ -4,13 +4,15 @@
 
 <span style="color:#1a5276">**PROFIsafe**</span> to protokół Safety działający na **warstwie aplikacji** ponad standardowym PROFINET lub PROFIBUS — bez osobnego okablowania bezpieczeństwa.
 
-**Dodatkowe dane w każdym pakiecie PROFIsafe** *(ponad normalne dane procesowe)*:
+**Struktura ramki PROFIsafe** *(dodatkowe dane ponad normalne dane procesowe)*:
 
 | Element | Rozmiar | Cel |
 |---------|---------|-----|
-| CRC (checksum) | 3 bajty | Wykrycie przekłamania danych |
-| Licznik wiadomości | 1 bajt | Wykrycie utraty lub powtórzenia pakietu |
-| F-Address | konfiguowalny | Wykrycie pakietu wysłanego do złego urządzenia |
+| F-Data (dane procesowe Safety) | zmienny | Bezpieczne dane wejść/wyjść |
+| Status/Control byte | 1 bajt | Toggle bit, potwierdzenia, sterowanie komunikacją |
+| CRC | 3 bajty (CRC1) lub 4 bajty (CRC2) | Integralność — obliczany z uwzględnieniem Virtual Consecutive Number (VCN) i F-Address |
+
+Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-Address) jest realizowana **wewnątrz obliczenia CRC** — nie są to osobne pola w ramce.
 
 **Błędy wykrywane przez PROFIsafe**, których zwykły PROFINET nie wykrywa:
 - Utrata pakietu

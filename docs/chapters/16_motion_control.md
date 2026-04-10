@@ -32,7 +32,7 @@
 - Silnik wykonuje sekwencję ruchów testowych — **odblokuj strefę bezpieczeństwa**
 - Wyznacza `Kp` (wzmocnienie) i `Ti` (czas całkowania) regulatora prędkości
 
-**3. Weryfikacja:** `r0047` (status identyfikacji) = `0` → brak błędu, parametry zapisane
+**3. Weryfikacja:** `r0047` ⚗️ DO WERYFIKACJI (status identyfikacji) = `0` → brak błędu, parametry zapisane. Można też sprawdzić po powrócie `p1910` do 0 i braku faultu w `r0945`.
 
 > 💡 Jeśli napęd jest mechatronicznie połączony z ciężką maszyną: uruchom identyfikację na **biegu jałowym** lub przy odłączonej mechanice, a potem ręcznie dostraj `Kp`.
 
@@ -56,7 +56,7 @@
 
 | Fault | Znaczenie | Najczęstsza przyczyna | Diagnoza |
 |-------|-----------|----------------------|---------|
-| **F30001** | Power unit: Ground fault — błąd doziemny wyjścia | Uszkodzona izolacja kabla silnikowego, zwarcie w uzwojeniu | Megaomomierz 500V DC między żyłami a PE — powinno być >10 MΩ |
+| **F30001** | Power unit: Overcurrent — przetężenie wyjścia | Zwarcie kabla silnikowego, doziemienie, zbyt szybka rampa przyspieszenia, błędne dane silnika | Sprawdź kabel megaomomierzem 500V DC między żyłami a PE (≥10 MΩ), zweryfikuj p0304–p0311, zmniejsz rampę p1120 |
 | **F07801** | Motor overtemperature (model termiczny) | Przeciążenie, zatkany filtr chłodzenia, za długie rozruchy | Sprawdź `p0335` (klasa izolacji) i wentylację silnika |
 
 > ⚠️ W starszych wersjach firmware G120 `F30001` może oznaczać różne usterki Power Unit — zawsze weryfikuj w Parameter Manual dla konkretnej wersji firmware (`r0018` = wersja firmware).
@@ -79,7 +79,7 @@
 **Stosowane silniki:**
 | Typ silnika | Tryb sterowania G120 | Typowe zastosowanie |
 |-------------|---------------------|-------------------|
-| Silnik indukcyjny klatkowy (IM) | V/f, Vector (VVC+) | Wentylatory, pompy, przenośniki |
+| Silnik indukcyjny klatkowy (IM) | V/f, Vector (sensorless / closed-loop) | Wentylatory, pompy, przenośniki |
 | Silnik indukcyjny z enkoderem | Vector closed-loop | Wciągarki, prasy, mieszalniki |
 | PMSM / IPM (IE4/IE5) | Vector PMSM | Sprężarki, pompy wysokosprawne |
 
@@ -176,7 +176,7 @@ G120 obsługuje kilka metod sterowania silnikiem — dobór zależy od wymagań 
 4. Po zakończeniu `p1910` wraca do 0, parametry `p0350` (R1), `p0356` (Ls) są zapisane
 5. Zapisz parametry: `p0971 = 1` (zapis do ROM) lub przez Startdrive → Download
 
-**Dlaczego toważne:**
+**Dlaczego to ważne:**
 - Zbyt wysokie R1 (długi kabel) → regulator wektorowy kompensuje automatycznie po ID
 - Silnik inny niż w danych tabliczkowych (np. przewinięty) → ID wykryje różniące się R1
 - Brak ID przy `p1300 = 20/21` → moment może być niedokładny o 20–40%
@@ -335,7 +335,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > ⚠️ **PROFINET enkoder z Technology Object:** telegram `102` (z enkoderem) wymaga że SINAMICS odbiera pozycję z wbudowanego enkodera przez Startdrive, następnie przesyła ją do CPU przez PROFINET jako część PZD telegramu. Telegramy `1` i `20` **nie zawierają** danych enkodera — tylko prędkość!
 
-> 💡 **HIPERFACE DSL:** jeden kabel do serwosilnika zawiera jednocześnie zasilanie silnika (3 fazy + PE) i sygnał enkodera DSL — brak osobnego kabla enkodera. Stosowany w Sinamics V90 z silnikami 1FK7. Upraszcza montaż ale wymaga specjalnego kabla (Siemens Motion Connect 500).
+> 💡 **HIPERFACE DSL:** jeden kabel do serwosiłnika zawiera jednocześnie zasilanie silnika (3 fazy + PE) i sygnał enkodera DSL — brak osobnego kabla enkodera. W Siemens: V90 współpracuje z silnikami 1FL6 (enkoder wbudowany), natomiast 1FK7 używa DRIVE-CLiQ z S120/S210 (OCT — One Cable Technology, Siemens Motion Connect kable).
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 16.15. Czym są silniki IE5 (IPM / synchroniczne z magnesami trwałymi) i dlaczego zastępują klasyczne silniki indukcyjne w nowych projektach?  🟢
@@ -361,7 +361,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 **IE5 w praktyce commissioning:**
 - Tabliczka znamionowa: `IPM` lub `PMSM` zamiast `IM` (Induction Motor)
 - Parametryzacja napędu: `p0300 = 2` *(PMSM)* zamiast `p0300 = 1` *(IM)*
-- Enkoder obowiązkowy (inkrementalny lub absolutny wbudowany) — nie ma pola magnetycznego wirnika bez magnesów = brak synchronizacji
+- Enkoder obowiązkowy (inkrementalny lub absolutny wbudowany) — napęd musi znać pozycję kątową wirnika z magnesami trwałymi, aby prawidłowo generować pole stojana (FOC)
 - Identyfikacja silnika (p1910/p1960) przebiega inaczej niż dla IM — uwzględnia magnetyzację stałą magnesów
 
 > ⚠️ **Najczęstszy błąd:** operator wymienia silnik IE3 (IM) na IE5 (IPM) i pozostawia `p0300 = 1` — napęd próbuje magnetyzować silnik synchroniczny jak indukcyjny → natychmiastowy fault lub zniszczenie uzwojeń.

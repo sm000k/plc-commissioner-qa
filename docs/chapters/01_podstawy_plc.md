@@ -24,14 +24,15 @@ Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system 
 **Podstawowe OB:**
 - OB1 — główny cykl programu, wykonywany ciągle. Tutaj trafia główna logika maszyny. Przerwany przez OB o wyższym priorytecie.
 - OB35 — przerwanie cykliczne (np. co 100ms). Używasz dla PID, komunikacji z napędami, obliczeń niezależnych od obciążenia OB1. Wyższy priorytet niż OB1.
-- OB100 — zimny start (Startup OB), wykonywany raz po przejściu CPU z STOP→RUN. Inicjalizacja zmiennych, reset stanu maszyny, wyzerowanie wyjść. W TIA Portal S7-1200/1500: jedyny OB startu (nie ma OB101/OB102 jak w starym S7-300).
+- OB100 — Startup OB, wykonywany raz po przejściu CPU z STOP→RUN. Inicjalizacja zmiennych, reset stanu maszyny, wyzerowanie wyjść. W TIA Portal S7-1200/1500: jedyny OB startu (nie ma OB101 Warm Restart / OB102 Cold Restart jak w S7-400).
 - F_MAIN — Safety OB, oddzielny cykl dla programu failsafe, chroniony przez F-CPU.
 
 **Diagnostyczne OB — ważne przy commissioning:**
 - OB80 — cycle time exceeded (czas cyklu przekroczył watchdog). Sygnalizuje zbyt wolną logikę.
 - OB82 — diagnostic error: moduł I/O zgłosił błąd diagnostyczny (np. zerwanie kabla, przegrzanie modułu F). W TIA Portal: blok RALRM lub ProDiag odbiera dane.
 - OB86 — rack failure / PROFINET station failure. Wywołany gdy zdalna stacja (ET200SP, napęd) znika z sieci.
-- OB121 / OB122 — błędy programistyczne (np. dostęp do nieistniejącej zmiennej) — ważne przy uruchamianiu nowego kodu.
+- OB121 — Programming Error: błędy programistyczne (dzielenie przez zero, błędna konwersja typów, przekroczenie zakresu tablicy).
+- OB122 — I/O Access Error: błąd dostępu do modułu I/O (moduł nie istnieje, awaria komunikacji z modułem). Ważne rozróżnienie przy uruchamianiu nowego kodu.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.4. Co to jest FB, FC, DB — kiedy używasz każdego?  🔴
@@ -98,14 +99,18 @@ END_CASE;
 **TIA Portal SCL vs klasyczny STEP 7 SCL:**
 - TIA Portal: zmienne wyłącznie symboliczne, brak tablicy symboli (Symbol Table), *Optimized Block Access* domyślnie włączony.
 - Stary STEP 7 (S7-300/400): mieszanie adresów absolutnych (I0.0, DB1.DBX0.0) i nazw symbolicznych; osobna tablica symboli.
-- W Safety: program F_MAIN w TIA Portal **V18 i starszych** wymaga FBD lub LAD — SCL nie jest certyfikowany dla F-bloków Safety. Od TIA Portal **V19** SCL jest obsługiwany jako język F-bloków Safety. Zawsze sprawdź dopuszczalne języki dla swojej wersji portalu przed użyciem SCL w logice Safety.
+- W Safety: program F_MAIN w starszych wersjach TIA Portal wymaga FBD lub LAD — SCL nie jest certyfikowany dla F-bloków Safety. SCL dla F-bloków Safety został wprowadzony w TIA Portal V19 (STEP 7 Safety V19). ⚗️ DO WERYFIKACJI: dokładna wersja i wymagany firmware F-CPU w Release Notes TIA Portal. Zawsze sprawdź dopuszczalne języki dla swojej wersji portalu przed użyciem SCL w logice Safety.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.7. Co to jest sygnał 4-20mA i dlaczego nie 0-20mA?
 
-4-20mA to standardowy sygnał analogowy dla czujników przemysłowych. Zakres 4mA (min) do 20mA (max).
-Dlaczego 4 a nie 0: sygnał 0mA jednoznacznie oznacza zerwanie kabla lub awarię zasilania czujnika — łatwa diagnostyka. Przy 0-20mA nie da się odróżnić minimalnej wartości od awarii.
-Sygnał prądowy ma też przewagę nad napięciowym (0-10V): nie spada na rezystancji kabla — można przesyłać na duże odległości bez strat.
+4-20mA to standardowy sygnał analogowy dla czujników przemysłowych (przetworniki ciśnienia, temperatury, przepływu). Zakres 4 mA (wartość minimalna procesu) do 20 mA (wartość maksymalna).
+
+- **Dlaczego 4 a nie 0 mA:** Sygnał 0 mA jednoznacznie oznacza zerwanie kabla lub awarię zasilania czujnika — łatwa diagnostyka. Przy 0-20 mA nie da się odróżnić minimalnej wartości procesu od awarii.
+- **Przewaga nad napięciowym (0-10V):** Sygnał prądowy nie spada na rezystancji kabla — można przesyłać na duże odległości (setki metrów) bez strat dokładności.
+- **Zakres poniżej 4 mA (np. 3,6 mA) i powyżej 20 mA (np. 20,5 mA):** Oznacza sygnał poza zakresem — diagnostyka w PLC (wire break / overflow).
+- **Skalowanie w TIA Portal:** Surowy sygnał z modułu AI: 0–27648 (integer) dla zakresu 4–20 mA. Blok `NORM_X` normalizuje do 0.0–1.0, a `SCALE_X` skaluje na zakres inżynierski (np. 0.0–100.0 bar). Alternatywnie: bezpośrednia przeliczenie REAL w SCL: `Ciśnienie := (REAL_AI - 4.0) / 16.0 * MaxRange;`
+- **Podłączenie dwuprzewodowe (2-wire):** Zasilanie i sygnał na jednej parze kabli (czujnik = zmienna rezystancja). Oszczędność okablowania.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.8. Co to jest PROFINET i czym różni się od PROFIBUS?  🔴
@@ -114,7 +119,7 @@ PROFINET: Ethernet-based, 100Mbit/s (gigabit w nowych instalacjach), elastyczna 
 PROFIBUS: RS-485, max 12Mbit/s, liniowa topologia z terminatorami na obu końcach kabla, starszy standard. Nadal spotykany w modernizacjach i instalacjach sprzed 2010.
 
 **Role urządzeń PROFINET — kluczowe na rozmowie:**
-- **IO-Controller**: sterownik nadrzędny zarządzający cyklem wymiany danych — to jest CPU (np. S7-1500F). Jeden IO-Controller obsługuje do 512 IO-Devices (S7-1500).
+- **IO-Controller**: sterownik nadrzędny zarządzający cyklem wymiany danych — to jest CPU (np. S7-1500F). Maksymalna liczba IO-Devices zależy od modelu CPU (⚠️ DO WERYFIKACJI: np. S7-1518 — do 512, S7-1511 — mniej; sprawdź w danych katalogowych konkretnego CPU).
 - **IO-Device**: urządzenie peryferyjne oddające/przyjmujące dane — ET200SP, ET200MP, SINAMICS G120, robot ABB IRC5, kurtyna PROFINET. Każde opisane przez plik GSDML.
 - **IO-Supervisor**: urządzenie diagnostyczne i konfiguracyjne (laptop z TIA Portal, panel HMI) — odczytuje dane, nie uczestniczy w cyklu produkcyjnym.
 
@@ -129,14 +134,24 @@ Siemens oferuje różne rodziny sterowników PLC, dostosowane do aplikacji o ró
 - **LOGO!**: Najmniejszy sterownik, nazywany przekaźnikiem programowalnym lub modułem logicznym.
   - **Zastosowanie:** Proste maszyny, nieskomplikowana automatyka procesowa (przepompownie, oczyszczalnie), automatyka budynkowa.
   - **Możliwości:** Możliwość rozszerzania o wejścia/wyjścia cyfrowe i analogowe, ale nie do zaawansowanych aplikacji napędowych czy kompletnych regulatorów PID.
+- **S7-300** *(wycofany z produkcji, nadal masowo zainstalowany)*: Modułowy sterownik na szynie S7-300.
+  - **Zastosowanie:** Modernizacje, utrzymanie istniejących instalacji. Spotykany na starszych liniach produkcyjnych.
+  - **Możliwości:** MPI/PROFIBUS, programowanie w STEP 7 Classic (Manager). Wersje F (315F-2, 317F-2) dla Safety. Zastąpiony przez S7-1500.
+- **S7-400** *(wycofany, niszowe zastosowania)*: High-end, duże systemy procesowe.
+  - **Zastosowanie:** Energetyka, chemia, rafinerie — tam gdzie wymagana redundancja H-CPU. Zastępowany przez S7-1500H.
+  - **Możliwości:** Redundancja CPU (H-System), hot swap modułów, duża pamięć, PROFIBUS/PROFINET.
 - **S7-1200**: Kompaktowe sterowniki ze zintegrowanymi wejściami i wyjściami.
   - **Zastosowanie:** Małe i średnie aplikacje, łączące dobrą wydajność z niską ceną.
-  - **Możliwości:** Modułowa konstrukcja, port PROFINET, płytka sygnałowa, moduły rozszerzeń DI/DO/AI/AO, moduły technologiczne (np. wagowe), moduły komunikacyjne (RS232, RS485, PROFIBUS, AS-i, IO-Link, GSM), wbudowane szybkie wejścia/wyjścia (do enkoderów, silników krokowych/serwo), wersje failsafe.
+  - **Możliwości:** Modułowa konstrukcja, port PROFINET, płytka sygnałowa, moduły rozszerzeń DI/DO/AI/AO, moduły technologiczne (np. wagowe), moduły komunikacyjne (RS232, RS485, PROFIBUS, AS-i, IO-Link, GSM), wbudowane szybkie wejścia/wyjścia (do enkoderów, silników krokowych/serwo), wersje failsafe (1214FC, 1215FC). Wbudowany serwer WWW.
 - **S7-1500**: Dedykowane do najbardziej wymagających aplikacji.
-  - **Zastosowanie:** Charakteryzują się największą mocą obliczeniową, zaawansowanymi funkcjami technologicznymi i komunikacyjnymi.
+  - **Zastosowanie:** Największa moc obliczeniowa, zaawansowane funkcje technologiczne i komunikacyjne.
+  - **Możliwości:** Wbudowany OPC UA Server, Web Server, wyświetlacz diagnostyczny na froncie CPU, Motion Control (Technology Objects), wersje F (failsafe), T (motion), R (redundancja komunikacji), H (hot standby), HF (H+F). Do 512 IO-Devices PROFINET (zależnie od modelu CPU).
+- **ET 200SP CPU** *(odmiany 1510SP, 1512SP, 1515SP)*: Kompaktowa alternatywa S7-1500 montowana bezpośrednio na szynie ET 200SP.
+  - **Zastosowanie:** Zdalne szafy sterownicze, rozproszona automatyka (automotive, linie montażowe). Wersje F dostępne.
+  - **Możliwości:** Identyczne programowanie jak S7-1500 w TIA Portal, mniejsza obudowa, moduły ET 200SP bezpośrednio na szynie.
 Praktyczne wskazówki:
-- Dla początkujących w programowaniu PLC, S7-1200 jest polecany ze względu na niższą cenę. Po opanowaniu S7-1200, przejście na S7-1500 nie powinno stanowić problemu.
-- Sterowniki S7-1200 posiadają wbudowany serwer WWW do diagnostyki i wyświetlania własnych stron.
+- Na rozmowie kwalifikacyjnej: S7-300/400 spotykasz przy modernizacjach — musisz znać STEP 7 Classic. Nowe projekty: S7-1200 lub S7-1500.
+- Dla początkujących w programowaniu PLC, S7-1200 jest polecany ze względu na niższą cenę.
 *Źródło: transkrypcje ControlByte*
 
 ### 1.10. Jakie są kluczowe aspekty pamięci sterownika PLC Siemens S7-1200/1500?
@@ -154,7 +169,7 @@ Pamięć sterownika PLC jest podzielona na obszary o różnych właściwościach
   - **Zawartość:** Pamięć bitowa M (zmienne z tablicy tagów), timery i liczniki systemowe, lokalna pamięć tymczasowa L (zmienne tymczasowe), aktualny obraz procesu wejść i wyjść.
 - **Pamięć Retentive (nieulotna):**
   - **Typ:** Specjalny obszar pamięci nieulotnej w sterowniku.
-  - **Działanie:** W przypadku utraty zasilania, sterownik przez chwilę podtrzymuje pracę i przepisuje część danych z pamięci roboczej do pamięci Retentive, co pozwala na zachowanie wybranych danych (np. parametry, aktualny stan maszyny).
+  - **Działanie:** Dane oznaczone jako retentywne są automatycznie zachowywane w pamięci nieulotnej (wbudowana Flash w S7-1200, SIMATIC Memory Card w S7-1500) i przywracane po ponownym uruchomieniu CPU. Pozwala na zachowanie wybranych danych (np. liczniki produkcji, aktualny stan maszyny, parametry receptur).
 Praktyczne wskazówki:
 - Ważne jest, aby świadomie decydować, które dane mają być retentywne, aby zachować stan maszyny po zaniku zasilania.
 - Ograniczona żywotność pamięci trwałej i długi czas zapisu/odczytu sprawiają, że pamięć RAM jest preferowana do bieżących operacji.
@@ -171,7 +186,7 @@ Rodzina S7-1200 to kompaktowe sterowniki montowane na szynie DIN, programowane w
 | 1212C | 8DI/6DO/2AI | 2 SM | 3 | 1 | |
 | 1214C | 14DI/10DO/2AI | 8 SM | 3 | 1 | Najpopularniejszy |
 | 1215C | 14DI/10DO/2AI | 8 SM | 3 | 1 | 2 porty PROFINET |
-| 1217C | 14DI/10DO/4AI | 8 SM | 3 | 1 | PTO4 (4 osie krokowe) |
+| 1217C | 14DI/10DO/2AI/2AO | 8 SM | 3 | 1 | PTO4 (4 osie krokowe), 2× PROFINET |
 
 **Typy modułów rozszerzeń:**
 - **SM (Signal Module)** — z prawej: DI, DO, DI/DO, AI, AO — maksymalnie 8 sztuk.
@@ -208,7 +223,7 @@ SCADA (Supervisory Control and Data Acquisition): system nadrzędny, monitoruje 
 - **WinCC Unified**: nowy standard oparty na HTML5/SVG/OPC UA, web client bez wtyczek, skrypty TypeScript. Zastępuje WinCC V7 w nowych instalacjach.
 - **WinCC Open Architecture (WinCC OA)**: dla najwyzszych wymagań (100k+ tagów, >100 klientów) — energetyka, infrastruktura.
 
-**Pytanie kontrolne:** *Ile tagów obsługuje WinCC?* — WinCC V7 Comfort: 512 tagów; Professional: 512–unlimited (licencja). WinCC Unified: oparty na połączeniach OPC UA — brak jednej liczby. Nie podawaj liczby bez kontekstu wersji licencji.
+**Pytanie kontrolne:** *Ile tagów obsługuje WinCC?* — Zależy od produktu i licencji: WinCC (TIA Portal) Basic: 256 Power Tags; Comfort: 2048; Professional: 512–4096+ (zależnie od licencji). WinCC V7.x (SCADA): 128 do unlimited (osobne licencje). Nie podawaj liczby bez kontekstu wersji i licencji.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 1.14. Co to jest PID i kiedy go używasz w PLC?

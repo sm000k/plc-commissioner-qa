@@ -6,6 +6,29 @@ Generowanie i utrzymanie kompendium **Q&A** dla inżyniera PLC/Commissioner przy
 ## Kontekst merytoryczny
 Technologie: **Siemens TIA Portal** (V16–V19), **SIMATIC Safety Integrated**, **ET200 SP/MP**, **SINAMICS G120/S120/V90**, **Robot ABB IRC5**, **SICAR@GST**
 
+## ⚡ Strategia pracy — automatyczne dzielenie zadań
+
+> **OBOWIĄZKOWE** — stosuj ZAWSZE, niezależnie od tego czy użytkownik o to prosi.
+
+### Zasada: max 3 pytania Q&A na jeden krok
+Przy generowaniu/edycji dokumentu Q&A **NIGDY** nie przetwarzaj więcej niż **3 pytania naraz**. Po każdej partii:
+1. Zapisz wynik do pliku (chapter lub draft)
+2. Podsumuj co zrobiłeś (1 linia)
+3. Przejdź do następnej partii
+
+### Zasada: 1 sekcja = 1 krok
+Przy pracy z wieloma sekcjami — przetwarzaj **jedną sekcję na raz**. Workflow:
+1. Odczytaj chapter danej sekcji
+2. Zbierz źródła (knowledge base, PDF)
+3. Wygeneruj/edytuj pytania dla TEJ sekcji
+4. Zapisz → przejdź do kolejnej sekcji
+
+### Zasada: używaj todo list
+Przy zadaniach obejmujących >1 sekcję lub >3 pytania — **ZAWSZE** utwórz todo list na początku i aktualizuj postęp po każdym kroku. Użytkownik musi widzieć co jest zrobione, a co jeszcze przed nim.
+
+### Zasada: duży plik = czytaj fragmentami
+Nie czytaj `LATEST.md` ani `qa_draft_v*.md` w całości. Czytaj tylko potrzebną sekcję (po numerze linii lub przez grep). Bazy wiedzy przeszukuj po słowach kluczowych, nie ładuj w całości.
+
 ## Struktura projektu
 
 ```
@@ -38,16 +61,89 @@ transcripts/controlbyte/             ← Transkrypcje YouTube (52 filmy)
 
 ## Źródła wiedzy (PDFy w sources/pdfs/)
 
-| Plik | Zawartość |
-|------|-----------|
-| `21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en.pdf` | Application Example: E-Stop SIL3, klasy zatrzymania, PFH, obliczenia ISO 13849-1 |
-| `39198632_Wiring_Example_en.pdf` | Przykłady okablowania F-DI/F-DO, PM-switching, PP-switching, relay |
-| `safety_getting_started_en-US.pdf` | Podstawy SIMATIC Safety — pierwsze kroki, architektura |
-| `SIMATIC Safety - Konfiguracja i programowanie (2).pdf` | Zaawansowana konfiguracja Safety, programowanie F-bloków |
-| `SIMATIC Safety Integrated – wszystko w jednym sterowniku PLC.pdf` | Koncepcja Safety Integrated, F-CPU, PROFIsafe |
-| `btc.pl-SCL-S7-1200.pdf` | Programowanie S7-1200 w SCL (TIA Portal V13+) |
-| `Sterowniki_PLC.pdf` | Ogólne informacje o sterownikach PLC |
-| `siemens SCL.PDF` | Programowanie w SCL — uzupełnienie |
+### Obecne źródła
+
+| Plik | Zawartość | Pokrywa sekcje |
+|------|-----------|----------------|
+| `21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en.pdf` | Application Example: E-Stop SIL3, klasy zatrzymania, PFH, obliczenia ISO 13849-1 | §13 |
+| `39198632_Wiring_Example_en.pdf` | Przykłady okablowania F-DI/F-DO, PM-switching, PP-switching, relay | §3 |
+| `safety_getting_started_en-US.pdf` | Podstawy SIMATIC Safety — pierwsze kroki, architektura | §2, §6 |
+| `SIMATIC Safety - Konfiguracja i programowanie (2).pdf` | Zaawansowana konfiguracja Safety, programowanie F-bloków | §2, §4, §5, §7, §9 |
+| `SIMATIC Safety Integrated – wszystko w jednym sterowniku PLC.pdf` | Koncepcja Safety Integrated, F-CPU, PROFIsafe | §2, §7 |
+| `btc.pl-SCL-S7-1200.pdf` | Programowanie S7-1200 w SCL (TIA Portal V13+) | §1 |
+| `Sterowniki_PLC.pdf` | Ogólne informacje o sterownikach PLC | §1 |
+| `siemens SCL.PDF` | Programowanie w SCL — uzupełnienie | §1 |
+
+### Mapa pokrycia sekcji — co jest, czego brakuje
+
+| § | Sekcja | Ma źródło? | Brak |
+|---|--------|------------|------|
+| 1 | Podstawy PLC | ✅ PDF + books | — |
+| 2 | Architektura Safety | ✅ 3 PDFy | — |
+| 3 | Moduły F-DI/F-DO | ✅ Wiring Example | — |
+| 4 | Struktury głosowania | ✅ Safety Konfig. | — |
+| 5 | Passivation/Reintegration | ✅ Safety Konfig. | — |
+| 6 | Safe State | ✅ Safety Getting Started | — |
+| 7 | PROFIsafe | ✅ Safety Konfig./Integrated | — |
+| 8 | Napędy Safety | ❌ | SINAMICS Safety Integrated FM |
+| 9 | TIA Portal Safety | ✅ Safety Konfig. | — |
+| 10 | Robot ABB IRC5 | ❌ | ABB IRC5 Application Manual |
+| 11 | Commissioning i diagnostyka | ⚠️ knowledge base only | S7-1500 Diagnostics Manual |
+| 12 | SICAR i Napędy SINAMICS | ❌ | SINAMICS G120 Commissioning, SICAR Conventions |
+| 13 | E-Stop | ✅ Application Example | — |
+| 14 | PROFINET | ❌ | PROFINET System Description |
+| 15 | Kurtyny/Muting | ❌ | Light Curtains App. Example |
+| 16 | Motion Control | ❌ | SINAMICS S120/V90 Manual |
+| 17 | Scenariusze commissioning | ⚠️ knowledge base only | — (pokryją inne PDFy) |
+| 18 | TIA Portal zaawansowane | ❌ | TIA Portal V19 What's New |
+| 19 | Commissioning stacje | ❌ | ET200SP/MP System Manual |
+| 20 | Schematy elektryczne | ❌ | EN 60204-1, schematy katalogowe |
+
+### 🔴 Brakujące źródła — do pobrania z Siemens SIOS (support.industry.siemens.com)
+
+> Szukaj po tytule lub numerze dokumentu. Wszystkie są darmowe (PDF download).
+
+**Priorytet 1 — krytyczne luki (sekcje bez żadnego źródła):**
+
+| Dokument do pobrania | Szukaj na SIOS | Dla sekcji |
+|----------------------|----------------|------------|
+| **SINAMICS G120 — Getting Started** | "SINAMICS G120 getting started" lub numer produktu 6SL3210 | §12, §16 |
+| **SINAMICS G120 — List Manual (parametry)** | "SINAMICS G120 list manual" | §8, §12, §16 |
+| **SINAMICS S120 — Safety Integrated Function Manual** | "SINAMICS S120 safety integrated function manual" | §8 |
+| **PROFINET System Description** | "PROFINET system description" | §14 |
+| **S7-1500 / ET200SP System Manual** | "ET200SP system manual" lub "S7-1500 system manual" | §11, §19 |
+| **S7-1500 Diagnostics Manual** | "S7-1500 diagnostics" | §11 |
+| **Light Curtains with SIMATIC Safety — Application Example** | "safety light curtain muting application example" | §15 |
+
+**Priorytet 2 — wzmocnienie istniejących sekcji:**
+
+| Dokument do pobrania | Szukaj na SIOS | Dla sekcji |
+|----------------------|----------------|------------|
+| **SINAMICS V90 — Getting Started** | "SINAMICS V90 getting started PROFINET" | §16 |
+| **TIA Portal V19 — What's New** | "TIA Portal V19 innovations" | §18 |
+| **PROFIsafe — System Description** | "PROFIsafe system description" (PI International) | §7 |
+| **SIMATIC Safety — Application Examples Collection** | "SIMATIC safety application examples" | §4, §5, §6 |
+| **IEC 61800-5-2 — Safety functions for drives** | Norma płatna, ale Siemens ma darmowe Application Notes opisujące STO/SS1/SS2 | §8 |
+
+**Priorytet 3 — źródła zewnętrzne (nie-Siemens):**
+
+| Dokument | Źródło | Dla sekcji |
+|----------|--------|------------|
+| **ABB IRC5 — Application Manual PROFINET** | ABB Library (library.abb.com), szukaj "IRC5 PROFINET" | §10 |
+| **ABB IRC5 — Technical Reference Manual** | ABB Library | §10 |
+| **SICAR@GST Conventions** | Wewnętrzny dokument Siemens (jeśli masz dostęp) | §12 |
+| **EN 60204-1 — Bezpieczeństwo maszyn, wyposażenie elektryczne** | Norma płatna (PKN), ale streszczenia dostępne w app. notes Siemens | §20 |
+
+### Konwencja nazw plików źródłowych
+
+Pobrane PDFy zapisuj w `sources/pdfs/` z nazwą: `{temat_krótki}_{lang}.pdf`
+Przykłady:
+- `sinamics_g120_getting_started_en.pdf`
+- `profinet_system_description_en.pdf`
+- `et200sp_system_manual_en.pdf`
+- `abb_irc5_profinet_en.pdf`
+
+Po dodaniu nowego PDF-a → zaktualizuj tabelę "Obecne źródła" powyżej.
 
 ## Aktywny dokument Q&A
 - **Bieżący**: `docs/LATEST.md` = `docs/qa_draft_v12.md` — **155 pytań, 20 sekcji** (2026-04-01)

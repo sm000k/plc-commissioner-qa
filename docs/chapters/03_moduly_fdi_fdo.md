@@ -8,7 +8,7 @@ F-DI (Fail-safe Digital Input) to moduł wejść bezpieczeństwa. Różnice od s
 - Cross-circuit detection — wykrywanie zwarć między kanałami
 - Komunikacja przez PROFIsafe z CRC do F-CPU
 - Self-test kanałów w tle
-Moduły ET200SP F-DI, ET200MP F-DI, ET200eco F-DI, S7-1200 SM 1226 F-DI.
+Moduły ET 200SP F-DI, ET 200MP F-DI, S7-1200 SM 1226 F-DI.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 3.2. Co to jest VS* (pulse testing) i jak wykrywa usterki?  🔴
@@ -17,7 +17,7 @@ VS* to wyjście zasilające na module F-DI które wysyła krótkie impulsy testo
 Moduł analizuje czy impulsy wróciły:
 - Brak impulsów → zerwanie przewodu lub zwarcie do masy
 - Impulsy cały czas bez przerwy → zwarcie do 24V
-To mechanizm cross-circuit detection zapewniający Diagnostics Coverage (DC) bez dodatkowego okablowania. VS* z cross-circuit detection zapewnia DC ≥ 99% (Diagnostic Coverage) — warunek konieczny do osiągnięcia kategorii Cat.4 i Performance Level e (PL e) wymaganego przez SIL 3 per ISO 13849-1.
+To mechanizm cross-circuit detection zapewniający Diagnostics Coverage (DC) bez dodatkowego okablowania. VS* z cross-circuit detection zapewnia DC ≥ 99% (Diagnostic Coverage) — warunek konieczny do osiągnięcia kategorii Cat.4 i Performance Level e (PL e wg ISO 13849-1) lub SIL 3 (wg IEC 62061 / IEC 61508). [ZWERYFIKOWANE — Siemens 39198632, normy ISO 13849-1 i IEC 62061]
 
 ![ET 200 F-DI: cross-circuit, wire break i short-circuit detection](images/safety/01d_safety_brochure_p4.png)
 
@@ -44,8 +44,8 @@ Decyduje inżynier projektu na podstawie analizy bezpieczeństwa — nie Siemens
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 3.6. Co to jest pm switching i pp switching — różnica?  🟡
 
-pm switching (plus-minus): F-DO przełącza linię P (plus, 24V) do aktuatora. Masa (M) jest wspólna. Prostsze okablowanie, niższy koszt.
-pp switching (plus-plus): F-DO przełącza obie linie P+ do aktuatora, bez wspólnej masy. Wyższy poziom bezpieczeństwa — zwarcie jednej linii do masy nie powoduje przypadkowego zadziałania. Używane przy wyższych wymaganiach SIL/PL.
+pm switching (plus-minus): moduł F-PM-E przełącza **obie** linie obciążenia — P (+24V) **i** M (0V). Aktuator podłączony jest między wyjściem P a wyjściem M modułu. Wymaga wydzielonego zasilania obciążenia (Load supply) odizolowanego od zasilania elektroniki. [ZWERYFIKOWANE — Siemens 39198632 Fig. 2-1]
+pp switching (plus-plus): moduł F-PM-E przełącza **dwa kanały po stronie P** (+24V). Linia M (0V) jest wspólnym powrotem obciążenia (common M) — nie jest przełączana przez moduł. [ZWERYFIKOWANE — Siemens 39198632 Fig. 2-2]
 F-PM-E (Power Module) w ET 200SP/S może realizować oba tryby.
 
 **pm-switching — schemat ET 200SP:**

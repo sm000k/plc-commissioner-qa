@@ -15,16 +15,18 @@
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.2. Co to jest F-CPU i jak działa dual-channel processing?  🔴
 
-**Dual-channel processing** to architektura, w której ten sam fragment kodu Safety jest wykonywany przez **dwa niezależne kanały obliczeniowe wewnątrz jednego CPU** (dwa osobne rdzenie lub dwa niezależne tory sprzętowe). Oba kanały przetwarzają identyczne dane wejściowe i produkują wyniki. Na końcu każdego cyklu Safety specjalny komparator porównuje wyniki obu kanałów:
+**Dual-channel processing** to architektura, w której ten sam fragment kodu Safety jest wykonywany przez **dwa niezależne kanały obliczeniowe wewnątrz jednego CPU**. W S7-1500F realizowane programowo (diversified redundant processing w jednym fizycznym procesorze — ten sam program Safety wykonywany dwukrotnie z dywersyfikowanym przetwarzaniem, wyniki porównywane). W starszych generacjach (S7-300F/400F) — sprzętowo (dwa oddzielne procesory). Oba kanały przetwarzają identyczne dane wejściowe i produkują wyniki. Na końcu każdego cyklu Safety specjalny komparator porównuje wyniki obu kanałów:
 - Wyniki zgodne → cykl OK, wyjścia Safety ustawiane normalnie.
 - Wyniki różne (nawet 1 bit) → CPU wykrywa błąd wewnętrzny → **natychmiastowe przejście w bezpieczny stan** (pasywacja wyjść Safety, stop napędów).
 
 **Co to oznacza w praktyce dla komisjonera/integratora:**
 - Nie musisz pisać logiki redundantnej — piszesz jeden program Safety, hardware sam wykonuje go dwukrotnie i sprawdza.
-- Błąd sprzetowy wewnątrz CPU (uszkodzony rejestr, przekłamanie RAM) jest wykrywalny — to jest właśnie cel tej architektury, nie programowej redundancji.
+- Błąd sprzętowy wewnątrz CPU (uszkodzony rejestr, przekłamanie RAM) jest wykrywalny — to jest właśnie cel tej architektury, nie programowej redundancji.
 - Czas cyklu Safety (F_MAIN) jest dłuższy niż OB1, bo CPU wykonuje go dwa razy + porównanie. Typowo 2× czas cyklu standardowego.
 
 **Ciągły self-test:** F-CPU w tle testuje pamięć RAM (CRC bloków), ALU, rejestry procesora. Program Safety działa w oddzielnym chronionym obszarze pamięci — standardowy program OB1 nie może go nadpisać ani odczytać bezpośrednio.
+
+> ⚠️ **DO WERYFIKACJI:** Twierdzenie „F_MAIN wykonywany typowo 2× dłużej niż OB1" jest uproszczeniem. Rzeczywisty czas cyklu Safety zależy od rozmiaru programu F, konfiguracji sprzętu i komunikacji PROFIsafe — nie jest to prosta wielokrotność czasu OB1. Sprawdź w TIA Portal → CPU properties → Cycle time.
 
 *Certyfikacja (informacyjnie):* F-CPU jest certyfikowany dla SIL 3 / PL e — ta informacja pochodzi z karty katalogowej napędu lub CPU; nie musisz jej znać na pamięć, ale warto wiedzieć że to TÜV zatwierdza architekturę, nie sam Siemens.
 
@@ -46,22 +48,22 @@ Ręczna edycja zniszczyłaby spójność podpisu → F-CPU odmówiłoby uruchomi
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.5. Co to jest F-signature i collective signature?  🟡
 
-F-signature to unikalny podpis kryptograficzny jednego bloku Safety — zmienia się przy każdej modyfikacji kodu.
+F-signature to unikalny podpis (suma kontrolna CRC) jednego bloku Safety — zmienia się przy każdej modyfikacji kodu.
 Collective signature (podpis zbiorczy) to podpis CAŁEGO programu Safety złożony ze wszystkich bloków. Widoczny na wyświetlaczu CPU lub w TIA Portal jako ciąg znaków (np. '5CBE6409').
 Przy wgraniu CPU porównuje collective signature — niezgodność → Safety nie uruchamia się.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.6. Jakie są tryby pracy Safety CPU i jak się przełącza?
 
-LOCK — Safety program zablokowany, nie wykonuje się. Wyjścia Safety → wartości zastępcze.
-RUN — Safety program działa normalnie.
-Przełączenie przez TIA Portal (Safety Administration) lub dedykowany sygnał w logice. Po przełączeniu wymagane potwierdzenie (hasło Safety lub ACK). Zmiana trybu jest logowana z datą i użytkownikiem.
+**Safety mode activated** — normalny tryb produktywny, program Safety działa, wyjścia sterowane przez logikę F.
+**Safety mode deactivated** — tryb commissioning/testowy, wejścia/wyjścia F modułów mogą być nadpisywane ręcznie bez ochrony Safety (używany np. podczas uruchamiania do testów okablowania).
+Przełączenie przez TIA Portal (Safety Administration) lub dedykowany sygnał w logice. Po przełączeniu wymagane potwierdzenie (hasło Safety lub ACK). Zmiana trybu jest logowana z datą i użytkownikiem. Uwaga: dezaktywacja trybu Safety jest widoczna w diagnostyce i na wyświetlaczu CPU — nie można jej ukryć.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 2.7. Co to jest STEP 7 Safety Advanced vs Safety Basic?
 
-Safety Basic: licencja dla prostszych aplikacji, S7-1200F i ET 200SP F. Ograniczone funkcje, niższy koszt.
-Safety Advanced: pełna licencja dla S7-1500F, wszystkie funkcje Safety, certyfikowane biblioteki funkcji (muting, two-hand, ESTOP), możliwość symulacji w PLCSIM.
+Safety Basic: licencja wyłącznie dla S7-1200F. Prostsza funkcjonalność, niższy koszt, ograniczone biblioteki Safety.
+Safety Advanced: pełna licencja dla S7-1500F i ET 200SP CPU F, wszystkie funkcje Safety, certyfikowane biblioteki funkcji (muting, two-hand, ESTOP), możliwość symulacji w PLCSIM.
 Obydwie są wtyczką do TIA Portal — nie są osobnym oprogramowaniem.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
@@ -112,7 +114,7 @@ Praktyczne wskazówki:
 
 **Różnica H vs F (Safety):**
 
-| Cecha | S7-1515F | S7-1516H | S7-1518HF |
+| Cecha | S7-1515F | S7-1517H | S7-1518HF |
 |-------|----------|----------|-----------|
 | Safety (F-CPU) | ✅ | ❌ | ✅ |
 | Hot Standby | ❌ | ✅ | ✅ |

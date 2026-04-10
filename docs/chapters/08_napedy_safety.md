@@ -79,15 +79,15 @@ Telegram PROFIdrive określa format wymiany danych między CPU a napędem przez 
 | **20** | STW1/ZSW1 + NSET + prąd/moment + alarmy | Rozszerzony monitoring — Startdrive, diagnostyka prądu |
 | **102** | STW + NSET + enkoder (pozycja + prędkość) | S7-1500 Motion Control (TO_SpeedAxis / TO_PositioningAxis) z enkoderem |
 | **105** | Telegram DSC (Dynamic Servo Control) + enkoder | S7-1500 TO_SynchronousAxis — wymagany IRT i Startdrive |
-| **352** | STW1/ZSW1 + PROFIsafe Safety | SINAMICS G120/S120 z Safety Integrated (STO/SS1/SLS przez PROFIsafe) |
+| **352** ⚠️ DO WERYFIKACJI | STW1/ZSW1 + PROFIsafe Safety | SINAMICS G120/S120 z Safety Integrated (STO/SS1/SLS przez PROFIsafe) — numer telegramu Safety wymaga weryfikacji w dokumentacji SINAMICS |
 
 **Jak dobrać telegram:**
 - Tylko prędkość, bez enkodera, bez Safety → Telegram 1
 - Motion Control S7-1500 z enkoderem → Telegram 102
 - Synchronizacja osi, IRT → Telegram 105
-- Safety (STO/SS1/SLS przez PROFIsafe) → Telegram 352
+- Safety (STO/SS1/SLS przez PROFIsafe) → telegram Safety **dodawany** do telegramu standardowego (np. Telegram 20 + Safety telegram 30 ⚗️ DO WERYFIKACJI numeru w dokumentacji SINAMICS)
 
-**Uwaga praktyczna:** Niezgodność telegramu między `p0922` a konfiguracją TIA Portal → napęd nie komunikuje się lub dane są przesunięte — błędne sterowanie bez alarmu. Zawsze weryfikuj `p0922` online po podłączeniu nowego napędu.
+**Uwaga praktyczna:** Niezgodność telegramu między `p0922` (⚠️ DO WERYFIKACJI w dokumentacji SINAMICS) a konfiguracją TIA Portal → napęd nie komunikuje się lub dane są przesunięte — błędne sterowanie bez alarmu. Zawsze weryfikuj numer telegramu online po podłączeniu nowego napędu.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 8.8. Jakie funkcje bezpieczeństwa są wbudowane w serwowzmacniacz Sinamics V90 i jak należy je podłączyć?

@@ -40,7 +40,7 @@ SICAR (Siemens Automation Platform for CAR Plants) to gotowy framework programis
 
 1. Dodaj napęd G120 do projektu (`CU240E-2 PN` lub `CU250S-2 PN`) — ustaw adres PROFINET i telegram (`p0922`)
 2. Zakładka `Safety Integrated` → włącz PROFIsafe, ustaw `F-Address`
-3. Wybierz funkcje Safety: `STO`, `SS1` (`p9560` = ramp time), `SLS` (`p9531` = max prędkość)
+3. Wybierz funkcje Safety: `STO`, `SS1` (`p9560` = ramp time ⚠️ DO WERYFIKACJI w SINAMICS G120 Safety Function Manual), `SLS` (`p9531` = max prędkość ⚠️ DO WERYFIKACJI)
 4. Autotuning: Static motor identification → Speed controller optimization
 5. Weryfikacja Safety: test STO → accept safety settings → Safety checksum/Safety ID
 

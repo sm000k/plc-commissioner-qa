@@ -45,7 +45,7 @@ Parametr `substitute value` w TIA Portal (właściwości kanału F-DO) określa 
 ### 6.4. Czym różni się STO jako Safe State napędu SINAMICS od zatrzymania programowego (OFF1/OFF2)? 🔴
 STO (Safe Torque Off) jako Safe State napędu oznacza zablokowanie impulsów bramkowania tranzystorów — napęd nie może generować momentu obrotowego, nawet przy zasilaniu energetycznym. Zatrzymanie OFF1/OFF2 to kontrolowane wyhamowanie przez falownik z możliwością ponownego załączenia bez potwierdzenia.
 - STO: brak momentu → wolne wybieganie jeśli nie ma hamulca mechanicznego (niebezpieczne na siłowniku pionowym!)
-- OFF1: hamowanie po rampie (p1121), potem wyłączenie impulsów — napęd można ponownie uruchomić sygnałem ON
+- OFF1: hamowanie po rampie (p1121 ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS), potem wyłączenie impulsów — napęd można ponownie uruchomić sygnałem ON
 - OFF2: natychmiastowe wyłączenie impulsów (jak STO, ale sterowane programem, nie Safety)
 - Safe State = STO → w konfiguracji F-DO parametr „substitute value" = 0 dla wyjścia STO
 - Dla osi pionowych (roboty, podnośniki): jako Safe State użyj SS1 (Stop + STO po rampie) lub SBC
@@ -56,7 +56,7 @@ Substitute value to wartość logiczna wyjścia F-DO nadawana automatycznie podc
 - Domyślnie: 0 (false) dla wszystkich kanałów — to zazwyczaj poprawne
 - Zawór bezpieczeństwa (NC — normalnie zamknięty): substitute value = 0 → zawór zamknięty ✓
 - Siłownik pneumatyczny: zależy od logiki bezpiecznej pozycji — z reguły 0 = bezpieczna
-- Napęd STO: substitute value = 0 → sygnał STO_active = false = brak momentu ✓
+- Napęd STO: substitute value = 0 → F-DO = 0 → STO_enable usunięty → STO aktywne (brak momentu) ✓
 - WYJĄTEK: zawór NO (normalnie otwarty) — substitute value = 0 → zawór OTWARTY (niespójne z intencją)
 - Ważna zasada: Zawsze weryfikuj że substitute value 0 odpowiada fizycznie bezpiecznemu stanowi urządzenia
 

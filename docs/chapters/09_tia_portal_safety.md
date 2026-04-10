@@ -6,7 +6,7 @@ Program Safety w TIA Portal składa się z:
 - F-OB (Safety Main OB, np. Main_Safety_RTG1) — główny cykl Safety, odpowiednik OB1 dla Safety
 - F-FB / F-FC — bloki logiki Safety programowane w F-LAD lub F-FBD
 - F-DB — instancje bloków, generowane automatycznie przez TIA Portal
-Kompilacja Safety generuje CRC dla każdego bloku i collective signature dla całości. Program Safety jest logicznie oddzielony od standardowego OB1.
+Kompilacja Safety generuje F-signature dla każdego bloku i collective signature dla całości. Program Safety jest logicznie oddzielony od standardowego OB1.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 9.2. Jak przekazujesz sygnał z obszaru F do standardowego OB?
@@ -37,7 +37,7 @@ Alternatywnie: Watch Table z zmiennymi F-DB modułu (DIAG, PASS_OUT, ACK_REQ, QB
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 9.6. Co to jest PLCSIM i jak pomaga w Safety?
 
-PLCSIM to symulator TIA Portal umożliwiający testowanie programu PLC bez fizycznego sprzętu. Obsługuje również programy Safety — możesz symulować działanie F-CPU, testować logikę Safety, weryfikować ACK, passivation, reintegration.
+PLCSIM Advanced to symulator TIA Portal umożliwiający testowanie programu PLC bez fizycznego sprzętu. Pełna symulacja programów Safety (F-CPU, logika F, PROFIsafe) wymaga **PLCSIM Advanced** — podstawowy PLCSIM ma ograniczone wsparcie Safety. W PLCSIM Advanced możesz symulować działanie F-CPU, testować logikę Safety, weryfikować ACK, passivation, reintegration.
 Oszczędza czas commissioning bo błędy logiczne wyłapujesz przed wyjazdem do klienta. Nie zastępuje testów na prawdziwym sprzęcie dla certyfikacji — ale znacznie skraca czas FAT.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*

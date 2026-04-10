@@ -149,7 +149,8 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 
 **3. Identyfikacja silnika (Motor Data Identification):**
 - `p1910 = 1` → napęd wykonuje pomiar rezystancji uzwojeń przy zatrzymanym silniku
-- `p1960 = 1` → identyfikacja przy obracającym się silniku (Speed Controller Optimization)
+- `p1910 = 3` → identyfikacja silnika przy obracającym się wale (Rotating Motor Identification)
+- `p1960 = 1` → optymalizacja regulatora prędkości (Speed Controller Optimization) — odrębny proces od identyfikacji silnika
 - Wyniki zapisywane automatycznie do parametrów regulatora
 
 **4. Telegram PROFINET i PZD:**

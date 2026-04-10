@@ -9,7 +9,7 @@ XooY = **X z Y**: ile (X) z dostępnych (Y) kanałów musi zadziałać aby syste
 |-------------|-----------|-----------|---------------|---------------------|
 | **1oo1** | 1 czujnik — wystarczy | Wysoka | Podstawowe | SIL1, proste maszyny |
 | **1oo2** | 2 czujniki — wystarczy JEDEN | Niska (fałszywe stopy) | Wysokie | E-stopy, osłony — SIL2/3 |
-| **2oo2** | 2 czujniki — wymagane OBA | Wysoka | Niższe (cichy błąd!) | Procesy ciągłe, kosztowne stoopy |
+| **2oo2** | 2 czujniki — wymagane OBA | Wysoka | Niższe (cichy błąd!) | Procesy ciągłe, kosztowne stopy |
 | **2oo3** | 3 czujniki — wymagane 2 z 3 | Balans | Balans | Przemysł procesowy, ciśnienie/temp. |
 
 > ⚠️ **2oo2 pułapka:** uszkodzenie jednego czujnika (sygnalizuje ciągle OK) → system może nie zadziałać gdy potrzeba. Wymagany monitoring DC!
@@ -70,7 +70,7 @@ Discrepancy time (czas rozbieżności) to maksymalny czas, przez jaki oba kanał
 - Przekroczenie → F-DI przechodzi w stan pasywny (passivation), wyjście F-DO = substitute value
 - Typowa przyczyna: mechaniczne opóźnienie styku bezpieczeństwa lub błąd okablowania
 - Konfiguracja: właściwości modułu F-DI → zakładka „Input" → „Discrepancy time [ms]"
-- W diagnostyce: alarm „1001: Discrepancy error channel 1/2" w F_LADDR.DIAG
+- W diagnostyce: alarm rozbieżności widoczny w buforze diagnostycznym CPU (F_LADDR.DIAG) ⚠️ DO WERYFIKACJI: konkretny numer kodu alarmu — sprawdź w SIMATIC Safety System Manual lub buforze diagnostycznym TIA Portal online
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2? 🟡
@@ -79,6 +79,6 @@ Detekcja cross-circuit (zwarcia między kanałami) to mechanizm pozwalający wyk
 - Wejścia odczytują sygnał z powrotem przez czujnik
 - Zwarcie między kanałami = impuls T1 pojawia się na wejściu kanału 2 → błąd cross-circuit
 - Wymaga okablowania z wyjść testowych (T1, T2) przez czujnik do wejść (DI0.0, DI0.1)
-- Nie działa przy PM-switching bez wyjść testowych (wtedy cross-circuit wykrywany ograniczenie)
+- Nie działa przy PM-switching bez wyjść testowych (wtedy detekcja cross-circuit jest ograniczona)
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*

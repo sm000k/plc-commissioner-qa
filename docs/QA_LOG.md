@@ -4,7 +4,52 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v12 — 2026-04-01 (aktualizacja v12.1) ✅ AKTYWNA WERSJA
+## qa_draft_v12 — 2026-04-01 (aktualizacja v12.2) ✅ AKTYWNA WERSJA
+
+### Quality pass v12.2 — pełny przegląd merytoryczny (2026-04-10)
+
+**Błędy merytoryczne naprawione (krytyczne):**
+- §1.3: OB100 „zimny start" → „Startup OB" (prawidłowa terminologia S7-1200/1500)
+- §1.3: OB121 vs OB122 — rozróżniono Programming Error vs I/O Access Error
+- §1.7: Rozbudowano z 3 zdań do pełnej odpowiedzi z bullet list, skalowaniem NORM_X/SCALE_X, zakresem 0–27648
+- §1.9: Dodano S7-300, S7-400, ET 200SP CPU — krytyczny brak na rozmowie kwalifikacyjnej
+- §1.11: CPU 1217C: 4AI → 2AI/2AO (potwierdzone: 6ES7217-1AG40-0XB0 = 14DI/10DQ/2AI/2AQ)
+- §2.2: Dual-channel processing — nie sprzętowe rdzenie w S7-1500F, lecz diversified redundant processing programowe
+- §2.6: Tryby LOCK/RUN → Safety mode activated/deactivated (prawidłowa terminologia Siemens)
+- §2.7: Safety Basic wyłącznie dla S7-1200F (nie ET 200SP F)
+- §2.9: CPU S7-1516H nie istnieje → S7-1517H
+- §3.1: ET200eco F-DI nie istnieje — usunięto
+- §7.1: Struktura pakietu PROFIsafe — VCN i F-Address wewnątrz CRC, nie osobne pola; dodano Status/Control byte
+- §11.8: p1960 ≠ Motor ID → p1910=3 (Rotating Motor ID), p1960=1 (Speed Controller Optimization)
+- §16.4: F30001 = Overcurrent (nie Ground fault)
+- §16.5: VVC+ to Danfoss → Vector (sensorless / closed-loop)
+- §16.14: V90 + 1FL6 (nie 1FK7); 1FK7 używa DRIVE-CLiQ z S120/S210
+- §17.4: F30001=overcurrent, F30002=overvoltage (nie overcurrent), F30004=overtemperature (nie overspeed)
+
+**Terminologia/precyzja:**
+- §1.6: SCL Safety → potwierdzone od TIA Portal V19
+- §1.10: Retentive — uściślono mechanizm (Flash/Memory Card, nie „podtrzymywanie")
+- §1.13: WinCC tagi — poprawiono zakresy (Basic 256, Comfort 2048, V7.x zależy od licencji)
+- §2.5: „podpis kryptograficzny" → „suma kontrolna CRC"
+- §5.2/5.3/5.4: ACK_NEC vs ACK_REI — rozróżniono konteksty (F-FB vs F-I/O reintegracja)
+- §6.5: Logika STO — poprawiono opis (F-DO=0 → STO_enable usunięty → STO aktywne)
+- §8.7: Telegram Safety jako addon do telegramu standardowego (nie alternatywa)
+- §9.6: PLCSIM Advanced wymagany dla pełnej symulacji Safety
+- §13.4: CCF punktacja — usunięto konkretne wartości, dodano ⚠️ DO WERYFIKACJI
+- §14.2: IRT — większość modeli S7-1500 (nie tylko T/F-CPU)
+- §14.8: TSN — te same telegramy aplikacji, zmiana na warstwie transportowej
+
+**Literówki/gramatyka:**
+- §2.2: „sprzetowy" → „sprzętowy"
+- §4.1: „kosztowne stoopy" → „kosztowne stopy"
+- §4.8: „wykrywany ograniczenie" → „detekcja jest ograniczona"
+- §10.3: PROFIsafe/PROFINET → PROFINET (dane standardowe)
+- §13.3: „Połaczenie" → „Połączenie"
+- §16.9: „toważne" → „to ważne"
+- §19.3: p61001 → p0918–p0924 ⚠️ DO WERYFIKACJI
+
+**Drobniejsze:**
+- §16.2: r0047 oznaczono ⚠️ DO WERYFIKACJI
 
 ### Quality pass v12.1 — przegląd jakości/skrócenie (2026-06-17)
 

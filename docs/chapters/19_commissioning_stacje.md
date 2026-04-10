@@ -77,7 +77,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 **Faza 1 — Przygotowanie sprzętowe:**
 1. Sprawdź CU (musi obsługiwać PROFINET: CU240E-2 PN lub CU250S-2 PN) i Power Module (PM)
-2. IP można przypisać przez TIA Portal (auto-assign), BOP2 (`p61001`) lub Startdrive
+2. IP można przypisać przez TIA Portal (auto-assign), BOP2 (parametry PROFINET `p0918`–`p0924` ⚗️ DO WERYFIKACJI) lub Startdrive
 3. Sprawdź firmware: `r0018` na BOP2 — zapisz wersję dla kompatybilności z TIA Portal
 
 **Faza 2 — Konfiguracja w Startdrive (TIA Portal):**

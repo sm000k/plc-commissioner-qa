@@ -43,7 +43,7 @@
 
 > ⚠️ **NIE podłączaj** zasilania `VS*` (pulse test) modułu F-DI do OSSD — kurtyna sama generuje własne impulsy testowe. W TIA Portal ustaw parametr `Sensor supply` tego kanału na `None` / `Disabled` — inaczej impulsy F-DI **zablokują sygnał** z kurtyny.
 
-`Discrepancy time`: dopasuj do specyfikacji kurtyny (zazwyczaj 10–30 ms).
+`Discrepancy time`: dopasuj do specyfikacji kurtyny (zazwyczaj 10–30 ms ⚠️ DO WERYFIKACJI — sprawdź w karcie katalogowej konkretnej kurtyny).
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 15.4. Jakie jest zastosowanie wyjść tranzystorowych z czujników bezpieczeństwa w systemach PLC Safety?
