@@ -74,7 +74,7 @@ try {
     $runAudit = $true
     if (Test-Path $auditStamp) {
         $lastRun = (Get-Item $auditStamp).LastWriteTime
-        if (((Get-Date) - $lastRun).TotalDays -lt 3) { $runAudit = $false }
+        if (((Get-Date) - $lastRun).TotalHours -lt 3) { $runAudit = $false }
     }
     if ($runAudit -and (Test-Path $auditScript)) {
         Write-Host "`n[audit] Sprawdzanie higieny projektu..." -ForegroundColor DarkGray
