@@ -892,21 +892,35 @@ Minimalna sieć Hot Standby wymaga **6 komponentów** — dwa CPU, dwa połącze
 ### 3.1. Co to jest F-DI i jak różni się od standardowego DI?  🔴
 
 F-DI (Fail-safe Digital Input) to moduł wejść bezpieczeństwa. Różnice od standardowego:
-- VS* (pulse testing) — impulsowe zasilanie do diagnostyki okablowania
+- **VS* (pulse testing)** — impulsowe zasilanie czujnika do diagnostyki okablowania. Wykrywa 3 typy usterek:
+  - **Zwarcie do L+ (24 V)** — przewód sygnałowy dotknął zasilania → moduł widzi stały sygnał wysoki bez pulsacji VS*
+  - **Zwarcie do M (0 V / masa)** — przewód sygnałowy dotknął masy → moduł widzi stały sygnał niski, brak impulsów zwrotnych
+  - **Przerwa przewodu (wire break)** — brak jakiegokolwiek sygnału zwrotnego
+- **Cross-circuit detection** — wykrywanie **zwarcia między dwoma kanałami** czujnika 1oo2 (np. przygnieciony kabel wielożyłowy → izolacja przebita, kanał A i B połączone elektrycznie). Bez tej detekcji zwarcie międzykanałowe zamaskuje awarię jednego styku E-Stop → obwód 2-kanałowy zdegradowany do 1-kanałowego, a system tego nie zauważy. [ZWERYFIKOWANE — Siemens 21064024: „short-circuits or cross-circuits are detected between the two input channels"]
 - Obsługa dwukanałowych czujników Safety (1oo2) z discrepancy time
-- Cross-circuit detection — wykrywanie zwarć między kanałami
 - Komunikacja przez PROFIsafe z CRC do F-CPU
-- Self-test kanałów w tle
-Moduły ET 200SP F-DI, ET 200MP F-DI, S7-1200 SM 1226 F-DI.
+- Self-test kanałów w tle (ciągły autotest hardware bez przerywania cyklu)
+Moduły: ET 200SP F-DI, ET 200MP F-DI, S7-1200 SM 1226 F-DI.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
 ### 3.2. Co to jest VS* (pulse testing) i jak wykrywa usterki?  🔴
 
-VS* to wyjście zasilające na module F-DI które wysyła krótkie impulsy testowe zamiast stałego napięcia. Czujnik zasilany jest tymi impulsami, a sygnał wraca na wejście razem z impulsami.
-Moduł analizuje czy impulsy wróciły:
-- Brak impulsów → zerwanie przewodu lub zwarcie do masy
-- Impulsy cały czas bez przerwy → zwarcie do 24V
-To mechanizm cross-circuit detection zapewniający Diagnostics Coverage (DC) bez dodatkowego okablowania. VS* z cross-circuit detection zapewnia DC ≥ 99% (Diagnostic Coverage) — warunek konieczny do osiągnięcia kategorii Cat.4 i Performance Level e (PL e wg ISO 13849-1) lub SIL 3 (wg IEC 62061 / IEC 61508). [ZWERYFIKOWANE — Siemens 39198632, normy ISO 13849-1 i IEC 62061]
+VS* (Versorgung Sensor / Sensor Supply) to wyjście zasilające na module F-DI, które wysyła **krótkie impulsy testowe** zamiast stałego 24 V. Czujnik zasilany jest tymi impulsami, a sygnał wraca na wejście z tą samą charakterystyką pulsacji.
+
+**Moduł analizuje wzorzec impulsów i rozróżnia 4 stany usterek:**
+
+| Usterka | Co widzi moduł | Mechanizm |
+|---------|----------------|-----------|
+| **Przerwa przewodu (wire break)** | Brak jakiegokolwiek sygnału zwrotnego | Obwód otwarty → impulsy nie wracają |
+| **Zwarcie do M (0 V / masa)** | Stały sygnał niski (0 V) | Przewód ściągnięty do masy → impulsy zanikają |
+| **Zwarcie do L+ (24 V)** | Stały sygnał wysoki bez pulsacji | Przewód podciągnięty do zasilania → brak przerw między impulsami |
+| **Cross-circuit (zwarcie międzykanałowe)** | Oba kanały mają identyczny wzorzec mimo różnych faz VS* | Kanał A i B spięte elektrycznie → utrata niezależności kanałów 1oo2 |
+
+**Jak działa cross-circuit detection:** Moduł F-DI zasila kanał A i kanał B czujnika 1oo2 impulsami VS* **z przesunięciem fazowym** (nie jednocześnie). Jeśli kanały są niezależne — odpowiedzi wracają z różnymi fazami. Jeśli przewody A i B są spięte (np. kabel przygnieciony → izolacja przebita) — obie odpowiedzi będą identyczne → moduł wykrywa cross-circuit. [ZWERYFIKOWANE — Siemens 21064024: „short-circuits or cross-circuits are detected between the two input channels (sensor circuits)"]
+
+VS* z cross-circuit detection zapewnia DC ≥ 99% (Diagnostic Coverage) — warunek konieczny do Cat.4 / PL e (ISO 13849-1) lub SIL 3 (IEC 62061 / IEC 61508). [ZWERYFIKOWANE — Siemens 39198632, normy ISO 13849-1 i IEC 62061]
+
+**Konfiguracja w TIA Portal:** Właściwości modułu F-DI → Short-circuit test → Activate (osobno per sensor supply 0 i 2). Domyślnie wyłączone — trzeba aktywować! [ZWERYFIKOWANE — Siemens 21064024, str. 12]
 
 ![ET 200 F-DI: cross-circuit, wire break i short-circuit detection](images/safety/01d_safety_brochure_p4.png)
 
