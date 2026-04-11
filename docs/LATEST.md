@@ -1,4 +1,4 @@
-﻿# KOMPENDIUM Q&A — v12.3
+﻿# KOMPENDIUM Q&A — v12.4
 
 ### PLC Programmer / Commissioner / Automatyk
 
@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.3 | Data: 2026-04-10 17:45 | Pytania: 155
+### Wersja: v12.4 | Data: 2026-04-11 13:11 | Pytania: 159
 
 ---
 
@@ -235,12 +235,16 @@
 - [21.4. Jak działa sterowanie sekwencyjne (Sequence Control) w SICAR?](#214-jak-działa-sterowanie-sekwencyjne-sequence-control-w-sicar--)
 - [21.5. Co to są Tec Units w SICAR i jak ich używasz?](#215-co-to-są-tec-units-w-sicar-i-jak-ich-używasz--)
 - [21.6. Jak działa synchronizacja i diagnostyka w SICAR DiagAddOn?](#216-jak-działa-synchronizacja-i-diagnostyka-w-sicar-diagaddon--)
+- [21.7. Czym różni się ilockExtSync od ilockExtInt i jak działa synchronizacja zewnętrzna między sekwencjami?](#217-czym-różni-się-ilockextsync-od-ilockextint-i-jak-działa-synchronizacja-zewnętrzna-między-sekwencjami--)
+- [21.8. Jak działają rozgałęzienia (branching) i funkcja Stop/Hold w sekwencjach SICAR?](#218-jak-działają-rozgałęzienia-branching-i-funkcja-stophold-w-sekwencjach-sicar--)
+- [21.9. Co to jest DB1000 (UiDiagAddOn_DB) i jak wykorzystujesz go w programowaniu?](#219-co-to-jest-db1000-uidiagaddon_db-i-jak-wykorzystujesz-go-w-programowaniu--)
+- [21.10. Jak działają ekrany ruchów (Movement Screens) i blokada ruchów (Lock Movements) w SICAR?](#2110-jak-działają-ekrany-ruchów-movement-screens-i-blokada-ruchów-lock-movements-w-sicar--)
 
 ---
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **155 pytań / 21 sekcji.**
+> **159 pytań / 21 sekcji.**
 
 
 ---
@@ -3254,3 +3258,163 @@ Sterowanie sekwencyjne to serce SICAR — blok **FB1000** zarządza do 255 sekwe
 > 💡 Na rozmowie: „Największa wartość DiagAddOn to diagnostyka — maintenance widzi online na HMI, który dokładnie warunek w którym kroku blokuje sekwencję. Nie muszą otwierać TIA Portal."
 
 *[ZWERYFIKOWANE] — źródło: 10_Introduction sekcja 1.2.2 DiagAddOn for PLC, 34_1 Sequence- and messageblocks sekcja Watchdog/Synchronization*
+
+### 21.7. Czym różni się ilockExtSync od ilockExtInt i jak działa synchronizacja zewnętrzna między sekwencjami?  🔴
+
+W SICAR każdy krok sekwencji oprócz `ilockAuto` dysponuje dwoma dodatkowymi warunkami: **ilockExtSync** i **ilockExtInt** — oba zatrzymują watchdog gdy = 0, ale różnią się udziałem w synchronizacji.
+
+**ilockExtSync — zewnętrzny warunek synchronizacji:**
+- **Uczestniczy w synchronizacji** (Participation in synchronization = Yes) — to kluczowa różnica
+- Służy do synchronizacji **między sekwencjami** (np. robot czeka na fixture, fixture czeka na robota)
+- Gdy `ilockExtSync = 0` → watchdog jest zatrzymany (nie generuje alarmu)
+- Preset = 1 (jeśli nieprogramowany → nie blokuje)
+- Programujesz sygnały z **innych sekwencji** — typowo wyniki FC975/FC976
+
+**ilockExtInt — zewnętrzny warunek procesu:**
+- **NIE uczestniczy w synchronizacji** (Participation in synchronization = No)
+- Służy do warunków **procesowych zewnętrznych** (pozycje narzędzi, sygnały z urządzeń peryferyjnych)
+- Również zatrzymuje watchdog gdy = 0
+- Sygnały powinny być programowane w innym module z własną diagnostyką
+
+**Bloki pomocnicze do synchronizacji:**
+- **FC975 (SeqCheckStep_FC)** — sprawdza czy podany krok jest aktywny (Auto/Inching) lub zsynchronizowany (tryb Off, dokładnie jeden krok zsynchronizowany) → zwraca `extSync`
+- **FC976 (CheckIlock_FC)** — sprawdza czy `ilockAuto` kroku PERM **i** `ilockAuto` wybranego kroku selektywnego oba = 1 → zwraca `extSync`
+- Oba bloki **muszą być wywołane PO FC998** w sekwencji
+
+**Typowy scenariusz na linii spawalniczej:**
+1. Sekwencja robota (FB1020) w kroku S005 czeka na fixture
+2. W sekwencji fixture (FB1004) wywołujesz FC975 z parametrem „step = 8" → sprawdza czy krok 8 fixture jest aktywny
+3. Wynik `extSync` podajesz do `ilockExtSync` w kroku S005 robota
+4. Robot rusza dopiero gdy fixture jest w pozycji (krok 8 aktywny)
+
+> 💡 Na rozmowie: „extSync używam do koordynacji robot-fixture — robot nie ruszy dopóki fixture nie potwierdzi pozycji. extInt używam do sygnałów procesowych jak czujniki narzędzi."
+
+*[ZWERYFIKOWANE] — źródło: 34_1 Sequence- and messageblocks, Edition 2022-06, sekcje 2.3.9–2.3.10, strony 15–18*
+
+### 21.8. Jak działają rozgałęzienia (branching) i funkcja Stop/Hold w sekwencjach SICAR?  🔴
+
+**Branching — #sequence.stepNplus1:**
+Pozwala na **warunkowe rozgałęzienie** sekwencji liniowej — zamiast przejścia do kolejnego kroku, FB1000 przeskakuje do wskazanego numeru kroku.
+
+**Mechanizm:**
+1. W aktualnym kroku sprawdzasz warunek (np. typ karoserii)
+2. Jeśli warunek spełniony → ładujesz numer docelowego kroku do `#sequence.stepNplus1`
+3. Przy następnym `transAuto = 1` → FB1000 przechodzi do kroku z `stepNplus1` zamiast do kolejnego liniowo
+4. Wartość `stepNplus1` jest ładowana **niezależnie** od stanu `transAuto` — ważne, by sprawdzać warunek rozgałęzienia **tylko gdy transAuto jest spełniony**
+
+**Przykład (STL):**
+```
+S002:
+  AN  #sequence.transAuto     // sprawdź tylko gdy trans spełniony
+  JC  E006
+  AN  M 600.2                 // warunek: typ karoserii
+  JC  E006
+  L   5                       // skok do kroku 5
+  T   #sequence.stepNplus1
+E006: BEU
+```
+Jeśli `M600.2 = 1` → następny krok = 5 (pomija 3 i 4). Jeśli `M600.2 = 0` → normalnie krok 3.
+
+**Stop/Hold — #sequence.stopInStepN:**
+Kontroluje zachowanie sekwencji po naciśnięciu przycisku „Stop" na HMI w trybie Auto.
+
+**Wartości programowalne:**
+- `255` (domyślna) — bieżący krok zostaje dokończony, potem sekwencja przechodzi do trybu Off
+- `0` — **natychmiastowe zatrzymanie** sekwencji (przerwanie kroku)
+- `1–228` — sekwencja kontynuuje do podanego kroku, dopiero tam się zatrzymuje
+
+**Sygnały statusu w I-DB sekwencji:**
+- `#sequence.OM_SB_Hold_request` — Stop (Hold) został aktywowany
+- `#sequence.OM_SB_Hold_Pos_reached` — pozycja Stop (Hold) została osiągnięta
+
+**holdPosExternReached:**
+- Dodatkowy sygnał potwierdzenia — jeśli `holdPosExternReached = 0`, aktywny krok zostanie dokończony **niezależnie** od `stopInStepN = 0` czy `twdRun = 0`
+- Preset = 1 (jeśli nieprogramowany → nie wpływa na zachowanie)
+
+**Wartość domyślną** `stopInStepN` (255) można zmienić globalnie w FC980, Network 3, parametr `Hold_Init_Value`.
+
+> 💡 Na commissioning: „Dla robotów programuję stopInStepN = 255 (dokończ ruch), dla prostych siłowników zostawiam 0 (zatrzymaj natychmiast). Na linii z wieloma stacjami — programuję warunkowe stopInStepN per krok, żeby robot dojechał do bezpiecznej pozycji."
+
+*[ZWERYFIKOWANE] — źródło: 34_1 Sequence- and messageblocks, Edition 2022-06, sekcje 2.3.11–2.3.12, strony 30–33*
+
+### 21.9. Co to jest DB1000 (UiDiagAddOn_DB) i jak wykorzystujesz go w programowaniu?  🔴
+
+**DB1000 (UiDiagAddOn_DB)** to centralny blok danych stanowiący **interfejs między oprogramowaniem użytkownika a oprogramowaniem DiagAddOn**. Wszystkie informacje potrzebne do sterowania z poziomu kodu użytkownika są dostępne w DB1000.
+
+**Struktura DB1000 — główne sekcje:**
+
+**1. OM_Seq[1..255] — status per sekwencja (1 bajt na sekwencję):**
+- `.0` = Automatic (sekwencja w trybie Auto)
+- `.1` = Inching (tryb krokowy)
+- `.2` = Manual (tryb ręczny)
+- `.3` = Inching_Step_plus1 / Hold in Step 1
+- `.4` = Start (sekwencja wystartowana)
+- `.5` = Acknowledge (restart watchdog)
+- `.6` = Clock (sygnał zegarowy)
+- `.7` = Synchronize (sekwencja zsynchronizowana)
+
+**2. Common — sygnały ogólne:**
+- Informacja czy istnieje aktywny komunikat błędu lub błąd sekwencji
+- Typowe zastosowanie: sterowanie lampą błędu na kolumnie sygnalizacyjnej
+
+**3. OPMode[1..8] — status per obszar trybów pracy:**
+- Informacje o aktywnym trybie, warunkach startowych, alarmach per area
+- Przykład: sterowanie syreną przy aktywacji Auto w danym area
+
+**4. Lock Movements — blokada ekranów ruchów:**
+- `Panel[x].movButtonActive` — na HMI x naciśnięto przycisk ruchu
+- `Panel[x].activeMovScreen` — który ekran ruchów jest otwarty (1–64)
+- `Panel[x].lockMovScreens` — zablokuj WSZYSTKIE ekrany ruchów na HMI x
+- `Panel[x].OPMode[y].lockMovements` — zablokuj ruchy w danym OPMode area na HMI x
+
+**5. Reset — przycisk resetowania per HMI:**
+- Od wersji V14.4.0 dostępny przycisk „Reset" w nagłówku DiagAddOn
+- Sygnał per HMI + sygnał zbiorczy wszystkich aktywnych HMI
+- Przypisanie w FC1983
+
+**Typowe zastosowania programistyczne:**
+- Wymuszenie trybu Auto dla wybranej sekwencji niezależnie od OPMode area → nadpisz bity `OM_Seq[x]` w DB1000 **przed** wywołaniem FC998
+- Sterowanie lampami/syrenami na podstawie stanu trybów z `OPMode[x]`
+- Blokada ruchów przy pracy wielopanelowej (use case: ruch na HMI1 → blokada HMI2)
+- Nawigacja między ekranami WinCC a DiagAddOn przez FC978 (Screenselect)
+
+> 💡 Na rozmowie: „DB1000 to mój główny punkt dostępu do stanu linii — stamtąd odczytuję tryby sekwencji, steruje blokadami ruchów między panelami i nadpisuję tryby dla sekwencji systemowych jak RFID."
+
+*[ZWERYFIKOWANE] — źródło: 40_User_Guideline SICAR@TIA DiagAddOn, Edition 2022-04, sekcja 4 User interface*
+
+### 21.10. Jak działają ekrany ruchów (Movement Screens) i blokada ruchów (Lock Movements) w SICAR?  🟡
+
+**Movement Screens** to ekrany HMI w DiagAddOn umożliwiające **ręczne sterowanie ruchami** maszyny w trybie Manual. Każda sekwencja/krok może mieć przypisany ruch na dedykowanym ekranie. System obsługuje do **64 ekranów ruchów** per HMI.
+
+**Parametryzacja ekranu ruchu (w narzędziu DiagGen):**
+- **Tekst ruchu** (movement text) — najważniejszy parametr; usunięcie tekstu kasuje cały wiersz ruchu
+- **Aktywna indykacja** — operand sygnalizujący wykonywanie ruchu (np. wyjście zaworu)
+- **Indykacja pozycji granicznej** — do 8 operandów feedback (np. czujniki krańcowe)
+- **Kaskada i krok** — powiązanie z `#sequence.motionButton` (ruch aktywuje konkretny krok sekwencji)
+- **Wartość pozycji** — parametryzacja DB i DBD dla wyświetlania pozycji (format: `DBx.DBDy`)
+- Jeśli nie podano operandów indykacji → system generuje je automatycznie z `limitManual` i `ilockManual`
+
+**motionButton — klucz ruchu:**
+- Zmienna `#sequence.motionButton` = 1 gdy operator naciśnie przycisk ruchu na ekranie HMI
+- Ustawiana **osobno per sekwencję** — ruch na jednym ekranie nie wpływa na inne sekwencje
+- **Zawsze programowana jako pierwszy warunek** w `ilockManual`: `A #sequence.motionButton`
+- Przejście z Manual do Auto możliwe natychmiast przez synchronizację (bez resetowania)
+
+**Lock Movements — blokada przy wielu panelach HMI:**
+Gdy na linii pracuje kilka paneli HMI jednocześnie, **ruch na jednym panelu musi blokować pozostałe** — to wymóg bezpieczeństwa.
+
+**Sygnały w DB1000 per HMI (Panel[x]):**
+- `movButtonActive` — czy przycisk ruchu jest naciśnięty na dowolnym ekranie HMI x
+- `activeMovScreen` — numer otwartego ekranu ruchów (1–64)
+- `lockMovScreens` — zablokuj WSZYSTKIE ekrany ruchów na HMI x
+- `OPMode[y].lockMovements` — zablokuj ruchy tylko w wybranym OPMode area na HMI x
+
+**Typowe use case'y blokady:**
+1. **Wzajemna blokada paneli** — ruch na HMI1 → `lockMovScreens` na HMI2 (i odwrotnie)
+2. **Blokada wybranych ekranów** — zablokuj ekrany 2+3 na HMI2 jeśli są otwarte na HMI2
+3. **Blokada per OPMode area** — HMI2 może sterować tylko area 2, area 1 zablokowany (linia z HMI1=area 1+2, HMI2=area 2)
+4. **Nawigacja z WinCC** — FC978 (Screenselect DiagAddOn) pozwala przejść z dowolnego ekranu WinCC bezpośrednio do konkretnego ekranu ruchu w DiagAddOn
+
+> 💡 Na commissioning: „Przy uruchamianiu linii z dwoma panelami — najpierw konfiguruję Lock Movements w DB1000, żeby operatorzy na dwóch HMI nie mogli jednocześnie ruszać tym samym urządzeniem. To kwestia bezpieczeństwa."
+
+*[ZWERYFIKOWANE] — źródło: 40_User_Guideline SICAR@TIA DiagAddOn, Edition 2022-04, sekcje 2.2.1 Configuration of movements, 4.4 Lock Movements, 5 External Screen select*

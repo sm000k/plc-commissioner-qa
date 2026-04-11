@@ -4,7 +4,17 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
-## qa_draft_v12 — 2026-04-01 (aktualizacja v12.3) ✅ AKTYWNA WERSJA
+## qa_draft_v12 — 2026-04-01 (aktualizacja v12.4) ✅ AKTYWNA WERSJA
+
+### v12.4 — Rozszerzenie rozdziału 21: SICAR zaawansowane (2026-04-11)
+
+**Nowe pytania (4):**
+- §21.7: ilockExtSync vs ilockExtInt — różnice, FC975/FC976, synchronizacja między sekwencjami robot-fixture
+- §21.8: Branching (stepNplus1) + Stop/Hold (stopInStepN) — rozgałęzienia sekwencji, wartości 0/255/N, holdPosExternReached
+- §21.9: DB1000 (UiDiagAddOn_DB) — struktura: OM_Seq, Common, OPMode, Lock Movements, Reset; interfejs user↔DiagAddOn
+- §21.10: Movement Screens + Lock Movements — parametryzacja ekranów, motionButton, blokada wielopanelowa, FC978 Screenselect
+
+**Źródła:** 34_1 Sequence- and messageblocks.pdf (Edition 2022-06, sekcje 2.3.9–2.3.12), 40_User_Guideline.pdf (Edition 2022-04, sekcje 2.2.1, 4, 5)
 
 ### v12.3 — Nowy rozdział 21: SICAR@TIA (2026-04-10)
 

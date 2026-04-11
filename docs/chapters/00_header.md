@@ -1,4 +1,4 @@
-﻿# KOMPENDIUM Q&A — v12.3
+﻿# KOMPENDIUM Q&A — v12.4
 
 ### PLC Programmer / Commissioner / Automatyk
 
@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.3 | Data: 2026-04-10 17:45 | Pytania: 155
+### Wersja: v12.4 | Data: 2026-04-11 13:11 | Pytania: 159
 
 ---
 
@@ -235,12 +235,16 @@
 - [21.4. Jak działa sterowanie sekwencyjne (Sequence Control) w SICAR?](#214-jak-działa-sterowanie-sekwencyjne-sequence-control-w-sicar--)
 - [21.5. Co to są Tec Units w SICAR i jak ich używasz?](#215-co-to-są-tec-units-w-sicar-i-jak-ich-używasz--)
 - [21.6. Jak działa synchronizacja i diagnostyka w SICAR DiagAddOn?](#216-jak-działa-synchronizacja-i-diagnostyka-w-sicar-diagaddon--)
+- [21.7. Czym różni się ilockExtSync od ilockExtInt i jak działa synchronizacja zewnętrzna między sekwencjami?](#217-czym-różni-się-ilockextsync-od-ilockextint-i-jak-działa-synchronizacja-zewnętrzna-między-sekwencjami--)
+- [21.8. Jak działają rozgałęzienia (branching) i funkcja Stop/Hold w sekwencjach SICAR?](#218-jak-działają-rozgałęzienia-branching-i-funkcja-stophold-w-sekwencjach-sicar--)
+- [21.9. Co to jest DB1000 (UiDiagAddOn_DB) i jak wykorzystujesz go w programowaniu?](#219-co-to-jest-db1000-uidiagaddon_db-i-jak-wykorzystujesz-go-w-programowaniu--)
+- [21.10. Jak działają ekrany ruchów (Movement Screens) i blokada ruchów (Lock Movements) w SICAR?](#2110-jak-działają-ekrany-ruchów-movement-screens-i-blokada-ruchów-lock-movements-w-sicar--)
 
 ---
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **155 pytań / 21 sekcji.**
+> **159 pytań / 21 sekcji.**
 
 
 ---
