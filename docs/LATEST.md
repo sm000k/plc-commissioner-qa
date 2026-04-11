@@ -461,6 +461,7 @@ Praktyczne wskazówki:
 Rodzina S7-1200 to kompaktowe sterowniki montowane na szynie DIN, programowane w TIA Portal. Wiedza o limitach rozbudowy jest ważna przy doborze do projektu.
 
 **Warianty CPU S7-1200:**
+
 | CPU | Wbudowane I/O | Max SM (prawo) | Max CM (lewo) | SB (front) | Uwagi |
 |-----|---------------|---------------|--------------|------------|-------|
 | 1211C | 6DI/4DO/2AI | brak | 3 | 1 | Brak rozbudowy SM |
