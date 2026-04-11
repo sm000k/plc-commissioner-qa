@@ -68,11 +68,18 @@ try {
         Write-Host "https://sm000k.github.io/plc-commissioner-qa/" -ForegroundColor White
     }
 
-    # --- Quick audit (non-blocking) ---
-    Write-Host "`n[audit] Sprawdzanie higieny projektu..." -ForegroundColor DarkGray
+    # --- Quick audit (non-blocking, co 3 dni) ---
     $auditScript = Join-Path $PSScriptRoot "audit_project.ps1"
-    if (Test-Path $auditScript) {
+    $auditStamp  = Join-Path $root ".last_audit"
+    $runAudit = $true
+    if (Test-Path $auditStamp) {
+        $lastRun = (Get-Item $auditStamp).LastWriteTime
+        if (((Get-Date) - $lastRun).TotalDays -lt 3) { $runAudit = $false }
+    }
+    if ($runAudit -and (Test-Path $auditScript)) {
+        Write-Host "`n[audit] Sprawdzanie higieny projektu..." -ForegroundColor DarkGray
         & $auditScript 2>$null
+        [IO.File]::WriteAllText($auditStamp, (Get-Date).ToString("o"))
     }
 } finally {
     Pop-Location

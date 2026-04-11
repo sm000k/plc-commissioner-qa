@@ -1,6 +1,7 @@
 # Windows system files
 desktop.ini
 Thumbs.db
+.last_audit
 
 # Python
 __pycache__/
