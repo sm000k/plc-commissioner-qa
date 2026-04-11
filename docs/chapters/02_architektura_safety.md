@@ -209,63 +209,148 @@ Redundancja CPU (H-system) nie oznacza automatycznie redundancji **sieci PROFINE
 | **Ring z zarządzalnym switchem** | ✅ | Wysoki | ≤ 200 ms / ≈ 0 ms (MRPD) | Wymagany dla IRT/S120 |
 | **Dual-homed** (dwa niezależne trakty) | ✅ | Najwyższy | ≈ 0 ms | IM 155-6 **MF** HF (Multi-Fieldbus, nie zwykły PN HF!) |
 
-> **Uwaga:** IM 155-6 **PN** HF (2 porty w jednym pierścieniu) vs IM 155-6 **MF** HF (2 niezależne interfejsy PROFINET → dual-homed na dwóch osobnych tratkach). Dual-homed wymaga droższego MF HF.
+> **Uwaga:** IM 155-6 **PN** HF (2 porty w jednym pierścieniu) vs IM 155-6 **MF** HF (2 niezależne interfejsy PROFINET → dual-homed na dwóch osobnych traktach). Dual-homed wymaga droższego MF HF.
 
 ---
 
-**Schemat — Daisy chain (najprostsza, bez redundancji kabla):**
+**Schematy wszystkich topologii:**
+
+> W każdym schemacie Sync Link (X3↔X3, X4↔X4) jest identyczny — łączy CPU PRIMARY z BACKUP. Różnice dotyczą wyłącznie połączeń PROFINET (porty X1).
+
+**① Daisy chain** — najprostsza, bez redundancji kabla:
 ```
-┌──────────────┐        Sync Link ×2        ┌──────────────┐
-│  CPU 1517H   │  X3 ══════════════ X3      │  CPU 1517H   │
-│  PRIMARY     │  X4 ══════════════ X4      │  BACKUP      │
-└──────┬───────┘                            └──────┬───────┘
-       │ X1 (PROFINET)                             │ X1 (PROFINET)
-       │                                           │
-       ├── ET200SP_1 ── ET200SP_2 ── ET200SP_3     │
-       │   IM155-6HF    IM155-6HF    IM155-6HF    │
-       │                                           │
-       └── ET200SP_4 ── ET200SP_5 ─────────────────┘
-           IM155-6HF    IM155-6HF
+    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
+    │ CPU PRIMARY │                 │ CPU BACKUP  │
+    └──────┬──────┘                 └──────┬──────┘
+       X1 P1                           X1 P1
+           │                               │
+           ▼                               ▼
+       [ET200SP_1]──[ET200SP_2]──[ET200SP_3]
+        IM155-HF     IM155-HF     IM155-HF
+
+    Awaria kabla: ──✕──
+       [ET200SP_1]  ✕  [ET200SP_2]──[ET200SP_3]
+        ✅ działa       ❌ utracone  ❌ utracone
 ```
-> ⚠️ Przerwa kabla między ET200SP_1 a _2 → utrata _2 i _3. Brak redundancji kabla — każdy CPU prowadzi osobny łańcuch.
+> Każdy CPU prowadzi osobny łańcuch do stacji. Przerwa kabla = utrata wszystkich stacji za punktem awarii.
 
 ---
 
-**Schemat — Ring bez zewnętrznego switcha (optymalne dla S7-1500H):**
+**② Gwiazda z niezarządzalnym switchem** (SCALANCE XB208):
 ```
-┌──────────────┐        Sync Link ×2        ┌──────────────┐
-│  CPU 1517H   │  X3 ══════════════ X3      │  CPU 1517H   │
-│  PRIMARY     │  X4 ══════════════ X4      │  BACKUP      │
-│  X1_P1  X1_P2│                            │  X1_P1 X1_P2 │
-└───┬───────┬──┘                            └──┬───────┬───┘
-    │       └──── ET200SP ── ET200SP ──────────┘       │
-    │             IM155-6HF  IM155-6HF                 │
-    │             (MRC)      (MRC)                     │
-    └──── ET200SP ── ET200SP ──────────────────────────┘
-          IM155-6HF  IM155-6HF
-          (MRC)      (MRC)
-     ─────────── wspólny PROFINET ring (MRP) ───────────
+    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
+    │ CPU PRIMARY │                 │ CPU BACKUP  │
+    └──────┬──────┘                 └──────┬──────┘
+       X1 P1                           X1 P1
+           │                               │
+           └───────────┬───────────────────┘
+                       │
+                ┌──────┴──────┐
+                │ SCALANCE    │  ← SPOF (Single Point of Failure)
+                │ XB208       │
+                │ (niezarz.)  │
+                └──┬───┬───┬──┘
+                   │   │   │
+              [ET200] [ET200] [ET200]
+              SP_1    SP_2    SP_3
 ```
-> CPU = MRM (Media Redundancy Manager), każdy IM 155-6 PN HF = MRC (Client). Awaria kabla → MRP przełącza w ≤ 200 ms, zero dodatkowych switchy.
+> Najtańszy switch. Brak diagnostyki, brak MRP. Awaria XB208 = utrata CAŁEJ sieci I/O.
 
 ---
 
-**Schemat — Dual-homed (systemy krytyczne):**
+**③ Gwiazda z zarządzalnym switchem** (SCALANCE XC/XP):
 ```
-┌──────────────┐        Sync Link ×2        ┌──────────────┐
-│  CPU 1517H   │  X3 ══════════════ X3      │  CPU 1517H   │
-│  PRIMARY     │  X4 ══════════════ X4      │  BACKUP      │
-└──────┬───────┘                            └──────┬───────┘
-       │ Trakt A                                   │ Trakt B
-  SCALANCE XC ─────────────────────────── SCALANCE XC
-       │                                           │
-       └───────────┬── ET200SP ────┬───────────────┘
-                   │  IM 155-6     │
-                   │  MF HF        │  ← 2 niezależne interfejsy PN
-                   │  (Trakt A + B)│     (Multi-Fieldbus!)
-                   └───────────────┘
+    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
+    │ CPU PRIMARY │                 │ CPU BACKUP  │
+    └──────┬──────┘                 └──────┬──────┘
+       X1 P1                           X1 P1
+           │                               │
+           └───────────┬───────────────────┘
+                       │
+                ┌──────┴──────┐
+                │ SCALANCE    │  ← SPOF, ale z diagnostyką
+                │ XC208       │
+                │ (zarządz.)  │
+                │ SNMP/LLDP   │
+                └──┬───┬───┬──┘
+                   │   │   │
+              [ET200] [ET200] [ET200]
+              SP_1    SP_2    SP_3
 ```
-> Awaria całego traktu A (switch + kable) → Trakt B przejmuje natychmiast (~0 ms). Wymaga IM 155-6 **MF** HF.
+> Jak ②, ale switch ma diagnostykę SNMP, LLDP, port mirroring. Wciąż SPOF — awaria switcha = utrata sieci. Bez MRP (gwiazda nie tworzy pierścienia).
+
+---
+
+**④ Ring bez switcha — porty CPU tworzą pierścień** (MRP, optymalne):
+```
+    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
+    │ CPU PRIMARY │                 │ CPU BACKUP  │
+    │ (MRM)       │                 │ (MRM)       │
+    └──┬───────┬──┘                 └──┬───────┬──┘
+   X1 P1    X1 P2                 X1 P1    X1 P2
+       │       │                     │       │
+       │       └─────────────────────┘       │
+       │           (górna gałąź)             │
+       │                                     │
+       │   [ET200SP_1]───[ET200SP_2]         │
+       │    IM155-HF      IM155-HF           │
+       │    (MRC)         (MRC)              │
+       │                                     │
+       └───[ET200SP_3]───[ET200SP_4]─────────┘
+            IM155-HF      IM155-HF
+            (MRC)         (MRC)
+       ◄──────── pierścień MRP ────────────►
+```
+> **Optymalne dla S7-1500H.** CPU = MRM (Media Redundancy Manager), stacje = MRC (Client). Awaria dowolnego kabla → MRP przełącza w ≤ 200 ms. Zero dodatkowych switchy = zero kosztów.
+
+---
+
+**⑤ Ring z zarządzalnym switchem** (MRPD, dla IRT/S120):
+```
+    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
+    │ CPU PRIMARY │                 │ CPU BACKUP  │
+    └──────┬──────┘                 └──────┬──────┘
+       X1 P1                           X1 P1
+           │                               │
+    ┌──────┴──────┐                 ┌──────┴──────┐
+    │ SCALANCE    │                 │ SCALANCE    │
+    │ XC216      ◄──── ring MRP ────►  XC216      │
+    │ (zarządz.)  │                 │ (zarządz.)  │
+    └──┬───┬───┬──┘                 └──┬───┬───┬──┘
+       │   │   │                       │   │   │
+    [ET200] [ET200] [ET200]       [ET200] [ET200] [ET200]
+    SP_1    SP_2    SP_3          SP_4    SP_5    SP_6
+```
+> Switche w pierścieniu MRP/MRPD. MRPD = ≈ 0 ms przełączenia (potrzebny dla IRT, np. napędy S120). Droższe, ale wymagane gdy stacje potrzebują synchronizacji zegarowej (isochronous mode).
+
+---
+
+**⑥ Dual-homed — dwa niezależne trakty** (systemy krytyczne):
+```
+    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
+    │ CPU PRIMARY │                 │ CPU BACKUP  │
+    └──────┬──────┘                 └──────┬──────┘
+       X1 P1                           X1 P1
+           │                               │
+    ┌──────┴──────┐                 ┌──────┴──────┐
+    │ SCALANCE XC │                 │ SCALANCE XC │
+    │ Trakt A     │                 │ Trakt B     │
+    └──────┬──────┘                 └──────┬──────┘
+           │                               │
+           │    ┌───────────────┐          │
+           │    │   ET200SP     │          │
+           ├────┤   IM 155-6    ├──────────┤
+           │    │   MF HF       │          │
+           │    │  (port A + B) │          │
+           │    └───────────────┘          │
+           │    ┌───────────────┐          │
+           │    │   ET200SP     │          │
+           └────┤   IM 155-6    ├──────────┘
+                │   MF HF       │
+                │  (port A + B) │
+                └───────────────┘
+```
+> Każda stacja ma 2 niezależne interfejsy PN (Multi-Fieldbus). Awaria całego traktu A (switch + kable) → Trakt B przejmuje natychmiast (~0 ms). Wymaga droższego IM 155-6 **MF** HF (nie zwykły PN HF).
 
 ---
 
@@ -273,9 +358,9 @@ Redundancja CPU (H-system) nie oznacza automatycznie redundancji **sieci PROFINE
 
 | Zastosowanie | Topologia | Uzasadnienie |
 |---|---|---|
-| Budżet niski, mała linia | Daisy chain lub gwiazda XB208 | Redundancja tylko CPU, nie sieci PN |
-| Standard automotive / H-system | Ring bez switcha (MRP) | Redundancja CPU + kabel PN, zero kosztów dodatkowych |
-| Systemy krytyczne / napędy S120 | Ring MRPD z SCALANCE XC/XP lub dual-homed | Minimalny przestój, IRT, pełna redundancja traktów |
+| Budżet niski, mała linia | ① Daisy chain lub ② Gwiazda XB208 | Redundancja tylko CPU, nie sieci PN |
+| Standard automotive / H-system | ④ Ring bez switcha (MRP) | Redundancja CPU + kabel PN, zero kosztów dodatkowych |
+| Systemy krytyczne / napędy S120 | ⑤ Ring MRPD z SCALANCE XC/XP lub ⑥ Dual-homed | Minimalny przestój, IRT, pełna redundancja traktów |
 
 *[ZWERYFIKOWANE] — [SIMATIC S7-1500H System Manual](https://support.industry.siemens.com/cs/document/109779336/); [S7-1500R/H strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500/s7-1500r-h.html); IEC 61158-6-10 (PROFINET MRP); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)]*
 
