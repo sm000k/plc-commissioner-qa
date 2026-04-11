@@ -60,39 +60,49 @@ Przy wgraniu CPU porównuje collective signature — niezgodność → Safety ni
 Przełączenie przez TIA Portal (Safety Administration) lub dedykowany sygnał w logice. Po przełączeniu wymagane potwierdzenie (hasło Safety lub ACK). Zmiana trybu jest logowana z datą i użytkownikiem. Uwaga: dezaktywacja trybu Safety jest widoczna w diagnostyce i na wyświetlaczu CPU — nie można jej ukryć.
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 2.7. Co to jest STEP 7 Safety Advanced vs Safety Basic?
-
-Safety Basic: licencja wyłącznie dla S7-1200F. Prostsza funkcjonalność, niższy koszt, ograniczone biblioteki Safety.
-Safety Advanced: pełna licencja dla S7-1500F i ET 200SP CPU F, wszystkie funkcje Safety, certyfikowane biblioteki funkcji (muting, two-hand, ESTOP), możliwość symulacji w PLCSIM.
-Obydwie są wtyczką do TIA Portal — nie są osobnym oprogramowaniem.
-
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
-### 2.8. Jakie są podstawowe komponenty i zasady programowania sterowników bezpieczeństwa Pilz PNOZmulti?
+### 2.7. Jakie są podstawowe komponenty i zasady programowania sterowników bezpieczeństwa Pilz PNOZmulti?
 
 Pilz PNOZmulti to programowalny sterownik bezpieczeństwa, który umożliwia łatwe i intuicyjne tworzenie logiki bezpieczeństwa dla maszyn, wykorzystując dedykowane bloki funkcyjne i graficzne środowisko programowania.
 - **Programowanie:**
   - Odbywa się za pomocą oprogramowania PNOZmulti Configurator.
   - Program jest podzielony na strony, co ułatwia organizację.
-  - Wykorzystuje dedykowane bloki funkcyjne do obsługi elementów bezpieczeństwa (np. ML DH M gate, ML 2 D H M dla rygli, wejścia dwukanałowe).
+  - Wykorzystuje dedykowane bloki funkcyjne — nazwy kodują funkcję: **ML DH M gate** = Magnet Lock (elektrorygiel) + Door monitoring + Hazardous guard locking + Manual restart, dla bramy ochronnej; **ML 2 D H M** = to samo, ale **2-kanałowe** (redundancja czujników, wymagana dla PL d/e). Bloki bez „2" = jednokanałowe (PL c), z „2" = dwukanałowe (PL d–e). Litera **M** na końcu = operator musi fizycznie potwierdzić restart.
   - Logika ryglowania i odryglowania jest zaimplementowana w specjalnych blokach.
 - **Konfiguracja sprzętowa:**
   - W zakładce "Open Hardware Configuration" można zobaczyć jednostkę główną, dodatkowe moduły wejść/wyjść oraz urządzenia sieciowe (np. panel PMI, czytniki RFID podłączone przez switch).
   - Mapowanie zmiennych i wejść/wyjść odbywa się w zakładce "I O List".
 - **Połączenie i diagnostyka:**
   - Połączenie ze sterownikiem odbywa się kablem Ethernet.
-  - Adres IP i maska podsieci są dostępne w menu Ethernet -> info.
+  - Adres IP i maska podsieci są dostępne w menu Ethernet → info.
   - Opcja "Scan Network" pozwala wykryć sterownik w sieci.
   - W "Project Manager" należy wprowadzić Order number i Serial number sterownika, aby uzyskać dostęp.
   - Dostępne są trzy poziomy dostępu: pełna edycja, podgląd, zmiana parametrów.
   - Tryb "online Dynamic Program Display" podświetla aktywne sygnały na zielono, co ułatwia diagnostykę.
-Praktyczne wskazówki:
-- Programowanie PNOZmulti jest bardzo przyjazne użytkownikowi dzięki dedykowanym blokom.
-- Diagnostyka w trybie online jest prosta, ponieważ aktywne sygnały są wizualnie wyróżnione.
 
 **Kontekst na rozmowie:** PNOZmulti to *dedykowany sterownik bezpieczeństwa* (nie F-CPU) — często spotykany przy modernizacjach maszyn i w małych izolowanych aplikacjach Safety (prasy, ogrodzenia). Integracja z Siemens PLC: PNOZmulti jako IO-Device PROFINET (Safe PNOZmulti) lub przez wyjścia przekaźnikowe Safety do F-DI Siemens. Różnica od SIMATIC Safety: PNOZmulti jest tańszy i prostszy dla <20 sygnałów Safety, ale nie łączy logiki Safety z programem PLC w jednym środowisku jak TIA Portal.
-*Źródło: transkrypcje ControlByte*
 
-### 2.9. Co to jest S7-1500H (Hot Standby) i kiedy go stosujesz?  🟢
+**Porównanie dedykowanych sterowników Safety — Pilz vs SICK vs Siemens F-CPU:**
+
+| Cecha | Pilz PNOZmulti 2 | SICK Flexi Soft / FLX3-CPUC | Siemens F-CPU (S7-1500F) |
+|-------|-------------------|------------------------------|--------------------------|
+| Typ | Dedykowany Safety PLC | Dedykowany Safety PLC | Zintegrowany Safety w CPU standardowym |
+| Programowanie | PNOZmulti Configurator (graficzne bloki) | SICK Safety Designer (FBD) | TIA Portal + STEP 7 Safety Advanced (LAD/FBD) |
+| Max SIL / PL | SIL CL 3 / PL e | SIL CL 3 / PL e | SIL 3 / PL e |
+| Skalowalność | Do ~20 F-I/O, rozszerzalny modułami | Do ~40 F-I/O, modułowe | Setki F-I/O przez ET200 + PROFIsafe |
+| Koszt (orientacyjnie) | €800–1500 (jednostka + moduły) | €600–1200 (jednostka + moduły) | €3000–8000 (CPU F + licencja Safety) |
+| Integracja z Siemens PLC | PROFINET IO-Device (opcja Safe) lub przekaźniki → F-DI | PROFINET IO-Device lub EtherNet/IP | Natywna — jeden projekt, jedna diagnostyka |
+| Kiedy stosować | Mała maszyna standalone, modernizacja, <20 sygnałów Safety | Mała/średnia maszyna, ekosystem SICK (kurtyny, skanery) | Duża instalacja, wiele stref Safety, integracja z logiką standardową |
+
+**Kluczowe różnice w praktyce:**
+- **SICK jest tańszy** od Pilza przy porównywalnej funkcjonalności — Flexi Soft / FLX3 konkuruje ceną, szczególnie gdy w projekcie są już czujniki SICK (kurtyny deTec, skanery microScan — wtedy integracja „za darmo")
+- **Pilz ma lepszą rozpoznawalność** w branży Safety — audytorzy i klienci „znają Pilz" jako synonim bezpieczeństwa maszyn, łatwiej przejść odbiór
+- **Oba przegrywają z F-CPU** w dużych instalacjach — >30 sygnałów Safety lub komunikacja Safety-to-Safety między stacjami → dedykowany Safety PLC staje się ograniczeniem (osobne narzędzie, osobna diagnostyka, dodatkowy interfejs)
+- **Modernizacja** — Pilz/SICK idealny gdy dorzucasz Safety do starej maszyny z S7-300 (bez F) — nie musisz wymieniać CPU, podłączasz standalone Safety controller obok
+
+⚠️ **DO WERYFIKACJI** — ceny orientacyjne z 2024, mogą się różnić zależnie od konfiguracji i rabatów.
+*Źródło: transkrypcje ControlByte + wiedza domenowa*
+
+### 2.8. Co to jest S7-1500H (Hot Standby) i kiedy go stosujesz?  🟢
 
 **S7-1500H** (Highly Available / Hot Standby) to konfiguracja redundantna dwóch identycznych CPU S7-1500 pracujących równolegle — jeden aktywny (Primary), drugi gotowy do natychmiastowego przejęcia sterowania (Backup).
 

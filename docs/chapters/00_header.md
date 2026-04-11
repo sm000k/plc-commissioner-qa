@@ -4,11 +4,13 @@
 
 ### Siemens TIA Portal · Safety PLC · ET200 · Napędy SINAMICS · Robot ABB · SICAR
 
+### Wersja: v12.5 | Data: 2026-04-11 15:48 | Pytania: 176
+
 ### Pytania + odpowiedzi zweryfikowane pod kątem rozmów kwalifikacyjnych.
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 15:39 | Pytania: 177
+### Wersja: v12.5 | Data: 2026-04-11 15:39 | Pytania: 176
 
 ---
 
@@ -63,9 +65,8 @@
 - [2.4. Co to jest F-DB i dlaczego nie można go edytować ręcznie?](#24-co-to-jest-f-db-i-dlaczego-nie-można-go-edytować-ręcznie)
 - [2.5. Co to jest F-signature i collective signature?](#25-co-to-jest-f-signature-i-collective-signature--)
 - [2.6. Jakie są tryby pracy Safety CPU i jak się przełącza?](#26-jakie-są-tryby-pracy-safety-cpu-i-jak-się-przełącza)
-- [2.7. Co to jest STEP 7 Safety Advanced vs Safety Basic?](#27-co-to-jest-step-7-safety-advanced-vs-safety-basic)
-- [2.8. Jakie są podstawowe komponenty i zasady programowania sterowników bezpieczeństwa Pilz PNOZmulti?](#28-jakie-są-podstawowe-komponenty-i-zasady-programowania-sterowników-bezpieczeństwa-pilz-pnozmulti)
-- [2.9. Co to jest S7-1500H (Hot Standby) i kiedy go stosujesz?](#29-co-to-jest-s7-1500h-hot-standby-i-kiedy-go-stosujesz--)
+- [2.7. Jakie są podstawowe komponenty i zasady programowania sterowników bezpieczeństwa Pilz PNOZmulti?](#27-jakie-są-podstawowe-komponenty-i-zasady-programowania-sterowników-bezpieczeństwa-pilz-pnozmulti)
+- [2.8. Co to jest S7-1500H (Hot Standby) i kiedy go stosujesz?](#28-co-to-jest-s7-1500h-hot-standby-i-kiedy-go-stosujesz--)
 
 **3. MODUŁY F-DI / F-DO — OKABLOWANIE I PARAMETRY**
 - [3.1. Co to jest F-DI i jak różni się od standardowego DI?](#31-co-to-jest-f-di-i-jak-różni-się-od-standardowego-di--)
@@ -262,7 +263,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **177 pytań / 21 sekcji.**
+> **176 pytań / 21 sekcji.**
 
 
 ---
