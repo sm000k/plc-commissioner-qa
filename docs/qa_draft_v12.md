@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 14:44 | Pytania: 178
+### Wersja: v12.5 | Data: 2026-04-11 14:45 | Pytania: 178
 
 ---
 
@@ -601,49 +601,50 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 
 ### 1.15. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
 
-**Dominacja** określa, który sygnał wygrywa gdy jednocześnie wciśniemy START i STOP. Jest to praktyczny odpowiednik priorytetu przerzutnika SR/RS, zbudowany wyłącznie ze styków i cewek w schemacie drabinkowym.
+**Dominacja** określa, który sygnał wygrywa gdy jednocześnie wciśniemy START i STOP. Jest to praktyczny odpowiednik priorytetu przerzutnika SR/RS, widoczny bezpośrednio w schemacie drabinkowym.
 
-**Dominacja RESET (= odpowiednik RS) — STOP wygrywa:**
-
-```
-  |                                                    |
-  |    START            STOP(NC)        MotorRun       |
-  +----] [--------+-----]/[-----------( )------------ -+
-  |               |                                    |
-  |  MotorRun     |                                    |
-  +----] [--------+                                    |
-  |                                                    |
-```
-- `START` i `MotorRun` (samopodtrzymanie) → gałęzie **równoległe** (OR)
-- `STOP(NC)` → **szeregowo** za obiema ścieżkami — odcina jedyną drogę do cewki
-- Gdy `START=1` i `STOP=1` → **MotorRun = 0** (STOP odcina cewkę)
-
-**Dominacja SET (= odpowiednik SR) — START wygrywa:**
+**Dominacja SET (= odpowiednik SR) — priorytet ma START:**
 
 ```
   |                                                    |
-  |    START                            MotorRun       |
+  |    START                            Lampka         |
   +----] [-------------------+--------( )------------ -+
   |                          |                         |
-  |  MotorRun     STOP(NC)   |                         |
+  |  Lampka       STOP(NC)   |                         |
   +----] [--------]/[--------+                         |
   |                                                    |
 ```
-- `START` → prowadzi do cewki **bezpośrednio** (górna gałąź — omija STOP)
-- `MotorRun` + `STOP(NC)` → dolna gałąź (samopodtrzymanie przez STOP)
-- Gdy `START=1` i `STOP=1` → **MotorRun = 1** (START w górnej gałęzi zasila cewkę mimo otwartego STOP w dolnej)
+- `START` steruje Lampką **bezpośrednio** (górna gałąź — równolegle z samopodtrzymaniem)
+- `STOP` jest szeregowy z samopodtrzymaniem, ale gdy `START=1` — omija STOP
+- Gdy `START=1` i `STOP=1` → **Lampka = 1** (SET wygrywa)
+- 💡 „START bezpośrednio steruje Lampką, dlatego STOP nie ma tutaj nic do gadania"
+
+**Dominacja RESET (= odpowiednik RS) — priorytet ma STOP:**
+
+```
+  |                                                    |
+  |    START            STOP(NC)        Lampka         |
+  +----] [--------+-----]/[-----------( )------------ -+
+  |               |                                    |
+  |  Lampka       |                                    |
+  +----] [--------+                                    |
+  |                                                    |
+```
+- `START` i `Lampka` (samopodtrzymanie) → gałęzie **równoległe** (OR)
+- `STOP(NC)` → **szeregowo** za obiema ścieżkami — odcina jedyną drogę do cewki
+- Gdy `START=1` i `STOP=1` → **Lampka = 0** (RESET wygrywa — STOP odcina zasilanie)
+- 💡 „START zasila Lampkę poprzez STOP, dlatego przycisk wyłączenia jest ważniejszy"
 
 **Tabela prawdy — porównanie obu dominacji:**
 
-| START | STOP | MotorRun_prev | Dominacja RESET | Dominacja SET |
-|:-----:|:----:|:-------------:|:---------------:|:-------------:|
-| 0     | 0    | 0             | 0               | 0             |
-| 0     | 0    | 1             | 1 (trzyma)      | 1 (trzyma)    |
-| 1     | 0    | ×             | 1               | 1             |
-| 0     | 1    | ×             | 0               | 0             |
-| **1** | **1**| **×**         | **0 ← STOP**   | **1 ← START** |
+| Stan | START | STOP | Lampka (Dom. SET) | Lampka (Dom. RESET) |
+|:-----|:-----:|:----:|:-----------------:|:-------------------:|
+| Oba wciśnięte | **1** | **1** | **1 ← SET wygrywa** | **0 ← RESET wygrywa** |
+| Tylko START | 1 | 0 | 1 | 1 |
+| Tylko STOP | 0 | 1 | 0 | 0 |
+| Żaden | 0 | 0 | * (stan poprzedni) | * (stan poprzedni) |
 
-> Jedyna różnica → wiersz ostatni (`START=1, STOP=1`). Reszta identyczna.
+> Gwiazdka `*` = stan zapamiętany — bez akcji na wejściach układ nie zmienia stanu (samopodtrzymanie działa). Jedyna różnica → wiersz `START=1, STOP=1`.
 
 **Związek z przerzutnikami bistabilnymi w TIA Portal:**
 
