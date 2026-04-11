@@ -67,7 +67,7 @@
 - [2.6. Jakie są tryby pracy Safety CPU i jak się przełącza?](#26-jakie-są-tryby-pracy-safety-cpu-i-jak-się-przełącza)
 - [2.7. Jakie są podstawowe komponenty i zasady programowania sterowników bezpieczeństwa Pilz PNOZmulti?](#27-jakie-są-podstawowe-komponenty-i-zasady-programowania-sterowników-bezpieczeństwa-pilz-pnozmulti)
 - [2.8. Co to jest S7-1500H (Hot Standby) i kiedy go stosujesz?](#28-co-to-jest-s7-1500h-hot-standby-i-kiedy-go-stosujesz--)
-- [2.9. Jak wygląda minimalna konfiguracja sprzętowa sieci S7-1500H?](#29-jak-wygląda-minimalna-konfiguracja-sprzętowa-sieci-s7-1500h--)
+- [2.9. Jak wygląda minimalna konfiguracja sprzętowa S7-1500H i jakie topologie PROFINET są możliwe dla redundancji?](#29-jak-wygląda-minimalna-konfiguracja-sprzętowa-s7-1500h-i-jakie-topologie-profinet-są-możliwe-dla-redundancji--)
 
 **3. MODUŁY F-DI / F-DO — OKABLOWANIE I PARAMETRY**
 - [3.1. Co to jest F-DI i jak różni się od standardowego DI?](#31-co-to-jest-f-di-i-jak-różni-się-od-standardowego-di--)
