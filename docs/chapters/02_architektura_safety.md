@@ -143,9 +143,9 @@ Pilz PNOZmulti to programowalny sterownik bezpieczeństwa, który umożliwia ła
 
 *Źródło: Siemens SIMATIC S7-1500H System Manual (6ES7518-4FX00-1AC2)*
 
-### 2.9. Jak wygląda minimalna konfiguracja sprzętowa S7-1500H i jakie topologie PROFINET są możliwe dla redundancji?  🟢
+### 2.9. Jak wygląda minimalna konfiguracja sprzętowa systemu S7-1500H?  🟢
 
-**S7-1500H** (Hot Standby) to system z dwoma CPU pracującymi równolegle — Primary i Backup. Redundancja dotyczy **CPU**, nie automatycznie sieci PROFINET. Minimalna konfiguracja wymaga 6 komponentów.
+**S7-1500H** (Hot Standby) to system z dwoma CPU pracującymi równolegle — Primary i Backup. Redundancja dotyczy **CPU** (wysoka dostępność), nie automatycznie sieci PROFINET. Minimalna konfiguracja wymaga 6 komponentów.
 
 **Lista komponentów (minimum):**
 
@@ -154,77 +154,85 @@ Pilz PNOZmulti to programowalny sterownik bezpieczeństwa, który umożliwia ła
 | 1 | CPU 1517H lub 1518H | 2 | Primary + Backup |
 | 2 | PM 190W zasilacz | 2 | Osobne zasilanie per CPU (niezależność awaryjna) |
 | 3 | Kabel Sync Link (X3↔X3, X4↔X4) | 2 | Synchronizacja danych — dedykowane, oddzielne od PROFINET |
-| 4 | Switch lub bezpośrednie połączenie | 1+ | PROFINET — sieć I/O (patrz topologie poniżej) |
+| 4 | SCALANCE switch (np. XB208) lub bezpośrednie połączenie | 1+ | PROFINET — sieć I/O |
 | 5 | ET200SP z IM 155-6 PN **HF** | 1 | Shared Device — 2 porty PN, widoczna przez oba CPU |
 | 6 | Moduły I/O (DI/DQ/AI) | min. 1 | Wejścia/wyjścia procesowe |
 
 **Kluczowe zasady:**
 - **Sync Link = 2 fizyczne połączenia** (X3↔X3 i X4↔X4) — redundancja linku synchronizacji CPU. Fiber do dużych odległości, Ethernet do ~100 m
-- **IM 155-6 PN HF** (nie zwykły IM!) — 2 porty PROFINET, komunikuje się z **oboma** CPU jednocześnie. Przy switchover stacja nie traci połączenia
+- **IM 155-6 PN HF** (nie zwykły IM!) — 2 porty PROFINET, komunikuje się z **oboma** CPU jednocześnie (System Redundancy R1). Przy switchover stacja nie traci połączenia
+- **Czas switchover CPU** — typowo 0,5–1,5 s (zależy od rozmiaru programu i liczby IO-Devices). Aplikacja musi tolerować krótką przerwę sterowania
 - **W TIA Portal** — konfigurujesz jeden H-CPU, TIA automatycznie generuje konfigurację Backup. Program piszesz raz
 
 **Czego NIE potrzebujesz w minimalnej konfiguracji:**
-- Redundancja PROFINET (ring MRP) — opcja, nie wymóg
+- Redundancja PROFINET (ring MRP) — opcja, nie wymóg (patrz Q2.10)
 - Moduły F (Safety) — H to dostępność, nie Safety
 - Dodatkowa licencja — H-firmware jest w CPU 1517H/1518H
 
+```
+┌──────────────────┐         Sync Link ×2         ┌──────────────────┐
+│   Szafa 1        │  X3 ════════════════════ X3   │   Szafa 2        │
+│  ┌────────────┐  │  X4 ════════════════════ X4   │  ┌────────────┐  │
+│  │ CPU 1517H  │  │                               │  │ CPU 1517H  │  │
+│  │  PRIMARY   │  │                               │  │  BACKUP    │  │
+│  └─────┬──────┘  │                               │  └─────┬──────┘  │
+│    PM 190W       │                               │    PM 190W       │
+└────────┼─────────┘                               └────────┼─────────┘
+         │ PROFINET X1                                      │ PROFINET X1
+         └──────────────┬───── SCALANCE XB208 ──────────────┘
+                        │
+                ┌───────┴───────┐
+                │  ET200SP      │
+                │  IM 155-6     │
+                │  PN HF        │  ← 2 porty PN (Shared Device / R1)
+                ├───────────────┤
+                │ DI │ DQ │ AI  │
+                └───────────────┘
+```
+
+*[ZWERYFIKOWANE] — [SIMATIC S7-1500H System Manual](https://support.industry.siemens.com/cs/document/109779336/); [S7-1500R/H strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500/s7-1500r-h.html)*
+
 ---
 
-**Topologie PROFINET dla S7-1500H — porównanie:**
+### 2.10. Jakie topologie PROFINET można stosować dla redundancji sieci w systemie S7-1500H?  🟢
 
-| Topologia | Redundancja kabla PN | Koszt sieci | Czas przełączenia przy awarii kabla | Uwagi |
+Redundancja CPU (H-system) nie oznacza automatycznie redundancji **sieci PROFINET**. Awaria kabla lub switcha może odciąć IO-Devices mimo działającego Backup CPU. Dobór topologii PROFINET decyduje o odporności sieci I/O na uszkodzenia fizyczne.
+
+**Porównanie topologii:**
+
+| Topologia | Redundancja kabla PN | Koszt sieci | Czas przełączenia (awaria kabla) | Uwagi |
 |-----------|:-------------------:|:-----------:|:-----------------------------------:|-------|
 | **Daisy chain** | ❌ | Brak | Utrata stacji za przerwą | Najprościej, bez switcha |
-| **Gwiazda — niezarządzalny switch** (XB208) | ❌ | Niski | Utrata wszystkich stacji | Switch = SPOF; jak na diagramie |
-| **Gwiazda — zarządzalny switch** (XC/XP) | ❌ | Średni | Utrata wszystkich stacji | Diagnostyka/SNMP, ale wciąż SPOF |
-| **Ring bez switcha** (port CPU → devices → port CPU) | ✅ | Brak | ≤ 200 ms (MRP) | Optymalne — redundancja bez kosztów |
+| **Gwiazda — niezarządzalny switch** (XB208) | ❌ | Niski | Utrata wszystkich stacji | Switch = SPOF |
+| **Gwiazda — zarządzalny switch** (XC/XP) | ❌ | Średni | Utrata wszystkich stacji | Diagnostyka SNMP, ale wciąż SPOF |
+| **Ring bez switcha** (porty CPU → devices → porty CPU) | ✅ | Brak | ≤ 200 ms (MRP) | Optymalne — redundancja bez kosztów |
 | **Ring z zarządzalnym switchem** | ✅ | Wysoki | ≤ 200 ms / ≈ 0 ms (MRPD) | Wymagany dla IRT/S120 |
-| **Dual-homed** (dwa niezależne trakty) | ✅ | Najwyższy | ≈ 0 ms | Systemy krytyczne, IM 155-6 MF HF |
+| **Dual-homed** (dwa niezależne trakty) | ✅ | Najwyższy | ≈ 0 ms | IM 155-6 **MF** HF (Multi-Fieldbus, nie zwykły PN HF!) |
+
+> **Uwaga:** IM 155-6 **PN** HF (2 porty w jednym pierścieniu) vs IM 155-6 **MF** HF (2 niezależne interfejsy PROFINET → dual-homed na dwóch osobnych tratkach). Dual-homed wymaga droższego MF HF.
 
 ---
 
-**Schemat 1 — Minimalna konfiguracja (gwiazda, SCALANCE XB208):**
-```
-┌──────────────┐        Sync Link ×2        ┌──────────────┐
-│  CPU 1517H   │  X3 ══════════════ X3      │  CPU 1517H   │
-│  PRIMARY     │  X4 ══════════════ X4      │  BACKUP      │
-│  PM 190W     │                            │  PM 190W     │
-└──────┬───────┘                            └──────┬───────┘
-       │ X1 (PROFINET)                             │ X1 (PROFINET)
-       └─────────────┬── SCALANCE XB208 ───────────┘
-                     │        (SPOF)
-              ┌──────┴──────┐
-              │  ET200SP    │
-              │  IM 155-6   │
-              │  PN HF      │  ← 2 porty PN (Shared Device)
-              │  DI│DQ│AI   │
-              └─────────────┘
-```
-> ⚠️ XB208 = niezarządzalny, bez MRP → awaria switcha = utrata całej sieci I/O
-
----
-
-**Schemat 2 — Ring bez zewnętrznego switcha (optymalne dla H):**
+**Schemat — Ring bez zewnętrznego switcha (optymalne dla S7-1500H):**
 ```
 ┌──────────────┐        Sync Link ×2        ┌──────────────┐
 │  CPU 1517H   │  X3 ══════════════ X3      │  CPU 1517H   │
 │  PRIMARY     │  X4 ══════════════ X4      │  BACKUP      │
 │  X1_P1  X1_P2│                            │  X1_P1 X1_P2 │
 └───┬───────┬──┘                            └──┬───────┬───┘
-    │       │                                  │       │
-    │  ┌────┴──────────────────────────────────┴────┐  │
-    │  │          PROFINET ring (MRP)               │  │
-    │  │                                            │  │
-    └──┤  ET200SP ── ET200SP ── ET200SP  ├──────────┘
-       │  IM155-6HF  IM155-6HF  IM155-6HF│
-       │  (każdy: 2 porty PN, MRP)       │
-       └────────────────────────────────┘
+    │       └──── ET200SP ── ET200SP ──────────┘       │
+    │             IM155-6HF  IM155-6HF                 │
+    │             (MRC)      (MRC)                     │
+    └──── ET200SP ── ET200SP ──────────────────────────┘
+          IM155-6HF  IM155-6HF
+          (MRC)      (MRC)
+     ─────────── wspólny PROFINET ring (MRP) ───────────
 ```
-> ✅ CPU pełni rolę MRM (Media Redundancy Manager), każdy IM 155-6 PN HF pełni MRC → awaria kabla ≤ 200 ms przełączenia, zero switchy
+> CPU = MRM (Media Redundancy Manager), każdy IM 155-6 PN HF = MRC (Client). Awaria kabla → MRP przełącza w ≤ 200 ms, zero dodatkowych switchy.
 
 ---
 
-**Schemat 3 — Dual-homed (systemy krytyczne):**
+**Schemat — Dual-homed (systemy krytyczne):**
 ```
 ┌──────────────┐        Sync Link ×2        ┌──────────────┐
 │  CPU 1517H   │  X3 ══════════════ X3      │  CPU 1517H   │
@@ -236,27 +244,22 @@ Pilz PNOZmulti to programowalny sterownik bezpieczeństwa, który umożliwia ła
        └───────────┬── ET200SP ────┬───────────────┘
                    │  IM 155-6     │
                    │  MF HF        │  ← 2 niezależne interfejsy PN
-                   │  (Trakt A + B)│
+                   │  (Trakt A + B)│     (Multi-Fieldbus!)
                    └───────────────┘
 ```
-> ✅ Awaria całego traktu A (switch + kable) → Trakt B przejmuje natychmiast (~0 ms)
+> Awaria całego traktu A (switch + kable) → Trakt B przejmuje natychmiast (~0 ms). Wymaga IM 155-6 **MF** HF.
 
 ---
 
-**Kiedy którą topologię wybrać:**
+**Rekomendacja doboru topologii:**
 
-```
-Budżet niski, linia mała:      Daisy chain lub gwiazda XB208
-                                (redundancja tylko CPU, nie sieć PN)
+| Zastosowanie | Topologia | Uzasadnienie |
+|---|---|---|
+| Budżet niski, mała linia | Daisy chain lub gwiazda XB208 | Redundancja tylko CPU, nie sieci PN |
+| Standard automotive / H-system | Ring bez switcha (MRP) | Redundancja CPU + kabel PN, zero kosztów dodatkowych |
+| Systemy krytyczne / napędy S120 | Ring MRPD z SCALANCE XC/XP lub dual-homed | Minimalny przestój, IRT, pełna redundancja traktów |
 
-Standard automotive / H-sys:   Ring bez switcha (CPU-port ring)
-                                (redundancja CPU + kabel PN, zero kosztów dodatkowych)
-
-Systemy krytyczne / S120:       Ring MRPD z SCALANCE XC/XP
-                                lub dual-homed (osobne trakty)
-```
-
-*[ZWERYFIKOWANE - [SIMATIC S7-1500H System Manual](https://support.industry.siemens.com/cs/document/109779336/); [S7-1500R/H strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500/s7-1500r-h.html); IEC 61158-6-10 (PROFINET MRP); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)]*
+*[ZWERYFIKOWANE] — [SIMATIC S7-1500H System Manual](https://support.industry.siemens.com/cs/document/109779336/); [S7-1500R/H strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500/s7-1500r-h.html); IEC 61158-6-10 (PROFINET MRP); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)]*
 
 ---
 
