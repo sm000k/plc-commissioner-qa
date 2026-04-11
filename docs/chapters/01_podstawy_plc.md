@@ -325,33 +325,33 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 **Dominacja SET (= odpowiednik SR) — priorytet ma START:**
 
 ```
-  |                                                    |
-  |    START                            Lampka         |
-  +----] [-------------------+--------( )------------ -+
-  |                          |                         |
-  |  Lampka       STOP(NC)   |                         |
-  +----] [--------]/[--------+                         |
-  |                                                    |
+  |                                                     |
+  |    START                                            |
+  +----] [-------------------+-------( Lampka )-------- +
+  |                          |                          |
+  |    Lampka     STOP(NC)   |                          |
+  +----] [--------]/[--------+                          |
+  |                                                     |
 ```
-- `START` steruje Lampką **bezpośrednio** (górna gałąź — równolegle z samopodtrzymaniem)
-- `STOP` jest szeregowy z samopodtrzymaniem, ale gdy `START=1` — omija STOP
-- Gdy `START=1` i `STOP=1` → **Lampka = 1** (SET wygrywa)
+- `START` steruje cewką `( Lampka )` **bezpośrednio** (górna gałąź — omija STOP)
+- Dolna gałąź: samopodtrzymanie `Lampka` szeregowo ze `STOP(NC)` — STOP odcina tylko podtrzymanie
+- Gdy `START=1` i `STOP=1` → **Lampka = 1** (SET wygrywa — górna gałąź omija STOP)
 - 💡 „START bezpośrednio steruje Lampką, dlatego STOP nie ma tutaj nic do gadania"
 
 **Dominacja RESET (= odpowiednik RS) — priorytet ma STOP:**
 
 ```
-  |                                                    |
-  |    START            STOP(NC)        Lampka         |
-  +----] [--------+-----]/[-----------( )------------ -+
-  |               |                                    |
-  |  Lampka       |                                    |
-  +----] [--------+                                    |
-  |                                                    |
+  |                                                     |
+  |    START            STOP(NC)                        |
+  +----] [--------+-----]/[---------( Lampka )--------- +
+  |               |                                     |
+  |    Lampka     |                                     |
+  +----] [--------+                                     |
+  |                                                     |
 ```
-- `START` i `Lampka` (samopodtrzymanie) → gałęzie **równoległe** (OR)
-- `STOP(NC)` → **szeregowo** za obiema ścieżkami — odcina jedyną drogę do cewki
-- Gdy `START=1` i `STOP=1` → **Lampka = 0** (RESET wygrywa — STOP odcina zasilanie)
+- `START` i `Lampka` (samopodtrzymanie) → gałęzie **równoległe** (OR), łączą się w węzeł `+`
+- `STOP(NC)` → **szeregowo za węzłem** — jedyna droga do cewki `( Lampka )` prowadzi przez STOP
+- Gdy `START=1` i `STOP=1` → **Lampka = 0** (RESET wygrywa — STOP odcina obie ścieżki)
 - 💡 „START zasila Lampkę poprzez STOP, dlatego przycisk wyłączenia jest ważniejszy"
 
 **Tabela prawdy — porównanie obu dominacji:**
