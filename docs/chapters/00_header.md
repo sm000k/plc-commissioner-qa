@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 13:48 | Pytania: 178
+### Wersja: v12.5 | Data: 2026-04-11 14:44 | Pytania: 178
 
 ---
 

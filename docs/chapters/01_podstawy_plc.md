@@ -257,21 +257,37 @@ Po wymianie uszkodzonego czujnika IO-Link Master automatycznie wgrywa zapisane p
 
 ### 1.14. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?  🟢
 
-**Przerzutniki bistabilne SR i RS** to elementy PLC zapamiętujące stan (bit) po zaniku sygnału sterującego. Różnią się zachowaniem gdy **S i R są aktywne jednocześnie** — wtedy priorytet decyduje o stanie wyjścia.
+**Przerzutniki bistabilne SR i RS** to elementy PLC zapamiętujące stan (bit) po zaniku sygnału sterującego. Stosuje się je, bo operator wciska przycisk START na chwilę — a silnik musi pracować dalej (samopodtrzymanie). Różnią się zachowaniem gdy **S i R są aktywne jednocześnie** — wtedy priorytet decyduje o stanie wyjścia.
 
 **SR — priorytet Set (Set dominant):**
 - Wyjście `Q` ustawia sygnał `S` (Set), kasuje sygnał `R1` (Reset)
 - Gdy `S=1` i `R1=1` jednocześnie → `Q = 1` (Set wygrywa)
-- Stosowany gdy **ważniejsze jest uruchomienie** niż zatrzymanie (np. zapłon palnika — jeśli coś każe zapalić, to zapala)
+- Stosowany gdy **ważniejsze jest uruchomienie** niż zatrzymanie (np. latch alarmu — alarm musi trzymać do ręcznego potwierdzenia)
 
 **RS — priorytet Reset (Reset dominant):**
 - Wyjście `Q` ustawia sygnał `S1` (Set), kasuje sygnał `R` (Reset)
 - Gdy `S1=1` i `R=1` jednocześnie → `Q = 0` (Reset wygrywa)
-- Stosowany gdy **ważniejsze jest zatrzymanie** niż uruchomienie (np. blokada silnika przez warunek bezpieczeństwa — safety beat start)
+- Stosowany gdy **ważniejsze jest zatrzymanie** niż uruchomienie (99% maszyn — STOP/E-Stop musi wygrać ze STARTem)
 
-**LAD w TIA Portal — wizualnie:**
+**Tabela prawdy — SR (Set-dominant):**
 
-![SR vs RS w TIA Portal LAD](images/safety/sr_rs_tia_portal.png)
+| S | R1 | Q (wyjście) |
+|:-:|:--:|:-----------:|
+| 0 | 0  | Q_prev (stan zapamiętany) |
+| 1 | 0  | **1** (Set) |
+| 0 | 1  | **0** (Reset) |
+| 1 | 1  | **1** ← Set wygrywa |
+
+**Tabela prawdy — RS (Reset-dominant):**
+
+| S1 | R | Q (wyjście) |
+|:--:|:-:|:-----------:|
+| 0  | 0 | Q_prev (stan zapamiętany) |
+| 1  | 0 | **1** (Set) |
+| 0  | 1 | **0** (Reset) |
+| 1  | 1 | **0** ← Reset wygrywa |
+
+> Jedyna różnica → wiersz ostatni (oba aktywne). Reszta identyczna.
 
 **Równoważny kod SCL — implementacja ręczna:**
 
@@ -304,40 +320,56 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 
 ### 1.15. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
 
-**Dominacja** określa, który sygnał wygrywa gdy jednocześnie wciśniemy START i STOP. Jest to praktyczny odpowiednik priorytetu przerzutnika SR/RS, widoczny bezpośrednio w schemacie drabinkowym.
+**Dominacja** określa, który sygnał wygrywa gdy jednocześnie wciśniemy START i STOP. Jest to praktyczny odpowiednik priorytetu przerzutnika SR/RS, zbudowany wyłącznie ze styków i cewek w schemacie drabinkowym.
 
-**Dominacja SET** (lewy obwód) — priorytet ma START:
-- START steruje Lampką **bezpośrednio** (równolegle z samopodtrzymaniem przez Lampkę)
-- STOP jest szeregowy z samopodtrzymaniem, ale gdy START=1 — omija STOP
-- Gdy `START=1` i `STOP=1` jednocześnie → **Lampka = 1** (SET wygrywa)
-- „START bezpośrednio steruje Lampką, dlatego STOP nie ma tutaj nic do gadania"
+**Dominacja RESET (= odpowiednik RS) — STOP wygrywa:**
 
-**Dominacja RESET** (prawy obwód) — priorytet ma STOP:
-- START zasila Lampkę **przez** STOP (szeregowo w tej samej gałęzi)
-- Gdy `START=1` i `STOP=1` jednocześnie → **Lampka = 0** (RESET wygrywa — STOP odcina zasilanie)
-- „START zasila Lampkę poprzez STOP, dlatego przycisk wyłączenia jest ważniejszy"
+```
+  |                                                    |
+  |    START            STOP(NC)        MotorRun       |
+  +----] [--------+-----]/[-----------( )------------ -+
+  |               |                                    |
+  |  MotorRun     |                                    |
+  +----] [--------+                                    |
+  |                                                    |
+```
+- `START` i `MotorRun` (samopodtrzymanie) → gałęzie **równoległe** (OR)
+- `STOP(NC)` → **szeregowo** za obiema ścieżkami — odcina jedyną drogę do cewki
+- Gdy `START=1` i `STOP=1` → **MotorRun = 0** (STOP odcina cewkę)
 
-![Dominacja SET vs RESET — porównanie obwodów LAD](images/safety/dominacja_set_reset_lad.png)
+**Dominacja SET (= odpowiednik SR) — START wygrywa:**
 
-**Tabele prawdy — zachowanie Lampki:**
+```
+  |                                                    |
+  |    START                            MotorRun       |
+  +----] [-------------------+--------( )------------ -+
+  |                          |                         |
+  |  MotorRun     STOP(NC)   |                         |
+  +----] [--------]/[--------+                         |
+  |                                                    |
+```
+- `START` → prowadzi do cewki **bezpośrednio** (górna gałąź — omija STOP)
+- `MotorRun` + `STOP(NC)` → dolna gałąź (samopodtrzymanie przez STOP)
+- Gdy `START=1` i `STOP=1` → **MotorRun = 1** (START w górnej gałęzi zasila cewkę mimo otwartego STOP w dolnej)
 
-![Tabele prawdy Dominacja SET i RESET](images/safety/dominacja_set_reset_tabela.png)
+**Tabela prawdy — porównanie obu dominacji:**
 
-| Stan | START | STOP | Lampka (Dominacja SET) | Lampka (Dominacja RESET) |
-|------|-------|------|------------------------|--------------------------|
-| Oba wciśnięte | 1 | 1 | **1** ← SET wygrywa | **0** ← RESET wygrywa |
-| Tylko START | 1 | 0 | 1 | 1 |
-| Tylko STOP | 0 | 1 | 0 | 0 |
-| Żaden | 0 | 0 | * (stan poprzedni) | * (stan poprzedni) |
+| START | STOP | MotorRun_prev | Dominacja RESET | Dominacja SET |
+|:-----:|:----:|:-------------:|:---------------:|:-------------:|
+| 0     | 0    | 0             | 0               | 0             |
+| 0     | 0    | 1             | 1 (trzyma)      | 1 (trzyma)    |
+| 1     | 0    | ×             | 1               | 1             |
+| 0     | 1    | ×             | 0               | 0             |
+| **1** | **1**| **×**         | **0 ← STOP**   | **1 ← START** |
 
-> Gwiazdka „*" oznacza stan zapamiętany — bez akcji na wejściach układ nie zmienia stanu (samopodtrzymanie działa).
+> Jedyna różnica → wiersz ostatni (`START=1, STOP=1`). Reszta identyczna.
 
 **Związek z przerzutnikami bistabilnymi w TIA Portal:**
 
-| Schemat LAD (ręczny) | Odpowiednik bloku TIA Portal |
-|----------------------|------------------------------|
-| Dominacja SET | Blok **SR** — Set-Dominant (S wygrywa) |
-| Dominacja RESET | Blok **RS** — Reset-Dominant (R wygrywa) |
+| Schemat LAD (styki + cewki) | Odpowiednik bloku TIA Portal |
+|-----------------------------|------------------------------|
+| Dominacja SET               | Blok **SR** — Set-Dominant (S wygrywa) |
+| Dominacja RESET             | Blok **RS** — Reset-Dominant (R wygrywa) |
 
 **Zasada projektowania bezpiecznych maszyn:** Zawsze stosuj **Dominację RESET** dla obwodów STOP i E-Stop. Operator musi mieć gwarancję, że wciśnięcie przycisku wyłączenia zatrzyma maszynę niezależnie od innych sygnałów (EN 60204-1 §9.2.2).
 
