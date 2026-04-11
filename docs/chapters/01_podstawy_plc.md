@@ -262,7 +262,8 @@ Rodzina S7-1200 to kompaktowe sterowniki montowane na szynie DIN, programowane w
 Po wymianie uszkodzonego czujnika IO-Link Master automatycznie wgrywa zapisane parametry do nowego urządzenia — bez interwencji serwisanta. TIA Portal → właściwości portu IO-Link → `Data Storage: On`.
 
 **Typowe zastosowania w automotive:**
-- Czujniki pozycji z identyfikacją narzędzi (numer seryjny toolingu czytany z IO-Link)
+- Czujniki odległości/ciśnienia z pełną parametryzacją — zmiana zakresu pomiarowego zdalnie z PLC bez fizycznej ingerencji
+- Czujniki RFID (IO-Link) do identyfikacji wymiennego oprzyrządowania (tooling) — PLC rozpoznaje zamontowany wariant i wybiera sekwencję
 - Kolumny świetlne z parametryzacją kolorów i wzorów przez PLC
 - Zawory pneumatyczne z diagnostyką licznika zadziałań
 

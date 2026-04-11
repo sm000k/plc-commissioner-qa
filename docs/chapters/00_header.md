@@ -1,4 +1,4 @@
-﻿# KOMPENDIUM Q&A — v12.5
+# KOMPENDIUM Q&A — v12.5
 
 ### PLC Programmer / Commissioner / Automatyk
 
@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 15:32 | Pytania: 177
+### Wersja: v12.5 | Data: 2026-04-11 15:39 | Pytania: 177
 
 ---
 

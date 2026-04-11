@@ -1,4 +1,4 @@
-﻿# KOMPENDIUM Q&A — v12.5
+# KOMPENDIUM Q&A — v12.5
 
 ### PLC Programmer / Commissioner / Automatyk
 
@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 15:32 | Pytania: 177
+### Wersja: v12.5 | Data: 2026-04-11 15:39 | Pytania: 177
 
 ---
 
@@ -542,7 +542,8 @@ Rodzina S7-1200 to kompaktowe sterowniki montowane na szynie DIN, programowane w
 Po wymianie uszkodzonego czujnika IO-Link Master automatycznie wgrywa zapisane parametry do nowego urządzenia — bez interwencji serwisanta. TIA Portal → właściwości portu IO-Link → `Data Storage: On`.
 
 **Typowe zastosowania w automotive:**
-- Czujniki pozycji z identyfikacją narzędzi (numer seryjny toolingu czytany z IO-Link)
+- Czujniki odległości/ciśnienia z pełną parametryzacją — zmiana zakresu pomiarowego zdalnie z PLC bez fizycznej ingerencji
+- Czujniki RFID (IO-Link) do identyfikacji wymiennego oprzyrządowania (tooling) — PLC rozpoznaje zamontowany wariant i wybiera sekwencję
 - Kolumny świetlne z parametryzacją kolorów i wzorów przez PLC
 - Zawory pneumatyczne z diagnostyką licznika zadziałań
 
