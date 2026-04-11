@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 15:07 | Pytania: 178
+### Wersja: v12.5 | Data: 2026-04-11 15:16 | Pytania: 177
 
 ---
 
@@ -55,7 +55,6 @@
 - [1.13. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?](#113-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc--)
 - [1.14. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?](#114-co-to-jest-przerzutnik-sr-i-rs-w-tia-portal-i-jaka-jest-różnica-w-priorytecie--)
 - [1.15. Jak zbudować układ samopodtrzymania w LAD i czym różni się Dominacja SET od Dominacji RESET?](#115-jak-zbudować-układ-samopodtrzymania-w-lad-i-czym-różni-się-dominacja-set-od-dominacji-reset--)
-- [1.16. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?](#116-jaką-typową-pułapkę-w-obwodzie-samopodtrzymania-lad-pokazuje-zadanie-znajdź-różnice--)
 
 **2. ARCHITEKTURA SIMATIC SAFETY INTEGRATED**
 - [2.1. Co to jest SIMATIC Safety Integrated i co oznacza 'wszystko w jednym sterowniku'?](#21-co-to-jest-simatic-safety-integrated-i-co-oznacza-wszystko-w-jednym-sterowniku--)
@@ -263,7 +262,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **178 pytań / 21 sekcji.**
+> **177 pytań / 21 sekcji.**
 
 
 ---
@@ -678,56 +677,6 @@ Układ seal-in z normalną cewką `( )`, bloki SR/RS i cewki `(S)`/`(R)` to **ta
 **Zasada bezpieczeństwa:** Zawsze stosuj **Dominację RESET** dla obwodów STOP i E-Stop. Operator musi mieć gwarancję, że STOP zatrzyma maszynę niezależnie od innych sygnałów (EN 60204-1 §9.2.2).
 
 *Źródło: Kurs ControlByte — Układy samopodtrzymania, Dominacja SET/RESET; EN 60204-1 §9.2.2*
-
-
----
-
-### 1.16. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?  🔴
-
-**Pułapka samopodtrzymania** polega na błędnym umieszczeniu styku samopodtrzymania (Lampka) tak, że **omija on przycisk STOP** — wciśnięcie STOP nie wyłącza cewki, bo prąd płynie alternatywną ścieżką.
-
-**Obwód LEWOSTRONNY — poprawny (Dominacja RESET):**
-```
-BARIERA_MAGISTRALI
-+--[ START ]--+----[ /STOP ]----(  Lampka  )
-              |
-+--[ Lampka ]-+
-```
-- Styk `Lampka` (samopodtrzymanie) jest w gałęzi **równoległej do START** — przed STOP
-- STOP jest **szeregowy z oboma ścieżkami** (START i samopodtrzymaniem)
-- Wciśnięcie STOP → otwiera jedyną drogę do cewki → Lampka **gaśnie** ✅
-
-**Obwód PRAWOSTRONNY — niepoprawny (STOP omijany):**
-```
-+--[ START ]--[ /STOP ]---(  Lampka  )
-|                              |
-+--------[ Lampka ]------------+
-```
-- Styk `Lampka` (samopodtrzymanie) jest w gałęzi **równoległej do całego szeregu START–STOP**
-- Gdy Lampka=1 i operator wciśnie STOP: prąd nadal płynie dolną ścieżką przez `Lampka` → cewka **nadal zasilona** ❌
-- STOP jest **bezużyteczny** gdy Lampka jest już włączona
-
-**Tabela porównawcza:**
-
-| Stan | STOP wciśnięty | Obwód LEWY (poprawny) | Obwód PRAWY (błędny) |
-|------|----------------|----------------------|----------------------|
-| Lampka=1 | TAK | Lampka → 0 ✅ | Lampka → **1** ❌ |
-| Lampka=0 | TAK | Lampka → 0 ✅ | Lampka → 0 ✅ |
-| START=1 | NIE | Lampka → 1 | Lampka → 1 |
-
-> ⚠️ **Błąd projektowy klasy STOP-ignorowanego!** Prawy obwód sprawia wrażenie poprawnego podczas statycznej analizy schematu. Błąd ujawnia się dopiero w działaniu — gdy Lampka raz się załączy, przycisku STOP nie można jej wyłączyć. W systemach safety jest to krytyczny błąd bezpieczeństwa.
-
-> 💡 **Reguła zapamiętywania:** Styk samopodtrzymania **zawsze przed STOP** (w gałęzi równoległej tylko do START). STOP musi być „po" całej logice podtrzymania, żeby faktycznie odcinał zasilanie cewki.
-
-**Zastosowanie w praktyce:**
-- Typowy obwód układu napędowego: `(START || KM_zal) AND STOP_NC → KM_cewka`
-- W TIA Portal LAD: samopodtrzymanie = styk wyjściowego bitu Q równoległy do przycisku START, STOP zawsze w gałęzi głównej przed cewką
-- Analogiczny błąd w SCL: `IF Start OR Q THEN Q := TRUE; IF Stop THEN Q := FALSE; END_IF;` — STOP nie zadziała jeśli `Start=TRUE` jednocześnie (priorytet SET)
-
-*Źródło: Kurs ControlByte — Slajd 9/24 „Znajdź różnice", Układy samopodtrzymania; EN 60204-1 §9.2.2*
-
-
----
 
 ## 2. ARCHITEKTURA SIMATIC SAFETY INTEGRATED
 

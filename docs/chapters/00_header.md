@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 15:07 | Pytania: 178
+### Wersja: v12.5 | Data: 2026-04-11 15:16 | Pytania: 177
 
 ---
 
@@ -55,7 +55,6 @@
 - [1.13. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?](#113-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc--)
 - [1.14. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?](#114-co-to-jest-przerzutnik-sr-i-rs-w-tia-portal-i-jaka-jest-różnica-w-priorytecie--)
 - [1.15. Jak zbudować układ samopodtrzymania w LAD i czym różni się Dominacja SET od Dominacji RESET?](#115-jak-zbudować-układ-samopodtrzymania-w-lad-i-czym-różni-się-dominacja-set-od-dominacji-reset--)
-- [1.16. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?](#116-jaką-typową-pułapkę-w-obwodzie-samopodtrzymania-lad-pokazuje-zadanie-znajdź-różnice--)
 
 **2. ARCHITEKTURA SIMATIC SAFETY INTEGRATED**
 - [2.1. Co to jest SIMATIC Safety Integrated i co oznacza 'wszystko w jednym sterowniku'?](#21-co-to-jest-simatic-safety-integrated-i-co-oznacza-wszystko-w-jednym-sterowniku--)
@@ -263,7 +262,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **178 pytań / 21 sekcji.**
+> **177 pytań / 21 sekcji.**
 
 
 ---
