@@ -136,5 +136,56 @@ Pilz PNOZmulti to programowalny sterownik bezpieczeństwa, który umożliwia ła
 
 *Źródło: Siemens SIMATIC S7-1500H System Manual (6ES7518-4FX00-1AC2)*
 
+### 2.9. Jak wygląda minimalna konfiguracja sprzętowa sieci S7-1500H?  🟢
+
+Minimalna sieć Hot Standby wymaga **6 komponentów** — dwa CPU, dwa połączenia synchronizacji i jedną stację I/O w trybie Shared Device:
+
+**Lista komponentów (minimum):**
+
+| # | Komponent | Ilość | Rola |
+|---|-----------|-------|------|
+| 1 | CPU 1517H (6ES7 517-3HP00) | 2 | Primary + Backup |
+| 2 | PM 190W zasilacz | 2 | Osobne zasilanie per CPU (niezależność awaryjna) |
+| 3 | Kabel Sync Link (X3↔X3, X4↔X4) | 2 | Synchronizacja danych — dedykowane, oddzielne od PROFINET |
+| 4 | SCALANCE switch (np. XB208) | 1 | PROFINET — oba CPU podłączone do wspólnej sieci |
+| 5 | ET200SP z IM 155-6 PN **HF** | 1 | Shared Device — 2 porty PN, widziana przez oba CPU |
+| 6 | Moduły I/O (DI/DQ/AI) | min. 1 | Wejścia/wyjścia procesowe |
+
+**Kluczowe zasady konfiguracji:**
+- **Sync Link = 2 fizyczne połączenia** (porty X3↔X3 i X4↔X4 między CPU) — redundancja linku synchronizacji. Jeden kabel padnie → system działa dalej. Fiber na duże odległości, Ethernet do ~100 m.
+- **Shared Device** — ET200SP z IM 155-6 PN **HF** (nie zwykły IM!) ma 2 porty PROFINET i prowadzi komunikację z **oboma** CPU jednocześnie. Przy switchover stacja nie traci połączenia.
+- **PROFINET** — oba CPU podłączone do tego samego PROFINET (przez switch), każdy prowadzi swoją komunikację z IO-Devices.
+- **W TIA Portal** — konfigurujesz **jeden** H-CPU w Hardware Config. TIA automatycznie generuje konfigurację Backup. Piszesz program raz.
+
+**Czego NIE potrzebujesz w minimalnej konfiguracji:**
+- Redundancja PROFINET (ring MRP) — opcja, nie wymóg
+- Moduły F (Safety) — H to dostępność, nie Safety
+- Dodatkowa licencja — H-firmware jest w CPU 1517H/1518H
+
+```
+┌──────────────────┐         Sync Link ×2         ┌──────────────────┐
+│   Szafa 1        │  X3 ════════════════════ X3   │   Szafa 2        │
+│  ┌────────────┐  │  X4 ════════════════════ X4   │  ┌────────────┐  │
+│  │ CPU 1517H  │  │                               │  │ CPU 1517H  │  │
+│  │  PRIMARY   │  │                               │  │  BACKUP    │  │
+│  └─────┬──────┘  │                               │  └─────┬──────┘  │
+│    PM 190W       │                               │    PM 190W       │
+└────────┼─────────┘                               └────────┼─────────┘
+         │ PROFINET X1                                      │ PROFINET X1
+         └──────────────┬───── SCALANCE XB208 ──────────────┘
+                        │
+                ┌───────┴───────┐
+                │  ET200SP      │
+                │  IM 155-6     │
+                │  PN HF        │
+                │  (Shared Dev) │
+                ├───────────────┤
+                │ DI │ DQ │ AI  │
+                └───────────────┘
+```
+
+⚠️ **DO WERYFIKACJI** — numery zamówieniowe CPU orientacyjne, mogą się różnić w zależności od wersji firmware.
+*[PRAWDOPODOBNE] — na podstawie Siemens S7-1500H System Manual*
+
 ---
 

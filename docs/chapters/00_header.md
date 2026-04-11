@@ -4,13 +4,13 @@
 
 ### Siemens TIA Portal · Safety PLC · ET200 · Napędy SINAMICS · Robot ABB · SICAR
 
-### Wersja: v12.5 | Data: 2026-04-11 15:48 | Pytania: 176
+### Wersja: v12.5 | Data: 2026-04-11 16:01 | Pytania: 177
 
 ### Pytania + odpowiedzi zweryfikowane pod kątem rozmów kwalifikacyjnych.
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 15:39 | Pytania: 176
+### Wersja: v12.5 | Data: 2026-04-11 15:39 | Pytania: 177
 
 ---
 
@@ -67,6 +67,7 @@
 - [2.6. Jakie są tryby pracy Safety CPU i jak się przełącza?](#26-jakie-są-tryby-pracy-safety-cpu-i-jak-się-przełącza)
 - [2.7. Jakie są podstawowe komponenty i zasady programowania sterowników bezpieczeństwa Pilz PNOZmulti?](#27-jakie-są-podstawowe-komponenty-i-zasady-programowania-sterowników-bezpieczeństwa-pilz-pnozmulti)
 - [2.8. Co to jest S7-1500H (Hot Standby) i kiedy go stosujesz?](#28-co-to-jest-s7-1500h-hot-standby-i-kiedy-go-stosujesz--)
+- [2.9. Jak wygląda minimalna konfiguracja sprzętowa sieci S7-1500H?](#29-jak-wygląda-minimalna-konfiguracja-sprzętowa-sieci-s7-1500h--)
 
 **3. MODUŁY F-DI / F-DO — OKABLOWANIE I PARAMETRY**
 - [3.1. Co to jest F-DI i jak różni się od standardowego DI?](#31-co-to-jest-f-di-i-jak-różni-się-od-standardowego-di--)
@@ -263,7 +264,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **176 pytań / 21 sekcji.**
+> **177 pytań / 21 sekcji.**
 
 
 ---
