@@ -1,4 +1,4 @@
-﻿# KOMPENDIUM Q&A — v12.4
+﻿# KOMPENDIUM Q&A — v12.5
 
 ### PLC Programmer / Commissioner / Automatyk
 
@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.4 | Data: 2026-04-11 13:11 | Pytania: 159
+### Wersja: v12.5 | Data: 2026-04-11 13:48 | Pytania: 178
 
 ---
 
@@ -108,6 +108,10 @@
 - [7.2. Co to jest F-Address i jak go konfigurujesz?](#72-co-to-jest-f-address-i-jak-go-konfigurujesz--)
 - [7.3. Co to jest F-monitoring time i co się dzieje po jego przekroczeniu?](#73-co-to-jest-f-monitoring-time-i-co-się-dzieje-po-jego-przekroczeniu)
 - [7.4. Jak Safety działa przez ET200 (zdalne I/O) i czym jest F-peripheral?](#74-jak-safety-działa-przez-et200-zdalne-io-i-czym-jest-f-peripheral)
+- [7.5. Jakie telegramy PROFIsafe są stosowane w napędach SINAMICS i co zawierają?](#75-jakie-telegramy-profisafe-są-stosowane-w-napędach-sinamics-i-co-zawierają)
+- [7.6. Jak oblicza się i dobiera F-monitoring time dla modułów PROFIsafe?](#76-jak-oblicza-się-i-dobiera-f-monitoring-time-dla-modułów-profisafe)
+- [7.7. Jak PROFIsafe chroni przed przekłamaniem danych i jakie mechanizmy bezpieczeństwa stosuje ramka PROFIsafe?](#77-jak-profisafe-chroni-przed-przekłamaniem-danych-i-jakie-mechanizmy-bezpieczeństwa-stosuje-ramka-profisafe)
+- [7.8. Jak działa komunikacja Safety między dwoma F-CPU (Safety-to-Safety communication) przez PROFIsafe?](#78-jak-działa-komunikacja-safety-między-dwoma-f-cpu-safety-to-safety-communication-przez-profisafe)
 
 **8. NAPĘDY SAFETY — SINAMICS Z WBUDOWANYM SAFETY**
 - [8.1. Co to jest STO (Safe Torque Off) i jak działa?](#81-co-to-jest-sto-safe-torque-off-i-jak-działa--)
@@ -154,6 +158,14 @@
 **12. NAPĘDY SINAMICS**
 - [12.1. Co to jest SINAMICS Startdrive w TIA Portal?](#121-co-to-jest-sinamics-startdrive-w-tia-portal)
 - [12.2. Jak konfigurujesz SINAMICS G120 z Safety przez PROFIsafe?](#122-jak-konfigurujesz-sinamics-g120-z-safety-przez-profisafe--)
+- [12.3. Z jakich komponentów składa się napęd SINAMICS G120 i jaką rolę pełni każdy z nich?](#123-z-jakich-komponentów-składa-się-napęd-sinamics-g120-i-jaką-rolę-pełni-każdy-z-nich)
+- [12.4. Czym są telegramy PROFIdrive i jakie telegramy stosuje się w SINAMICS G120?](#124-czym-są-telegramy-profidrive-i-jakie-telegramy-stosuje-się-w-sinamics-g120)
+- [12.5. Jak wygląda procedura pierwszego uruchomienia (commissioning) SINAMICS G120 przez Startdrive?](#125-jak-wygląda-procedura-pierwszego-uruchomienia-commissioning-sinamics-g120-przez-startdrive)
+- [12.6. Czym różnią się napędy SINAMICS G120, S120 i V90 i kiedy stosuje się każdy z nich?](#126-czym-różnią-się-napędy-sinamics-g120-s120-i-v90-i-kiedy-stosuje-się-każdy-z-nich)
+- [12.7. Jak wygląda diagnostyka napędu SINAMICS G120 — fault codes, ostrzeżenia i kasowanie błędów?](#127-jak-wygląda-diagnostyka-napędu-sinamics-g120--fault-codes-ostrzeżenia-i-kasowanie-błędów)
+- [12.8. Czym jest sterowanie wektorowe (Vector Control) vs skalarne (V/f) w SINAMICS G120 i kiedy stosujesz każdy tryb?](#128-czym-jest-sterowanie-wektorowe-vector-control-vs-skalarne-vf-w-sinamics-g120-i-kiedy-stosujesz-każdy-tryb)
+- [12.9. Czym różni się architektura SINAMICS S120 od G120 i jak wygląda jej konfiguracja w TIA Portal?](#129-czym-różni-się-architektura-sinamics-s120-od-g120-i-jak-wygląda-jej-konfiguracja-w-tia-portal)
+- [12.10. Jak wyglądają typowe scenariusze wymiany napędu SINAMICS G120 na obiekcie (service/replacement)?](#1210-jak-wyglądają-typowe-scenariusze-wymiany-napędu-sinamics-g120-na-obiekcie-servicereplacement)
 
 **13. E-STOP — NORMY, IMPLEMENTACJA I OBLICZENIA BEZPIECZEŃSTWA**
 - [13.1. Jakie są kategorie zatrzymania wg EN 60204-1 i jak wpływają na wybór STO vs SS1?](#131-jakie-są-kategorie-zatrzymania-wg-en-60204-1-i-jak-wpływają-na-wybór-sto-vs-ss1--)
@@ -161,6 +173,9 @@
 - [13.3. Co to jest feedback circuit (obwód sprzężenia zwrotnego styczników) i dlaczego jest wymagany dla SIL 3 / PL e?](#133-co-to-jest-feedback-circuit-obwód-sprzężenia-zwrotnego-styczników-i-dlaczego-jest-wymagany-dla-sil-3--pl-e--)
 - [13.4. Co to są CCF (Common Cause Failure) i jakie środki są wymagane dla Cat.4?](#134-co-to-są-ccf-common-cause-failure-i-jakie-środki-są-wymagane-dla-cat4--)
 - [13.5. Czy można łączyć przyciski e-stop szeregowo do jednego wejścia F-DI?](#135-czy-można-łączyć-przyciski-e-stop-szeregowo-do-jednego-wejścia-f-di)
+- [13.6. Jak wygląda obliczenie PFHD (Probability of Dangerous Failure per Hour) dla funkcji Safety E-Stop z F-CPU S7-1500F?](#136-jak-wygląda-obliczenie-pfhd-probability-of-dangerous-failure-per-hour-dla-funkcji-safety-e-stop-z-f-cpu-s7-1500f)
+- [13.7. Co to jest DC (Diagnostic Coverage) i jak jest osiągane w poszczególnych podsystemach E-Stop?](#137-co-to-jest-dc-diagnostic-coverage-i-jak-jest-osiągane-w-poszczególnych-podsystemach-e-stop)
+- [13.8. Jak wygląda obliczenie czasów odpowiedzi (response time) w funkcji Safety E-Stop i co na nie wpływa?](#138-jak-wygląda-obliczenie-czasów-odpowiedzi-response-time-w-funkcji-safety-e-stop-i-co-na-nie-wpływa)
 
 **14. PROFINET — TOPOLOGIA, DIAGNOSTYKA I ZAAWANSOWANE FUNKCJE**
 - [14.1. Co to jest MRP (Media Redundancy Protocol) i kiedy go stosujesz?](#141-co-to-jest-mrp-media-redundancy-protocol-i-kiedy-go-stosujesz--)
@@ -218,6 +233,10 @@
 - [19.1. Jak krok po kroku dodajesz nową wyspę sygnałową ET200SP Safety (F-peripheral) do istniejącego projektu?](#191-jak-krok-po-kroku-dodajesz-nową-wyspę-sygnałową-et200sp-safety-f-peripheral-do-istniejącego-projektu--)
 - [19.2. Jak dodajesz wyspę pneumatyczną SMC (seria EX600) do projektu TIA Portal przez PROFINET?](#192-jak-dodajesz-wyspę-pneumatyczną-smc-seria-ex600-do-projektu-tia-portal-przez-profinet)
 - [19.3. Jak krok po kroku dodajesz napęd SINAMICS G120 przez PROFINET do projektu TIA Portal?](#193-jak-krok-po-kroku-dodajesz-napęd-sinamics-g120-przez-profinet-do-projektu-tia-portal)
+- [19.4. Jak dodajesz stację ET200MP z modułami Safety do istniejącej linii produkcyjnej z wieloma stacjami PROFINET?](#194-jak-dodajesz-stację-et200mp-z-modułami-safety-do-istniejącej-linii-produkcyjnej-z-wieloma-stacjami-profinet)
+- [19.5. Co to jest „Assign PROFIsafe address" i dlaczego jest wymagane osobno od konfiguracji TIA Portal?](#195-co-to-jest-assign-profisafe-address-i-dlaczego-jest-wymagane-osobno-od-konfiguracji-tia-portal)
+- [19.6. Jak dodajesz urządzenie firm trzecich (np. Festo, Beckhoff, WAGO) do projektu TIA Portal przez PROFINET?](#196-jak-dodajesz-urządzenie-firm-trzecich-np-festo-beckhoff-wago-do-projektu-tia-portal-przez-profinet)
+- [19.7. Jak wygląda procedura wymiany uszkodzonego modułu ET200SP na działającej linii (hot swap)?](#197-jak-wygląda-procedura-wymiany-uszkodzonego-modułu-et200sp-na-działającej-linii-hot-swap)
 
 **20. SCHEMATY ELEKTRYCZNE — CZYTANIE, ANALIZA I PRAKTYKA COMMISSIONING**
 - [20.1. Co to jest schemat elektryczny i jakie rodzaje schematów spotykasz na obiekcie?](#201-co-to-jest-schemat-elektryczny-i-jakie-rodzaje-schematów-spotykasz-na-obiekcie)
@@ -244,7 +263,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **159 pytań / 21 sekcji.**
+> **178 pytań / 21 sekcji.**
 
 
 ---
@@ -1190,6 +1209,97 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 ---
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+
+### 7.5. Jakie telegramy PROFIsafe są stosowane w napędach SINAMICS i co zawierają?
+
+**Telegramy PROFIsafe w napędach** to dodatkowe submoduły komunikacyjne konfigurowane w TIA Portal obok standardowych telegramów PROFIdrive. Przesyłają komendy Safety (STO, SS1, SLS…) i status Safety napędu przez tę samą sieć PROFINET.
+
+- **Telegram PROFIsafe 30** — podstawowy telegram Safety dla napędów SINAMICS. Zawiera:
+  - Dane sterujące (F-CPU → napęd): komendy aktywacji/deaktywacji funkcji Safety (STO, SS1, SLS, SDI itp.)
+  - Dane statusowe (napęd → F-CPU): potwierdzenie aktywnych funkcji Safety, status błędów Safety
+  - Stosowany w SINAMICS G120 (CU250S-2) i S120 dla prostych konfiguracji Safety
+- **Telegram PROFIsafe 54** — rozszerzony telegram Safety z dodatkowymi danymi diagnostycznymi, używany w zaawansowanych konfiguracjach S120
+- **Telegram PROFIsafe 900/902** — telegramy Safety dla SINAMICS S120, stosowane w trybie izochronicznym (IRT). Telegram 902 jest konfigurowany np. na CU310-2 PN V5.1 dla synchronizacji Safety z cyklem PROFINET
+- **Konfiguracja w TIA Portal:** Device view napędu → zakładka „Submodules" → dodaj submoduł PROFIsafe (np. „PROFIsafe Telegram 30") → ustaw F-Address, F-monitoring time
+
+**Relacja telegram PROFIdrive + PROFIsafe:**
+Napęd może mieć jednocześnie telegram PROFIdrive (np. telegram 20 — sterowanie prędkością) i telegram PROFIsafe (np. telegram 30 — komendy Safety). Oba działają równolegle na tym samym połączeniu PROFINET.
+
+**Praktyka commissioning:** Po dodaniu telegramu PROFIsafe do napędu → F-Address musi być identyczny w TIA Portal i w napędzie. Po każdej zmianie parametrów Safety wymagany jest Safety Acceptance Test z podpisem. W S120 z trybem izochronicznym (telegram 902) należy skonfigurować także partition image process (PIP) dedykowane tylko dla F-I/O.
+
+> Źródło: SIMATIC Safety - Konfiguracja i programowanie (2), s.62 — konfiguracja submodułu „Profisafe Telgr 902" sterownika SINAMICS S120 CU310-2 PN V5.1 [ZWERYFIKOWANE]
+
+### 7.6. Jak oblicza się i dobiera F-monitoring time dla modułów PROFIsafe?
+
+**F-monitoring time (czas monitorowania PROFIsafe, TPSTO)** to parametr określający maksymalny dozwolony czas między kolejnymi poprawnymi ramkami PROFIsafe. Po jego przekroczeniu moduł F przechodzi do stanu bezpiecznego (passivation).
+
+- **Konfiguracja:**
+  - Centralnie: we właściwościach F-CPU → „Default F-monitoring time for F-I/O of this interface" — domyślna wartość dla wszystkich modułów F na danym interfejsie
+  - Indywidualnie: we właściwościach każdego F-I/O → „F-monitoring time" — nadpisuje wartość domyślną
+- **Zasada doboru:**
+  - **Za krótki** → fałszywe passivation przy chwilowym obciążeniu sieci (np. duży ruch PROFINET, wiele stacji)
+  - **Za długi** → wolna reakcja na rzeczywistą awarię komunikacji — wydłuża czas odpowiedzi Safety
+- **Narzędzie do obliczeń:** Siemens udostępnia arkusz kalkulacyjny Excel do obliczenia minimalnego F-monitoring time na podstawie: czasu cyklu PROFINET, liczby F-I/O, czasu cyklu grupy F-runtime, topologii sieci. Dostępny na support.automation.siemens.com (Entry ID: 49368678)
+- **Czynniki wpływające:** czas cyklu PROFINET (Send Clock), liczba urządzeń na interfejsie, update time F-I/O, czas cyklu F-runtime group
+
+**Procedura weryfikacji na obiekcie (z dokumentacji Siemens):**
+1. Dodaj tymczasowy F-I/O do sieci
+2. Ustaw na nim krótszy F-monitoring time niż na produkcyjnych F-I/O
+3. Jeśli tymczasowy F-I/O generuje „Monitoring time for safety message frame exceeded" → wartość jest poniżej minimum
+4. Zwiększaj F-monitoring time aż przestanie generować błędy — to przybliżone minimum dla sieci
+
+**Praktyka commissioning:** Na nowych instalacjach zacznij od wartości domyślnej F-CPU. Jeśli pojawiają się sporadyczne passivation bez widocznej przyczyny sieciowej → zwiększ F-monitoring time o 50%. Zawsze dokumentuj wartości w tabeli komisjonowania.
+
+> Źródło: SIMATIC Safety - Konfiguracja i programowanie (2), s.654-655 — procedura kontroli czasu monitorowania PROFIsafe [ZWERYFIKOWANE]
+
+### 7.7. Jak PROFIsafe chroni przed przekłamaniem danych i jakie mechanizmy bezpieczeństwa stosuje ramka PROFIsafe?
+
+**PROFIsafe** implementuje warstwę bezpieczeństwa na standardowym PROFINET/PROFIBUS, stosując mechanizm „black channel" — traktuje sieć jako kanał niebezpieczny i zabezpiecza się przed wszystkimi typami błędów transmisji.
+
+**Mechanizmy ochronne w ramce PROFIsafe:**
+
+- **CRC (Cyclic Redundancy Check)** — obliczany na podstawie danych Safety, F-Address i Virtual Consecutive Number (VCN). Wykrywa przekłamanie danych (bit flip) i błędne zaadresowanie (moduł dostaje dane innego modułu)
+  - CRC1 (3 bajty) — dla krótszych telegramów
+  - CRC2 (4 bajty) — dla dłuższych telegramów, wyższe pokrycie błędów
+- **Virtual Consecutive Number (VCN)** — wirtualny numer sekwencyjny wbudowany w obliczenie CRC (nie jest osobnym polem w ramce). Chroni przed: utratą pakietu, powtórzeniem pakietu (replay), błędną sekwencją
+- **Toggle bit** — w status/control byte ramki PROFIsafe. Zmienia się przy każdej nowej ramce — pozwala odbiorcy wykryć, czy otrzymał nową ramkę czy powtórzenie
+- **F-Address w CRC** — adres nadawcy/odbiorcy jest wbudowany w obliczenie CRC. Jeśli ramka dotrze do niewłaściwego urządzenia, CRC się nie zgadza → passivation
+- **Watchdog (F-monitoring time)** — jeśli prawidłowa ramka nie dotrze w określonym czasie → passivation
+
+**Porównanie z „gołym" PROFINET:**
+| Zagrożenie | PROFINET | PROFIsafe |
+|-----------|----------|-----------|
+| Bit flip | Ethernet CRC (L2) — nie fail-safe | CRC1/CRC2 z F-Address — fail-safe |
+| Utrata pakietu | Brak wykrycia | VCN + watchdog |
+| Powtórzenie/replay | Brak wykrycia | VCN + toggle bit |
+| Błędny adres | Routing do IP — nie fail-safe | F-Address w CRC |
+
+**Praktyka commissioning:** PROFIsafe nie wymaga specjalnego okablowania ani dedykowanych switchy — działa na standardowej infrastrukturze PROFINET. Ale jakość sieci wpływa na ilość retransmisji i ryzyko passivation. Na obciążonych sieciach → monitoruj wskaźnik retransmisji PROFIsafe w diagnostyce TIA Portal.
+
+*[ZWERYFIKOWANE] — na podstawie SIMATIC Safety Integrated broszura (PROFINET i PROFIsafe, „black channel", s.7) + SIMATIC Safety - Konfiguracja i programowanie*
+
+### 7.8. Jak działa komunikacja Safety między dwoma F-CPU (Safety-to-Safety communication) przez PROFIsafe?
+
+**Komunikacja Safety-to-Safety (F-CPU ↔ F-CPU)** pozwala na wymianę danych bezpieczeństwa między dwoma sterownikami Safety bez pośrednictwa standardowego kodu — np. przekazanie stanu E-Stop z jednej linii do drugiej.
+
+- **Realizacja:** Przez instrukcje `SENDDP/RCVDP` (S7-300F/400F) lub przez **Safety Data Exchange (S7-1500F)** — wymiana danych Safety przez PROFINET IO między dwoma F-CPU
+- **Mechanizm:**
+  - Jeden F-CPU jest IO-Controller, drugi jest IO-Device (lub oba mają funkcję Shared Device / I-Device)
+  - Dane Safety przesyłane są przez PROFIsafe z pełnym CRC, VCN i F-monitoring time — identycznie jak dla F-I/O
+  - Każde połączenie Safety-to-Safety wymaga osobnego F-Address i F-monitoring time
+- **Zastosowanie:**
+  - Linia produkcyjna z wieloma stacjami, każda ma własny F-CPU — E-Stop na jednej stacji musi zatrzymać napędy na sąsiednich
+  - Robot ABB z dedykowanym PLC Safety — wymiana danych Safety z nadrzędnym F-CPU linii
+  - Automotive: SICAR — każda cela robotyczna ma własny F-CPU, sygnały Safety (bramki, E-Stop, kurtyny) muszą być dzielone między celami
+
+**Konfiguracja w TIA Portal:**
+1. F-CPU „nadawca" konfiguruje transfer area w Safety Administration → definiuje jakie dane wysyła
+2. F-CPU „odbiorca" konfiguruje odbieranie z podaniem F-Address nadawcy
+3. Oba F-CPU muszą mieć identyczne collective signature Safety po konfiguracji
+
+**Praktyka commissioning:** Przy Safety-to-Safety upewnij się, że F-monitoring time jest dostatecznie długi — komunikacja przechodzi przez PROFINET między CPU, co dodaje opóźnienie. Na dużych instalacjach z wieloma hopami sieciowymi zwiększ F-monitoring time o współczynnik 2-3x względem lokalnych F-I/O.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, szczegóły konfiguracji Safety-to-Safety mogą się różnić między S7-300F/400F a S7-1500F*
 ## 8. NAPĘDY SAFETY — SINAMICS Z WBUDOWANYM SAFETY
 
 ### 8.1. Co to jest STO (Safe Torque Off) i jak działa?  🔴
@@ -1730,6 +1840,161 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 ---
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+
+### 12.3. Z jakich komponentów składa się napęd SINAMICS G120 i jaką rolę pełni każdy z nich?
+
+**SINAMICS G120** to modułowy przemiennik częstotliwości Siemens składający się z dwóch głównych komponentów: Control Unit (CU) i Power Module (PM), które dobieramy niezależnie.
+
+- **Control Unit (CU)** — moduł sterujący odpowiedzialny za regulację napędu, komunikację sieciową (PROFINET/PROFIBUS) oraz realizację funkcji Safety Integrated. Warianty:
+  - `CU240E-2` — podstawowa wersja z interfejsem Ethernet/PROFINET
+  - `CU250S-2` — wersja z Safety Integrated (STO, SS1, SLS, SDI przez PROFIsafe) i wejściami/wyjściami Safety
+- **Power Module (PM)** — moduł mocy zasilający silnik. Warianty obejmują PM240-2 (standardowy), PM230 (bez hamowania DC), PM250 (z wbudowanym hamowaniem regeneracyjnym)
+- **Panel operatorski (opcja)** — BOP-2 (Basic Operator Panel — wyświetlacz segmentowy, ustawianie parametrów ręcznie), IOP-2 (Intelligent Operator Panel — graficzny wyświetlacz LCD, kopiowanie parametrów między napędami)
+- **Karta pamięci SD** — na CU, przechowuje parametryzację napędu (backup/restore — wymiana CU bez ponownej parametryzacji)
+
+**Praktyka commissioning:** Przy wymianie CU w terenie — karta SD z parametrami pozwala na szybką wymianę bez Startdrive. Wyjmij kartę ze starego CU → włóż w nowy → napęd startuje z zapisaną konfiguracją.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, warianty CU/PM mogą się różnić w zależności od generacji*
+
+### 12.4. Czym są telegramy PROFIdrive i jakie telegramy stosuje się w SINAMICS G120?
+
+**PROFIdrive** to standard komunikacji napędów przez PROFINET/PROFIBUS, definiujący strukturę danych wymienianych cyklicznie między PLC a napędem. Wybór telegramu determinuje jakie dane sterujące i statusowe są przesyłane.
+
+- **Telegram 1** — sterowanie prędkościowe podstawowe: słowo sterujące STW1 + zadana prędkość NSOLL_A → słowo statusowe ZSW1 + aktualna prędkość NIST_A. Najczęściej stosowany w prostych aplikacjach transporterów i wentylatorów
+- **Telegram 20** — rozszerzony telegram prędkościowy z dodatkowymi słowami sterującymi (STW2) i procesowymi (PZD). Umożliwia przesyłanie dodatkowych parametrów (np. moment, prąd)
+- **Telegram 352/353** — telegramy z danymi Safety (PROFIsafe) — dla CU250S-2 z Safety Integrated, łączy sterowanie standardowe z danymi failsafe
+- **p0922** — parametr w napędzie, który określa numer aktywnego telegramu. Zmiana telegramu wymaga restartu napędu
+
+**Słowo sterujące STW1 (Control Word)** — kluczowe bity:
+- Bit 0: ON/OFF1 (włącz/wyłącz napęd z wyhamowaniem po rampie)
+- Bit 1: OFF2 (wyłącz — wybieg naturalny)
+- Bit 3: Enable operation (zezwolenie na pracę)
+- Bit 7: Acknowledge fault (kasowanie błędu — zbocze narastające)
+
+**Praktyka commissioning:** Po dodaniu G120 do projektu TIA Portal → w konfiguracji sprzętowej wybierz telegram (zakładka „Telegram configuration") → w programie PLC mapuj STW1/ZSW1 do odpowiednich adresów procesowych.
+
+*[PRAWDOPODOBNE] — struktura telegramów zgodna z profilem PROFIdrive V4; numery telegramów Safety (352/353) ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS G120*
+
+### 12.5. Jak wygląda procedura pierwszego uruchomienia (commissioning) SINAMICS G120 przez Startdrive?
+
+**Procedura pierwszego uruchomienia G120** w TIA Portal ze Startdrive obejmuje konfigurację podstawowych parametrów silnika, identyfikację i optymalizację regulatorów.
+
+**Krok po kroku:**
+
+1. **Dodaj napęd do projektu** — wstaw CU (np. CU240E-2 PN) z katalogu sprzętowego, przypisz adres PROFINET i nazwę urządzenia
+2. **Konfiguracja silnika (dane z tabliczki znamionowej):**
+   - Moc znamionowa, napięcie, prąd, częstotliwość, prędkość obrotowa — Startdrive prowadzi przez wizard „Motor data"
+   - Tryb sterowania: V/f (skalarny — proste aplikacje) lub Vector (wektorowy — precyzyjna regulacja momentu)
+3. **Identyfikacja silnika:**
+   - „Stationary motor identification" — pomiar parametrów silnika bez obrotu wału (rezystancja, indukcyjność, stała czasowa). Bezpieczna — silnik się nie kręci
+   - „Rotating motor identification" — pomiar z obrotem wału (momenty bezwładności, optymalizacja regulatora prędkości). Uwaga: silnik się obraca — odłącz mechanikę!
+4. **Autotuning regulatorów** — na podstawie identyfikacji Startdrive proponuje nastawy regulatora prądowego i prędkościowego
+5. **Test w trybie Jog** — ręczny obrót silnika z Startdrive (przycisk Jog w panelu commissioning) → weryfikacja kierunku obrotu, płynności pracy
+6. **Download do napędu** — „Download to device" → parametry zapisywane w CU (EEPROM)
+
+**Praktyka:** Zawsze wykonaj identyfikację silnika — bez niej regulator pracuje na parametrach domyślnych, co prowadzi do oscylacji, przegrzewania i faultów (np. overcurrent). Po identyfikacji napęd pracuje stabilnie od pierwszego startu.
+
+*[PRAWDOPODOBNE] — procedura ogólna Startdrive commissioning wizard, nazwy parametrów mogą się różnić między wersjami Startdrive*
+
+### 12.6. Czym różnią się napędy SINAMICS G120, S120 i V90 i kiedy stosuje się każdy z nich?
+
+**Rodzina SINAMICS** obejmuje trzy główne serie napędów, dobierane w zależności od wymagań aplikacji: prostota (G120), wydajność wieloosiowa (S120) lub precyzja serwo (V90).
+
+- **SINAMICS G120** — modułowy przemiennik częstotliwości do silników asynchronicznych. Zastosowanie: transportery, pompy, wentylatory, proste napędy w liniach produkcyjnych. Moc: 0,37 kW – 250 kW. Sterowanie: V/f lub wektorowe. Safety opcjonalnie (CU250S-2)
+- **SINAMICS S120** — wieloosiowy system napędowy do wymagających aplikacji Motion Control. Architektura: wspólna szyna DC (Active/Smart Line Module) + pojedyncze Motor Modules dla każdej osi. Zastosowanie: maszyny wieloosiowe (CNC, pakowanie, handling), linie produkcyjne automotive. Pełna integracja Safety Integrated (STO, SS1, SS2, SOS, SLS, SDI, SBC). Wymaga CU310-2 PN lub CU320-2 PN
+- **SINAMICS V90** — kompaktowy serwonapęd do prostych aplikacji pozycjonowania. Sterowanie: PTI (Pulse Train Input) lub PROFINET (telegram 1/2/3/102). Wbudowane STO (hardwired, dwukanałowe). Zastosowanie: małe maszyny, proste osie pozycjonujące, podajniki. Komisjonowanie przez V-Assistant (dedykowane narzędzie) lub Startdrive
+
+**Kryterium wyboru na commissioning:**
+| Kryterium | G120 | S120 | V90 |
+|-----------|------|------|-----|
+| Typ silnika | Asynchroniczny | Synchroniczny/Asynchroniczny | Serwo (1FL6) |
+| Liczba osi | Jednoosiowy | Wieloosiowy (wspólna DC bus) | Jednoosiowy |
+| Safety Integrated | Opcja (CU250S-2) | Pełna (CU310/320) | Tylko STO hardwired |
+| Narzędzie | Startdrive | Startdrive/STARTER | V-Assistant/Startdrive |
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i źródeł workspace (kb_S16, kb_S08)*
+
+### 12.7. Jak wygląda diagnostyka napędu SINAMICS G120 — fault codes, ostrzeżenia i kasowanie błędów?
+
+**Diagnostyka napędów SINAMICS** opiera się na kodach błędów (fault/alarm) wyświetlanych na BOP/IOP, w Startdrive online lub odczytywanych z PLC przez słowo statusowe ZSW1 i bufor diagnostyczny.
+
+- **Fault (Fxxxx)** — błąd krytyczny, napęd zatrzymuje się. Wymaga usunięcia przyczyny i skasowania (acknowledge). Przykłady typowych faultów:
+  - `F07011` — Motor blocked / zablokowany silnik (przeciążenie mechaniczne)
+  - `F07801` — Motor overtemperature / przegrzanie silnika (KTY/PTC)
+  - `F30001` — Power module overcurrent / przetężenie modułu mocy
+  - `F30003` — DC-link overvoltage / przepięcie na szynie DC (hamowanie bez rezystora hamującego)
+  - `F01000` — Internal software error (często po aktualizacji firmware — reset do factory)
+  ⚠️ DO WERYFIKACJI — numery faultów mogą się różnić między generacjami firmware G120
+- **Alarm (Axxxx)** — ostrzeżenie, napęd kontynuuje pracę. Np. `A07900` — motor overtemperature warning (zbliżanie się do limitu)
+- **Kasowanie błędu z PLC** — zbocze narastające na bicie 7 słowa STW1 (Acknowledge fault). Z BOP: przytrzymanie przycisku `FN`
+- **Bufor diagnostyczny** — Startdrive → „Diagnostics" → „Fault buffer" / „Alarm buffer" — historia ostatnich błędów z timestampem
+
+**Praktyka commissioning:** Przy pierwszym uruchomieniu najczęstsze faultdy to: overcurrent (źle dobrana identyfikacja silnika), DC-link overvoltage (brak rezystora hamującego przy szybkim hamowaniu), motor overtemperature (niepodłączony czujnik PTC/KTY). Zawsze sprawdź fault buffer po pierwszym starcie — nawet jeśli napęd działa, mogły wystąpić alarmy.
+
+*[PRAWDOPODOBNE] — typowe faultcodes SINAMICS, numery konkretnych faultów ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS G120 Faults and Alarms*
+
+### 12.8. Czym jest sterowanie wektorowe (Vector Control) vs skalarne (V/f) w SINAMICS G120 i kiedy stosujesz każdy tryb?
+
+**Tryb sterowania** w napędzie SINAMICS G120 określa sposób regulacji prędkości/momentu silnika asynchronicznego. Wybór trybu wpływa na dynamikę, precyzję i zachowanie napędu.
+
+- **V/f (skalarny)** — utrzymuje stały stosunek napięcia do częstotliwości. Prosty, nie wymaga identyfikacji silnika. Zastosowanie: proste aplikacje bez wymagań dynamicznych — pompy, wentylatory, transportery. Nie kontroluje momentu bezpośrednio
+- **Vector (wektorowy, SLVC — Sensorless Vector Control)** — rozdziela prąd silnika na składową momentotwórczą i magnesującą, regulując moment niezależnie od prędkości. Wymaga identyfikacji silnika (motor identification). Zastosowanie: precyzyjna regulacja prędkości/momentu, aplikacje z dynamicznym obciążeniem (wciągarki, nawijarki, prasy)
+- **Vector z enkoderem (VC — Vector Control with Encoder)** — jak SLVC, ale z enkodem na wale silnika — najlepsza precyzja. Pozwala na pełny moment przy 0 Hz (holding torque). Wymaga fizycznego enkodera i karty enkoderowej na CU
+
+**Kiedy co wybrać:**
+| Aspekt | V/f | SLVC | VC (z enkoderem) |
+|--------|-----|------|-------------------|
+| Precyzja prędkości | ±2-3% | ±0,5% | ±0,01% |
+| Moment przy 0 Hz | Brak | Ograniczony | Pełny |
+| Identyfikacja silnika | Nie wymagana | Wymagana | Wymagana |
+| Koszt wdrożenia | Najniższy | Średni | Najwyższy |
+
+**Praktyka commissioning:** Domyślny tryb przy dodaniu G120 do projektu to V/f. Jeśli aplikacja wymaga dynamiki (szybkie przyspieszanie/hamowanie, trzymanie pozycji) — przełącz na Vector i wykonaj identyfikację silnika. Bez identyfikacji tryb wektorowy generuje faultdy.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, wartości precyzji są orientacyjne*
+
+### 12.9. Czym różni się architektura SINAMICS S120 od G120 i jak wygląda jej konfiguracja w TIA Portal?
+
+**SINAMICS S120** to wieloosiowy system napędowy z centralną szyną DC, przeznaczony do maszyn o wielu osiach (CNC, handling, automotive). W odróżnieniu od G120 (samodzielny napęd jednoosiowy), S120 składa się z wielu modułów współdzielących zasilanie.
+
+- **Architektura S120:**
+  - **Active/Smart Line Module (ALM/SLM)** — prostownik sieciowy zasilający wspólną szynę DC. ALM umożliwia zwrot energii do sieci (regeneracja), SLM jest prostszy (bez regeneracji)
+  - **Motor Module (MM)** — falownik dla pojedynczej osi, zasilany z szyny DC. Jeden Motor Module na jedną oś/silnik
+  - **Control Unit (CU310-2 PN / CU320-2 PN)** — sterownik napędu. CU310-2 steruje jedną osią, CU320-2 steruje wieloma osiami (do 6 Motor Modules). CU320-2 jest typowy dla aplikacji wieloosiowych
+  - **Sensor Module (SMC/SME)** — moduł do podłączenia enkodera silnika
+- **Konfiguracja w TIA Portal:**
+  1. Wstaw Line Module + CU + Motor Modules z katalogu sprzętowego → automatycznie tworzą się połączenia po szynie DRIVE-CLiQ (wewnętrzna magistrala między modułami S120)
+  2. Każdy Motor Module konfiguruj osobno: dane silnika, telegram PROFIdrive, identyfikacja
+  3. Safety: każda oś S120 ma pełen zestaw Safety Integrated (STO, SS1, SS2, SOS, SLS, SDI, SBC) — konfiguracja przez PROFIsafe telegram (np. telegram 30/54/902)
+- **Tryb izochroniczny** — S120 obsługuje synchronizację cyklu napędu z cyklem PROFINET IRT (Isochronous Real-Time), co jest wymagane w aplikacjach Motion Control z wieloma zsynchronizowanymi osiami
+
+**Praktyka commissioning:** Przy S120 kluczowe jest DRIVE-CLiQ topology — fizyczne połączenie kablami DRIVE-CLiQ między CU, Motor Modules i Sensor Modules musi odpowiadać topologii w projekcie TIA Portal. Błędna topologia → napęd nie startuje i zgłasza fault.
+
+> Źródło: SIMATIC Safety - Konfiguracja i programowanie (2), s. 62 — konfiguracja PROFIsafe telegram 902 dla SINAMICS S120 CU310-2 PN V5.1 w trybie izochronicznym [ZWERYFIKOWANE]
+
+### 12.10. Jak wyglądają typowe scenariusze wymiany napędu SINAMICS G120 na obiekcie (service/replacement)?
+
+**Wymiana napędu G120** na działającej linii produkcyjnej to częsta procedura serwisowa. Kluczowe jest szybkie przywrócenie pracy bez ponownej pełnej parametryzacji.
+
+**Scenariusz 1 — Wymiana Power Module (PM) przy sprawnym CU:**
+1. Odłącz zasilanie → wymień PM na identyczny typ
+2. CU rozpoznaje nowy PM automatycznie → parametryzacja pozostaje w CU
+3. Włącz zasilanie → napęd powinien wystartować bez zmian. Jeśli PM jest innego typu → fault incompatibility
+
+**Scenariusz 2 — Wymiana Control Unit (CU) z kartą SD:**
+1. Wyjmij kartę SD ze starego CU → włóż w nowy CU tego samego typu
+2. Przy starcie nowy CU ładuje parametry z karty SD automatycznie
+3. Ustaw nazwę PROFINET i adres IP identycznie jak poprzedni CU (przez Startdrive online lub BOP)
+4. Weryfikacja: Startdrive online → porównaj parametry → test Jog
+
+**Scenariusz 3 — Wymiana CU bez karty SD (brak backupu):**
+1. Skonfiguruj napęd od zera w Startdrive (wizard commissioning)
+2. Jeśli masz backup projektu TIA Portal → „Download to device" przywraca pełną konfigurację
+3. Jeśli nie masz backupu → ręczna parametryzacja z dokumentacji maszyny + identyfikacja silnika
+
+**Praktyka commissioning:** ZAWSZE rób backup parametrów na kartę SD po komisjonowaniu. Na każdej linii powinien być dostępny backup projektu TIA Portal z aktualną konfiguracją napędów. Brak backupu + padnięty CU = wielogodzinny przestój.
+
+*[PRAWDOPODOBNE] — procedura standardowa wymiany SINAMICS G120, zgodna z praktyką serwisową*
 ## 13. E-STOP — NORMY, IMPLEMENTACJA I OBLICZENIA BEZPIECZEŃSTWA
 
 
@@ -1799,6 +2064,82 @@ Jeśli szeregowo: każde zadziałanie to osobna "supplementary safety function" 
 ---
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+
+### 13.6. Jak wygląda obliczenie PFHD (Probability of Dangerous Failure per Hour) dla funkcji Safety E-Stop z F-CPU S7-1500F?
+
+**PFHD** to prawdopodobieństwo niebezpiecznej awarii na godzinę — podstawowa miara ilościowa bezpieczeństwa funkcjonalnego. Dla osiągnięcia PL e / SIL 3 sumaryczne PFHD wszystkich podsystemów musi być < 10⁻⁷ (< 1×10⁻⁷ /h).
+
+**Podział na podsystemy (z Application Example Siemens, Entry ID: 21064024):**
+
+Funkcja Safety E-Stop dzieli się na 3 podsystemy, każdy oceniany osobno:
+
+| Podsystem | Komponenty | PFHD | PL |
+|-----------|-----------|------|-----|
+| **Detection** (detekcja) | Przycisk E-Stop (B10=100.000, 20% dangerous) + F-DI (DC≥99%, 1oo2) | 9,06×10⁻¹⁰ | PL e |
+| **Evaluation** (ewaluacja) | CPU 1516F (2,00×10⁻⁹) + ET200MP F-DI (1,00×10⁻⁹) + F-DQ (2,00×10⁻⁹) | 5,00×10⁻⁹ | PL e |
+| **Reaction** (reakcja) | 2 styczniki (B10=1.000.000, 73% dangerous, Cat.4, DC≥99%) | 1,45×10⁻⁹ | PL e |
+| **SUMA** | — | **7,35×10⁻⁹** | **PL e** |
+
+**Kluczowe parametry wejściowe:**
+- **B10** — liczba cykli do 10% awaryjności (producent podaje w karcie katalogowej)
+- **Percentage of dangerous failures** — jaki % awarii jest niebezpieczny (E-Stop: 20%, stycznik: 73%)
+- **DC (Diagnostic Coverage)** — ≥99% wymagane dla Cat.4/PL e. Realizowane przez: cross-comparison w F-DI (detekcja) i redundantną ścieżkę wyłączania + dynamiczny monitoring styczników (reakcja)
+- **CCF ≥ 65 punktów** — wymagane środki przeciw usterkom wspólnej przyczyny wg ISO 13849-1 Tablica F.1
+
+**Narzędzie do obliczeń:** Safety Evaluation w TIA Selection Tool (online) — wprowadzasz komponenty, parametry B10, DC, architekturę → narzędzie oblicza PFHD per podsystem i sumę.
+
+**Praktyka commissioning:** Nie musisz obliczać PFHD samodzielnie — jako commissioner weryfikujesz, czy zastosowane komponenty i architektura odpowiadają obliczeniom z projektu Safety. Sprawdź: czy zastosowano właściwe styczniki (B10 z karty), czy feedback circuit jest podłączony (DC≥99%), czy CCF measures są spełnione (separacja kabli, różne trasy).
+
+> Źródło: Siemens Application Example „Emergency Stop up to PL e / SIL 3 with F-S7-1500", Entry ID: 21064024, V7.0.1, tabele 3-3 do 3-8 [ZWERYFIKOWANE]
+
+### 13.7. Co to jest DC (Diagnostic Coverage) i jak jest osiągane w poszczególnych podsystemach E-Stop?
+
+**DC (Diagnostic Coverage / Pokrycie diagnostyczne)** to miara procentowa zdolności systemu do wykrywania niebezpiecznych awarii zanim doprowadzą do utraty funkcji Safety. DC ≥ 99% jest wymagane dla najwyższych poziomów bezpieczeństwa (Cat.4 / PL e / SIL 3).
+
+**DC w podsystemie Detection (detekcja — E-Stop + F-DI):**
+- Realizowane przez **cross-comparison w module F-DI** — moduł porównuje sygnały z dwóch kanałów (1oo2 evaluation). Rozbieżność → discrepancy error → passivation
+- E-Stop z pozytywnym otwieraniem (EN 60947-5-1) zapewnia, że mechaniczne zacięcie jest wykrywalne przez drugi kanał
+- DC ≥ 99% — cross-comparison wykrywa praktycznie wszystkie awarie w torze detekcji
+
+**DC w podsystemie Evaluation (ewaluacja — F-CPU + F-I/O):**
+- Realizowane przez **wewnętrzną diagnostykę F-CPU** — dual-channel processing, program diversification, self-tests
+- Wartość PFHD podawana przez Siemens w Safety Evaluation TIA Selection Tool (np. CPU 1516F: 2,00×10⁻⁹)
+- Commissioner nie konfiguruje DC ewaluacji — jest wbudowane w F-CPU
+
+**DC w podsystemie Reaction (reakcja — styczniki):**
+- Realizowane przez **redundantną ścieżkę wyłączania** (2 styczniki) + **dynamiczny feedback monitoring** (styki pomocnicze NC podłączone do F-DI/DI, monitorowane przez LSafe_EStop → parametr feedbackTime)
+- Zgrzany styk jednego stycznika → feedback = niezgodność → blokada restartu → system wykrywa awarię
+- DC ≥ 99% wymaga ZARÓWNO redundancji (2 styczniki) JAK I feedback monitoringu — same 2 styczniki bez monitoringu to DC < 99%
+
+**Praktyka commissioning:** Podczas acceptance testu sprawdź: (1) oba kanały E-Stop podłączone i przetestowane (cross-comparison w F-DI), (2) feedback z obu styczników podłączony i monitorowany, (3) feedbackTime ustawiony odpowiednio do typu stycznika (typowo 100–300 ms ⚠️ DO WERYFIKACJI — zależy od producenta stycznika).
+
+> Źródło: Siemens Application Example Entry ID: 21064024, tabele 3-3 i 3-6 — DC≥99% przez cross-comparison i redundant switch-off path [ZWERYFIKOWANE]
+
+### 13.8. Jak wygląda obliczenie czasów odpowiedzi (response time) w funkcji Safety E-Stop i co na nie wpływa?
+
+**Czas odpowiedzi Safety (Safety Response Time)** to czas od wykrycia zagrożenia (naciśnięcie E-Stop) do osiągnięcia stanu bezpiecznego (odcięcie momentu napędu). Jest sumą opóźnień w całym łańcuchu Safety.
+
+**Składowe czasu odpowiedzi:**
+
+| Składowa | Typowy zakres | Źródło opóźnienia |
+|---------|--------------|-------------------|
+| Czas reakcji F-DI | 2–12 ms | Filtrowanie wejścia + czas cyklu aktualizacji F-I/O |
+| Czas cyklu F-runtime group | 10–100 ms | Czas przetwarzania programu Safety (zależy od rozmiaru programu) |
+| Czas komunikacji PROFIsafe (round-trip) | 2–20 ms | Zależy od topologii sieci, send clock PROFINET, liczby urządzeń |
+| Czas reakcji F-DQ | 1–5 ms | Czas przełączenia wyjścia Safety |
+| Czas mechaniczny stycznika | 10–30 ms | Czas otwarcia styku (z karty katalogowej producenta) |
+| **Suma (worst case)** | **25–167 ms** | — |
+
+**Czynniki wpływające:**
+- **F-monitoring time** — nie jest częścią normalnego czasu odpowiedzi, ale wpływa na worst-case w przypadku utraty komunikacji
+- **Czas cyklu F-runtime group** — najważniejszy parametr do optymalizacji. Ustawisz go w Safety Administration → F-runtime group → Max cycle time
+- **Filtr wejścia F-DI** — zbyt długi filtr debounce na wejściu F-DI zwiększa czas reakcji
+
+**Narzędzie Siemens:** Arkusz kalkulacyjny Excel do obliczenia response time dostępny na support.automation.siemens.com (Entry ID: 49368678). Wprowadzasz parametry sieci i konfiguracji → arkusz oblicza worst-case response time.
+
+**Praktyka commissioning:** Czas odpowiedzi musi być krótszy niż czas dobiegu maszyny do zatrzymania (wynikający z analizy ryzyka). Jeśli obliczony response time > czas wymagany → skróć cykl F-runtime, zmniejsz filtr wejścia F-DI, upewnij się, że PROFINET send clock jest optymalny. Dokumentuj obliczony response time w protokole Safety Acceptance Test.
+
+> Źródło: Siemens Application Example Entry ID: 21064024 + arkusz kalkulacyjny Entry ID: 49368678 (referencja w SIMATIC Safety - Konfiguracja i programowanie, s.654) [ZWERYFIKOWANE]
 ## 14. PROFINET — TOPOLOGIA, DIAGNOSTYKA I ZAAWANSOWANE FUNKCJE
 
 
@@ -2814,6 +3155,112 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 ---
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+
+### 19.4. Jak dodajesz stację ET200MP z modułami Safety do istniejącej linii produkcyjnej z wieloma stacjami PROFINET?
+
+**ET200MP** to wariant wysp I/O Siemens w formacie S7-300 (35mm) — stosowany gdy potrzebne są moduły o większej gęstości kanałów niż ET200SP.
+
+**Krok 1 — Planowanie adresacji:**
+- Sprawdź istniejącą tabelę adresów: wolny adres IP w podsieci, wolna nazwa PROFINET, wolne zakresy F-Address
+- Zweryfikuj, czy F-Address nie kolidują z innymi stacjami F-I/O — duplikat = PROFIsafe error na OBU stacjach
+
+**Krok 2 — Konfiguracja w TIA Portal:**
+1. `Add new device` → `ET 200MP` → wybierz IM (np. IM155-5 PN) — numer katalogowy z tabliczki
+2. Device view: wstaw moduły w slotach — kolejność musi odpowiadać fizycznej konfiguracji na szynie
+3. Dla modułów F-DI/F-DQ: zakładka Safety → F-Address, discrepancy time, sensor evaluation, test pulse
+4. Network view: połącz z F-CPU, sprawdź, że PROFINET subnet jest wspólna
+
+**Krok 3 — Podłączenie fizyczne:**
+- Kabel PROFINET RJ45 z istniejącego switcha/portu IM do nowej stacji
+- Sprawdź topologię: ring (MRP) wymaga dwóch kabli, linia jeden kabel
+- Zasilanie 24V DC: osobne zasilanie dla IM i osobne dla modułów I/O (rozdzielone w ET200MP)
+
+**Krok 4 — Online: nazwy, adresy, download:**
+1. `Assign PROFINET device name` po MAC
+2. `Assign PROFIsafe address` dla każdego modułu F
+3. Download → sprawdź Diagnostic Buffer → moduły zielone
+4. Test Safety: wymuś sygnał na F-DI → sprawdź reakcję w F-programie
+
+**Praktyka commissioning:** Na działającej linii — NIGDY nie rób „Download all" do F-CPU. Użyj „Download only changes" (delta download) — inaczej zatrzymasz Safety na całej linii i wymusisz pełny Safety Acceptance Test.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+
+### 19.5. Co to jest „Assign PROFIsafe address" i dlaczego jest wymagane osobno od konfiguracji TIA Portal?
+
+**PROFIsafe address (F-Address)** to unikalny identyfikator urządzenia Safety w sieci PROFIsafe. Musi być zapisany zarówno w projekcie TIA Portal (konfiguracja) jak i fizycznie w urządzeniu — i muszą się zgadzać.
+
+- **Dlaczego osobno?** F-Address jest zapisywany w urządzeniu niezależnie od download projektu — jako zabezpieczenie przed przypadkową podmianą modułów. Gdyby F-Address był nadawany automatycznie przy download, wymiana modułu na identyczny w innym slocie mogłaby pozostać niezauważona → zagrożenie bezpieczeństwa
+- **Mechanizm w ET200SP:** F-Address jest zapisywany w **elemencie kodującym (EK — Codierelement)** na BaseUnit, nie w samym module F-DI/F-DQ. Wymiana uszkodzonego modułu F nie wymaga ponownego „Assign PROFIsafe address" — adres pozostaje w EK
+- **Mechanizm w ET200MP:** F-Address jest zapisywany w profilu modułu na szynie backplane
+- **W napędach SINAMICS:** F-Address jest zapisywany w CU napędu (parametr wewnętrzny) — wymiana CU wymaga ponownego przypisania F-Address
+
+**Procedura „Assign PROFIsafe address" w TIA Portal:**
+1. Prawy klik na moduł F w network/device view → `Assign PROFIsafe address`
+2. Diody LED na module migają (identyfikacja fizyczna — potwierdź, że to właściwy moduł)
+3. Potwierdź → adres jest zapisywany w urządzeniu
+4. Powtórz dla każdego modułu F w stacji
+
+**Praktyka commissioning:** Przy rozbudowie istniejącej instalacji — spisz tabelę F-Address dla całej linii PRZED rozpoczęciem pracy. Kolizja F-Address jest trudna do zdiagnozowania i objawia się passivation na pozornie losowych modułach.
+
+> Źródło: SIMATIC Safety - Konfiguracja i programowanie, rozdział „Zalecenia dotyczące przypisywania adresu PROFIsafe" [ZWERYFIKOWANE]
+
+### 19.6. Jak dodajesz urządzenie firm trzecich (np. Festo, Beckhoff, WAGO) do projektu TIA Portal przez PROFINET?
+
+**Urządzenia firm trzecich** komunikują się z PLC Siemens przez PROFINET jako standardowe I/O devices, ale wymagają instalacji pliku GSDML (GSD Markup Language) — odpowiednika sterownika urządzenia.
+
+**Krok 1 — Pozyskanie GSDML:**
+- Producent urządzenia udostępnia plik `.xml` (GSDML) na swojej stronie wsparcia technicznego
+- **GSDML musi odpowiadać hardware revision** — numer rewizji jest na tabliczce znamionowej urządzenia. Niezgodna wersja → „Module does not match" lub brak urządzenia w katalogu
+
+**Krok 2 — Instalacja w TIA Portal:**
+1. `Options → Manage general station description files (GSD)` → `Install`
+2. Wskaż folder z pobranym plikiem `.xml` → zainstaluj
+3. Urządzenie pojawi się w Hardware Catalog w kategorii `Other field devices → PROFINET IO`
+
+**Krok 3 — Konfiguracja:**
+1. Przeciągnij urządzenie z katalogu do Network view → połącz z PLC
+2. Ustaw IP address i PROFINET device name
+3. Device view: skonfiguruj sloty/subsloty wg dokumentacji producenta (liczba i kolejność modułów musi odpowiadać fizycznej konfiguracji)
+4. Jeśli urządzenie ma wbudowany web server (większość nowoczesnych urządzeń PROFINET) — wpisz IP w przeglądarkę dla szybkiej diagnostyki
+
+**Krok 4 — Online:**
+1. `Assign PROFINET device name` po MAC address
+2. Download configuration do PLC
+3. Sprawdź online status: zielone → komunikacja OK, czerwone → sprawdź GSDML version, IP, nazwę
+
+**Typowe problemy:**
+- Niekompatybilna wersja GSDML → „Station not configured" alarm w PLC
+- Urządzenie nie odpowiada na `Assign device name` → sprawdź, czy firmware urządzenia obsługuje DCP (Discovery and Configuration Protocol)
+- Duplikat nazwy PROFINET w sieci → jedno z urządzeń traci komunikację
+
+**Praktyka commissioning:** Przed wyjazdem na obiekt — pobierz GSDML dla WSZYSTKICH urządzeń firm trzecich i zainstaluj w TIA Portal. Na obiekcie bez internetu nie pobierzesz brakującego pliku.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i praktyki commissioning*
+
+### 19.7. Jak wygląda procedura wymiany uszkodzonego modułu ET200SP na działającej linii (hot swap)?
+
+**Wymiana modułu ET200SP** na działającej linii produkcyjnej to standardowa procedura serwisowa. ET200SP obsługuje wymianę modułów „na gorąco" (hot swapping) bez wyłączania całej stacji.
+
+**Warunki hot swap:**
+- Nowy moduł musi być identycznego typu (ten sam numer katalogowy) jak uszkodzony
+- BaseUnit pozostaje na szynie — wymieniasz tylko moduł elektroniczny (electronic module)
+- Element kodujący (EK) na BaseUnit zachowuje F-Address — nie trzeba ponownie przypisywać PROFIsafe address
+
+**Procedura krok po kroku:**
+1. **Identyfikacja uszkodzonego modułu** — w TIA Portal online: moduł z czerwonym statusem lub w Diagnostic Buffer. Fizycznie: czerwona/pomarańczowa dioda LED na module
+2. **Odłóż moduł** — odblokuj zatrzask, wysuń moduł elektroniczny z BaseUnit. Stacja kontynuuje pracę — pozostałe moduły nie tracą komunikacji
+3. **Włóż nowy moduł** — ten sam typ → moduł automatycznie przejmuje konfigurację. Diody przechodzą z pomarańczowej na zieloną w ciągu kilku sekund
+4. **Weryfikacja** — TIA Portal online: moduł zielony, brak nowych wpisów diagnostycznych. Dla modułów F: sprawdź `PASS_OUT = FALSE` (brak passivation)
+5. **Jeśli moduł F był w stanie passivation** — może wymagać reintegration (ACK z programu Safety lub przycisk Reset na HMI)
+
+**Czego NIE wymaga wymiana identycznego modułu:**
+- Nie trzeba download do PLC
+- Nie trzeba ponownej konfiguracji w TIA Portal
+- Nie trzeba Assign PROFIsafe address (dla ET200SP — adres w EK na BaseUnit)
+
+**Praktyka commissioning:** Trzymaj zapas modułów na obiekcie — szczególnie F-DI i F-DO. Czas wymiany modułu ET200SP to dosłownie 30 sekund, ale czas oczekiwania na dostawę może być tygodniami. Zawsze zaznacz na schemacie elektrycznym który slot używa jakiego modułu.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, procedura hot swap standardowa dla ET200SP*
 ## 20. SCHEMATY ELEKTRYCZNE — CZYTANIE, ANALIZA I PRAKTYKA COMMISSIONING
 
 ### 20.1. Co to jest schemat elektryczny i jakie rodzaje schematów spotykasz na obiekcie?

@@ -1,4 +1,4 @@
-﻿# KOMPENDIUM Q&A — v12.4
+﻿# KOMPENDIUM Q&A — v12.5
 
 ### PLC Programmer / Commissioner / Automatyk
 
@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.4 | Data: 2026-04-11 13:11 | Pytania: 159
+### Wersja: v12.5 | Data: 2026-04-11 13:48 | Pytania: 178
 
 ---
 
@@ -108,6 +108,10 @@
 - [7.2. Co to jest F-Address i jak go konfigurujesz?](#72-co-to-jest-f-address-i-jak-go-konfigurujesz--)
 - [7.3. Co to jest F-monitoring time i co się dzieje po jego przekroczeniu?](#73-co-to-jest-f-monitoring-time-i-co-się-dzieje-po-jego-przekroczeniu)
 - [7.4. Jak Safety działa przez ET200 (zdalne I/O) i czym jest F-peripheral?](#74-jak-safety-działa-przez-et200-zdalne-io-i-czym-jest-f-peripheral)
+- [7.5. Jakie telegramy PROFIsafe są stosowane w napędach SINAMICS i co zawierają?](#75-jakie-telegramy-profisafe-są-stosowane-w-napędach-sinamics-i-co-zawierają)
+- [7.6. Jak oblicza się i dobiera F-monitoring time dla modułów PROFIsafe?](#76-jak-oblicza-się-i-dobiera-f-monitoring-time-dla-modułów-profisafe)
+- [7.7. Jak PROFIsafe chroni przed przekłamaniem danych i jakie mechanizmy bezpieczeństwa stosuje ramka PROFIsafe?](#77-jak-profisafe-chroni-przed-przekłamaniem-danych-i-jakie-mechanizmy-bezpieczeństwa-stosuje-ramka-profisafe)
+- [7.8. Jak działa komunikacja Safety między dwoma F-CPU (Safety-to-Safety communication) przez PROFIsafe?](#78-jak-działa-komunikacja-safety-między-dwoma-f-cpu-safety-to-safety-communication-przez-profisafe)
 
 **8. NAPĘDY SAFETY — SINAMICS Z WBUDOWANYM SAFETY**
 - [8.1. Co to jest STO (Safe Torque Off) i jak działa?](#81-co-to-jest-sto-safe-torque-off-i-jak-działa--)
@@ -154,6 +158,14 @@
 **12. NAPĘDY SINAMICS**
 - [12.1. Co to jest SINAMICS Startdrive w TIA Portal?](#121-co-to-jest-sinamics-startdrive-w-tia-portal)
 - [12.2. Jak konfigurujesz SINAMICS G120 z Safety przez PROFIsafe?](#122-jak-konfigurujesz-sinamics-g120-z-safety-przez-profisafe--)
+- [12.3. Z jakich komponentów składa się napęd SINAMICS G120 i jaką rolę pełni każdy z nich?](#123-z-jakich-komponentów-składa-się-napęd-sinamics-g120-i-jaką-rolę-pełni-każdy-z-nich)
+- [12.4. Czym są telegramy PROFIdrive i jakie telegramy stosuje się w SINAMICS G120?](#124-czym-są-telegramy-profidrive-i-jakie-telegramy-stosuje-się-w-sinamics-g120)
+- [12.5. Jak wygląda procedura pierwszego uruchomienia (commissioning) SINAMICS G120 przez Startdrive?](#125-jak-wygląda-procedura-pierwszego-uruchomienia-commissioning-sinamics-g120-przez-startdrive)
+- [12.6. Czym różnią się napędy SINAMICS G120, S120 i V90 i kiedy stosuje się każdy z nich?](#126-czym-różnią-się-napędy-sinamics-g120-s120-i-v90-i-kiedy-stosuje-się-każdy-z-nich)
+- [12.7. Jak wygląda diagnostyka napędu SINAMICS G120 — fault codes, ostrzeżenia i kasowanie błędów?](#127-jak-wygląda-diagnostyka-napędu-sinamics-g120--fault-codes-ostrzeżenia-i-kasowanie-błędów)
+- [12.8. Czym jest sterowanie wektorowe (Vector Control) vs skalarne (V/f) w SINAMICS G120 i kiedy stosujesz każdy tryb?](#128-czym-jest-sterowanie-wektorowe-vector-control-vs-skalarne-vf-w-sinamics-g120-i-kiedy-stosujesz-każdy-tryb)
+- [12.9. Czym różni się architektura SINAMICS S120 od G120 i jak wygląda jej konfiguracja w TIA Portal?](#129-czym-różni-się-architektura-sinamics-s120-od-g120-i-jak-wygląda-jej-konfiguracja-w-tia-portal)
+- [12.10. Jak wyglądają typowe scenariusze wymiany napędu SINAMICS G120 na obiekcie (service/replacement)?](#1210-jak-wyglądają-typowe-scenariusze-wymiany-napędu-sinamics-g120-na-obiekcie-servicereplacement)
 
 **13. E-STOP — NORMY, IMPLEMENTACJA I OBLICZENIA BEZPIECZEŃSTWA**
 - [13.1. Jakie są kategorie zatrzymania wg EN 60204-1 i jak wpływają na wybór STO vs SS1?](#131-jakie-są-kategorie-zatrzymania-wg-en-60204-1-i-jak-wpływają-na-wybór-sto-vs-ss1--)
@@ -161,6 +173,9 @@
 - [13.3. Co to jest feedback circuit (obwód sprzężenia zwrotnego styczników) i dlaczego jest wymagany dla SIL 3 / PL e?](#133-co-to-jest-feedback-circuit-obwód-sprzężenia-zwrotnego-styczników-i-dlaczego-jest-wymagany-dla-sil-3--pl-e--)
 - [13.4. Co to są CCF (Common Cause Failure) i jakie środki są wymagane dla Cat.4?](#134-co-to-są-ccf-common-cause-failure-i-jakie-środki-są-wymagane-dla-cat4--)
 - [13.5. Czy można łączyć przyciski e-stop szeregowo do jednego wejścia F-DI?](#135-czy-można-łączyć-przyciski-e-stop-szeregowo-do-jednego-wejścia-f-di)
+- [13.6. Jak wygląda obliczenie PFHD (Probability of Dangerous Failure per Hour) dla funkcji Safety E-Stop z F-CPU S7-1500F?](#136-jak-wygląda-obliczenie-pfhd-probability-of-dangerous-failure-per-hour-dla-funkcji-safety-e-stop-z-f-cpu-s7-1500f)
+- [13.7. Co to jest DC (Diagnostic Coverage) i jak jest osiągane w poszczególnych podsystemach E-Stop?](#137-co-to-jest-dc-diagnostic-coverage-i-jak-jest-osiągane-w-poszczególnych-podsystemach-e-stop)
+- [13.8. Jak wygląda obliczenie czasów odpowiedzi (response time) w funkcji Safety E-Stop i co na nie wpływa?](#138-jak-wygląda-obliczenie-czasów-odpowiedzi-response-time-w-funkcji-safety-e-stop-i-co-na-nie-wpływa)
 
 **14. PROFINET — TOPOLOGIA, DIAGNOSTYKA I ZAAWANSOWANE FUNKCJE**
 - [14.1. Co to jest MRP (Media Redundancy Protocol) i kiedy go stosujesz?](#141-co-to-jest-mrp-media-redundancy-protocol-i-kiedy-go-stosujesz--)
@@ -218,6 +233,10 @@
 - [19.1. Jak krok po kroku dodajesz nową wyspę sygnałową ET200SP Safety (F-peripheral) do istniejącego projektu?](#191-jak-krok-po-kroku-dodajesz-nową-wyspę-sygnałową-et200sp-safety-f-peripheral-do-istniejącego-projektu--)
 - [19.2. Jak dodajesz wyspę pneumatyczną SMC (seria EX600) do projektu TIA Portal przez PROFINET?](#192-jak-dodajesz-wyspę-pneumatyczną-smc-seria-ex600-do-projektu-tia-portal-przez-profinet)
 - [19.3. Jak krok po kroku dodajesz napęd SINAMICS G120 przez PROFINET do projektu TIA Portal?](#193-jak-krok-po-kroku-dodajesz-napęd-sinamics-g120-przez-profinet-do-projektu-tia-portal)
+- [19.4. Jak dodajesz stację ET200MP z modułami Safety do istniejącej linii produkcyjnej z wieloma stacjami PROFINET?](#194-jak-dodajesz-stację-et200mp-z-modułami-safety-do-istniejącej-linii-produkcyjnej-z-wieloma-stacjami-profinet)
+- [19.5. Co to jest „Assign PROFIsafe address" i dlaczego jest wymagane osobno od konfiguracji TIA Portal?](#195-co-to-jest-assign-profisafe-address-i-dlaczego-jest-wymagane-osobno-od-konfiguracji-tia-portal)
+- [19.6. Jak dodajesz urządzenie firm trzecich (np. Festo, Beckhoff, WAGO) do projektu TIA Portal przez PROFINET?](#196-jak-dodajesz-urządzenie-firm-trzecich-np-festo-beckhoff-wago-do-projektu-tia-portal-przez-profinet)
+- [19.7. Jak wygląda procedura wymiany uszkodzonego modułu ET200SP na działającej linii (hot swap)?](#197-jak-wygląda-procedura-wymiany-uszkodzonego-modułu-et200sp-na-działającej-linii-hot-swap)
 
 **20. SCHEMATY ELEKTRYCZNE — CZYTANIE, ANALIZA I PRAKTYKA COMMISSIONING**
 - [20.1. Co to jest schemat elektryczny i jakie rodzaje schematów spotykasz na obiekcie?](#201-co-to-jest-schemat-elektryczny-i-jakie-rodzaje-schematów-spotykasz-na-obiekcie)
@@ -244,7 +263,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **159 pytań / 21 sekcji.**
+> **178 pytań / 21 sekcji.**
 
 
 ---

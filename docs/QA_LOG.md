@@ -4,6 +4,19 @@ Każda wersja dokumentu jest opisana: co dodano, co poprawiono, z jakich źróde
 
 ---
 
+## v12.5 — 2026-04-11
+
+**+19 pytań** (159 → 178) — rozbudowa 4 najsłabszych sekcji:
+
+- **§12 Napędy SINAMICS** — +8 pytań (2→10): architektura G120 (CU+PM), telegramy PROFIdrive, commissioning Startdrive, G120 vs S120 vs V90, diagnostyka fault codes, sterowanie V/f vs Vector, architektura S120, wymiana napędu na obiekcie
+- **§19 Commissioning stacje** — +4 pytania (3→7): ET200MP Safety, Assign PROFIsafe address, urządzenia firm trzecich (GSDML), hot swap modułów ET200SP
+- **§7 PROFIsafe** — +4 pytania (4→8): telegramy PROFIsafe w napędach (30/54/902), obliczanie F-monitoring time, mechanizmy bezpieczeństwa ramki PROFIsafe, Safety-to-Safety communication
+- **§13 E-Stop** — +3 pytania (5→8): obliczenia PFHD z Application Example 21064024, DC (Diagnostic Coverage) w podsystemach, response time Safety
+
+Źródła: Siemens App. Example 21064024 (tabele PFHD), SIMATIC Safety - Konfiguracja i programowanie (2) (PROFIsafe telegram 902, F-monitoring time), SIMATIC Safety Integrated broszura (PROFIsafe black channel), knowledge base S08/S16
+
+---
+
 ## qa_draft_v12 — 2026-04-01 (aktualizacja v12.4) ✅ AKTYWNA WERSJA
 
 ### v12.4 — Rozszerzenie rozdziału 21: SICAR zaawansowane (2026-04-11)

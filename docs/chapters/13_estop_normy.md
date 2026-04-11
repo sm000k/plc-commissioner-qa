@@ -67,3 +67,79 @@ Jeśli szeregowo: każde zadziałanie to osobna "supplementary safety function" 
 ---
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+
+### 13.6. Jak wygląda obliczenie PFHD (Probability of Dangerous Failure per Hour) dla funkcji Safety E-Stop z F-CPU S7-1500F?
+
+**PFHD** to prawdopodobieństwo niebezpiecznej awarii na godzinę — podstawowa miara ilościowa bezpieczeństwa funkcjonalnego. Dla osiągnięcia PL e / SIL 3 sumaryczne PFHD wszystkich podsystemów musi być < 10⁻⁷ (< 1×10⁻⁷ /h).
+
+**Podział na podsystemy (z Application Example Siemens, Entry ID: 21064024):**
+
+Funkcja Safety E-Stop dzieli się na 3 podsystemy, każdy oceniany osobno:
+
+| Podsystem | Komponenty | PFHD | PL |
+|-----------|-----------|------|-----|
+| **Detection** (detekcja) | Przycisk E-Stop (B10=100.000, 20% dangerous) + F-DI (DC≥99%, 1oo2) | 9,06×10⁻¹⁰ | PL e |
+| **Evaluation** (ewaluacja) | CPU 1516F (2,00×10⁻⁹) + ET200MP F-DI (1,00×10⁻⁹) + F-DQ (2,00×10⁻⁹) | 5,00×10⁻⁹ | PL e |
+| **Reaction** (reakcja) | 2 styczniki (B10=1.000.000, 73% dangerous, Cat.4, DC≥99%) | 1,45×10⁻⁹ | PL e |
+| **SUMA** | — | **7,35×10⁻⁹** | **PL e** |
+
+**Kluczowe parametry wejściowe:**
+- **B10** — liczba cykli do 10% awaryjności (producent podaje w karcie katalogowej)
+- **Percentage of dangerous failures** — jaki % awarii jest niebezpieczny (E-Stop: 20%, stycznik: 73%)
+- **DC (Diagnostic Coverage)** — ≥99% wymagane dla Cat.4/PL e. Realizowane przez: cross-comparison w F-DI (detekcja) i redundantną ścieżkę wyłączania + dynamiczny monitoring styczników (reakcja)
+- **CCF ≥ 65 punktów** — wymagane środki przeciw usterkom wspólnej przyczyny wg ISO 13849-1 Tablica F.1
+
+**Narzędzie do obliczeń:** Safety Evaluation w TIA Selection Tool (online) — wprowadzasz komponenty, parametry B10, DC, architekturę → narzędzie oblicza PFHD per podsystem i sumę.
+
+**Praktyka commissioning:** Nie musisz obliczać PFHD samodzielnie — jako commissioner weryfikujesz, czy zastosowane komponenty i architektura odpowiadają obliczeniom z projektu Safety. Sprawdź: czy zastosowano właściwe styczniki (B10 z karty), czy feedback circuit jest podłączony (DC≥99%), czy CCF measures są spełnione (separacja kabli, różne trasy).
+
+> Źródło: Siemens Application Example „Emergency Stop up to PL e / SIL 3 with F-S7-1500", Entry ID: 21064024, V7.0.1, tabele 3-3 do 3-8 [ZWERYFIKOWANE]
+
+### 13.7. Co to jest DC (Diagnostic Coverage) i jak jest osiągane w poszczególnych podsystemach E-Stop?
+
+**DC (Diagnostic Coverage / Pokrycie diagnostyczne)** to miara procentowa zdolności systemu do wykrywania niebezpiecznych awarii zanim doprowadzą do utraty funkcji Safety. DC ≥ 99% jest wymagane dla najwyższych poziomów bezpieczeństwa (Cat.4 / PL e / SIL 3).
+
+**DC w podsystemie Detection (detekcja — E-Stop + F-DI):**
+- Realizowane przez **cross-comparison w module F-DI** — moduł porównuje sygnały z dwóch kanałów (1oo2 evaluation). Rozbieżność → discrepancy error → passivation
+- E-Stop z pozytywnym otwieraniem (EN 60947-5-1) zapewnia, że mechaniczne zacięcie jest wykrywalne przez drugi kanał
+- DC ≥ 99% — cross-comparison wykrywa praktycznie wszystkie awarie w torze detekcji
+
+**DC w podsystemie Evaluation (ewaluacja — F-CPU + F-I/O):**
+- Realizowane przez **wewnętrzną diagnostykę F-CPU** — dual-channel processing, program diversification, self-tests
+- Wartość PFHD podawana przez Siemens w Safety Evaluation TIA Selection Tool (np. CPU 1516F: 2,00×10⁻⁹)
+- Commissioner nie konfiguruje DC ewaluacji — jest wbudowane w F-CPU
+
+**DC w podsystemie Reaction (reakcja — styczniki):**
+- Realizowane przez **redundantną ścieżkę wyłączania** (2 styczniki) + **dynamiczny feedback monitoring** (styki pomocnicze NC podłączone do F-DI/DI, monitorowane przez LSafe_EStop → parametr feedbackTime)
+- Zgrzany styk jednego stycznika → feedback = niezgodność → blokada restartu → system wykrywa awarię
+- DC ≥ 99% wymaga ZARÓWNO redundancji (2 styczniki) JAK I feedback monitoringu — same 2 styczniki bez monitoringu to DC < 99%
+
+**Praktyka commissioning:** Podczas acceptance testu sprawdź: (1) oba kanały E-Stop podłączone i przetestowane (cross-comparison w F-DI), (2) feedback z obu styczników podłączony i monitorowany, (3) feedbackTime ustawiony odpowiednio do typu stycznika (typowo 100–300 ms ⚠️ DO WERYFIKACJI — zależy od producenta stycznika).
+
+> Źródło: Siemens Application Example Entry ID: 21064024, tabele 3-3 i 3-6 — DC≥99% przez cross-comparison i redundant switch-off path [ZWERYFIKOWANE]
+
+### 13.8. Jak wygląda obliczenie czasów odpowiedzi (response time) w funkcji Safety E-Stop i co na nie wpływa?
+
+**Czas odpowiedzi Safety (Safety Response Time)** to czas od wykrycia zagrożenia (naciśnięcie E-Stop) do osiągnięcia stanu bezpiecznego (odcięcie momentu napędu). Jest sumą opóźnień w całym łańcuchu Safety.
+
+**Składowe czasu odpowiedzi:**
+
+| Składowa | Typowy zakres | Źródło opóźnienia |
+|---------|--------------|-------------------|
+| Czas reakcji F-DI | 2–12 ms | Filtrowanie wejścia + czas cyklu aktualizacji F-I/O |
+| Czas cyklu F-runtime group | 10–100 ms | Czas przetwarzania programu Safety (zależy od rozmiaru programu) |
+| Czas komunikacji PROFIsafe (round-trip) | 2–20 ms | Zależy od topologii sieci, send clock PROFINET, liczby urządzeń |
+| Czas reakcji F-DQ | 1–5 ms | Czas przełączenia wyjścia Safety |
+| Czas mechaniczny stycznika | 10–30 ms | Czas otwarcia styku (z karty katalogowej producenta) |
+| **Suma (worst case)** | **25–167 ms** | — |
+
+**Czynniki wpływające:**
+- **F-monitoring time** — nie jest częścią normalnego czasu odpowiedzi, ale wpływa na worst-case w przypadku utraty komunikacji
+- **Czas cyklu F-runtime group** — najważniejszy parametr do optymalizacji. Ustawisz go w Safety Administration → F-runtime group → Max cycle time
+- **Filtr wejścia F-DI** — zbyt długi filtr debounce na wejściu F-DI zwiększa czas reakcji
+
+**Narzędzie Siemens:** Arkusz kalkulacyjny Excel do obliczenia response time dostępny na support.automation.siemens.com (Entry ID: 49368678). Wprowadzasz parametry sieci i konfiguracji → arkusz oblicza worst-case response time.
+
+**Praktyka commissioning:** Czas odpowiedzi musi być krótszy niż czas dobiegu maszyny do zatrzymania (wynikający z analizy ryzyka). Jeśli obliczony response time > czas wymagany → skróć cykl F-runtime, zmniejsz filtr wejścia F-DI, upewnij się, że PROFINET send clock jest optymalny. Dokumentuj obliczony response time w protokole Safety Acceptance Test.
+
+> Źródło: Siemens Application Example Entry ID: 21064024 + arkusz kalkulacyjny Entry ID: 49368678 (referencja w SIMATIC Safety - Konfiguracja i programowanie, s.654) [ZWERYFIKOWANE]

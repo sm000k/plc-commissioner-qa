@@ -118,3 +118,109 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 ---
 
 *[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+
+### 19.4. Jak dodajesz stację ET200MP z modułami Safety do istniejącej linii produkcyjnej z wieloma stacjami PROFINET?
+
+**ET200MP** to wariant wysp I/O Siemens w formacie S7-300 (35mm) — stosowany gdy potrzebne są moduły o większej gęstości kanałów niż ET200SP.
+
+**Krok 1 — Planowanie adresacji:**
+- Sprawdź istniejącą tabelę adresów: wolny adres IP w podsieci, wolna nazwa PROFINET, wolne zakresy F-Address
+- Zweryfikuj, czy F-Address nie kolidują z innymi stacjami F-I/O — duplikat = PROFIsafe error na OBU stacjach
+
+**Krok 2 — Konfiguracja w TIA Portal:**
+1. `Add new device` → `ET 200MP` → wybierz IM (np. IM155-5 PN) — numer katalogowy z tabliczki
+2. Device view: wstaw moduły w slotach — kolejność musi odpowiadać fizycznej konfiguracji na szynie
+3. Dla modułów F-DI/F-DQ: zakładka Safety → F-Address, discrepancy time, sensor evaluation, test pulse
+4. Network view: połącz z F-CPU, sprawdź, że PROFINET subnet jest wspólna
+
+**Krok 3 — Podłączenie fizyczne:**
+- Kabel PROFINET RJ45 z istniejącego switcha/portu IM do nowej stacji
+- Sprawdź topologię: ring (MRP) wymaga dwóch kabli, linia jeden kabel
+- Zasilanie 24V DC: osobne zasilanie dla IM i osobne dla modułów I/O (rozdzielone w ET200MP)
+
+**Krok 4 — Online: nazwy, adresy, download:**
+1. `Assign PROFINET device name` po MAC
+2. `Assign PROFIsafe address` dla każdego modułu F
+3. Download → sprawdź Diagnostic Buffer → moduły zielone
+4. Test Safety: wymuś sygnał na F-DI → sprawdź reakcję w F-programie
+
+**Praktyka commissioning:** Na działającej linii — NIGDY nie rób „Download all" do F-CPU. Użyj „Download only changes" (delta download) — inaczej zatrzymasz Safety na całej linii i wymusisz pełny Safety Acceptance Test.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+
+### 19.5. Co to jest „Assign PROFIsafe address" i dlaczego jest wymagane osobno od konfiguracji TIA Portal?
+
+**PROFIsafe address (F-Address)** to unikalny identyfikator urządzenia Safety w sieci PROFIsafe. Musi być zapisany zarówno w projekcie TIA Portal (konfiguracja) jak i fizycznie w urządzeniu — i muszą się zgadzać.
+
+- **Dlaczego osobno?** F-Address jest zapisywany w urządzeniu niezależnie od download projektu — jako zabezpieczenie przed przypadkową podmianą modułów. Gdyby F-Address był nadawany automatycznie przy download, wymiana modułu na identyczny w innym slocie mogłaby pozostać niezauważona → zagrożenie bezpieczeństwa
+- **Mechanizm w ET200SP:** F-Address jest zapisywany w **elemencie kodującym (EK — Codierelement)** na BaseUnit, nie w samym module F-DI/F-DQ. Wymiana uszkodzonego modułu F nie wymaga ponownego „Assign PROFIsafe address" — adres pozostaje w EK
+- **Mechanizm w ET200MP:** F-Address jest zapisywany w profilu modułu na szynie backplane
+- **W napędach SINAMICS:** F-Address jest zapisywany w CU napędu (parametr wewnętrzny) — wymiana CU wymaga ponownego przypisania F-Address
+
+**Procedura „Assign PROFIsafe address" w TIA Portal:**
+1. Prawy klik na moduł F w network/device view → `Assign PROFIsafe address`
+2. Diody LED na module migają (identyfikacja fizyczna — potwierdź, że to właściwy moduł)
+3. Potwierdź → adres jest zapisywany w urządzeniu
+4. Powtórz dla każdego modułu F w stacji
+
+**Praktyka commissioning:** Przy rozbudowie istniejącej instalacji — spisz tabelę F-Address dla całej linii PRZED rozpoczęciem pracy. Kolizja F-Address jest trudna do zdiagnozowania i objawia się passivation na pozornie losowych modułach.
+
+> Źródło: SIMATIC Safety - Konfiguracja i programowanie, rozdział „Zalecenia dotyczące przypisywania adresu PROFIsafe" [ZWERYFIKOWANE]
+
+### 19.6. Jak dodajesz urządzenie firm trzecich (np. Festo, Beckhoff, WAGO) do projektu TIA Portal przez PROFINET?
+
+**Urządzenia firm trzecich** komunikują się z PLC Siemens przez PROFINET jako standardowe I/O devices, ale wymagają instalacji pliku GSDML (GSD Markup Language) — odpowiednika sterownika urządzenia.
+
+**Krok 1 — Pozyskanie GSDML:**
+- Producent urządzenia udostępnia plik `.xml` (GSDML) na swojej stronie wsparcia technicznego
+- **GSDML musi odpowiadać hardware revision** — numer rewizji jest na tabliczce znamionowej urządzenia. Niezgodna wersja → „Module does not match" lub brak urządzenia w katalogu
+
+**Krok 2 — Instalacja w TIA Portal:**
+1. `Options → Manage general station description files (GSD)` → `Install`
+2. Wskaż folder z pobranym plikiem `.xml` → zainstaluj
+3. Urządzenie pojawi się w Hardware Catalog w kategorii `Other field devices → PROFINET IO`
+
+**Krok 3 — Konfiguracja:**
+1. Przeciągnij urządzenie z katalogu do Network view → połącz z PLC
+2. Ustaw IP address i PROFINET device name
+3. Device view: skonfiguruj sloty/subsloty wg dokumentacji producenta (liczba i kolejność modułów musi odpowiadać fizycznej konfiguracji)
+4. Jeśli urządzenie ma wbudowany web server (większość nowoczesnych urządzeń PROFINET) — wpisz IP w przeglądarkę dla szybkiej diagnostyki
+
+**Krok 4 — Online:**
+1. `Assign PROFINET device name` po MAC address
+2. Download configuration do PLC
+3. Sprawdź online status: zielone → komunikacja OK, czerwone → sprawdź GSDML version, IP, nazwę
+
+**Typowe problemy:**
+- Niekompatybilna wersja GSDML → „Station not configured" alarm w PLC
+- Urządzenie nie odpowiada na `Assign device name` → sprawdź, czy firmware urządzenia obsługuje DCP (Discovery and Configuration Protocol)
+- Duplikat nazwy PROFINET w sieci → jedno z urządzeń traci komunikację
+
+**Praktyka commissioning:** Przed wyjazdem na obiekt — pobierz GSDML dla WSZYSTKICH urządzeń firm trzecich i zainstaluj w TIA Portal. Na obiekcie bez internetu nie pobierzesz brakującego pliku.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i praktyki commissioning*
+
+### 19.7. Jak wygląda procedura wymiany uszkodzonego modułu ET200SP na działającej linii (hot swap)?
+
+**Wymiana modułu ET200SP** na działającej linii produkcyjnej to standardowa procedura serwisowa. ET200SP obsługuje wymianę modułów „na gorąco" (hot swapping) bez wyłączania całej stacji.
+
+**Warunki hot swap:**
+- Nowy moduł musi być identycznego typu (ten sam numer katalogowy) jak uszkodzony
+- BaseUnit pozostaje na szynie — wymieniasz tylko moduł elektroniczny (electronic module)
+- Element kodujący (EK) na BaseUnit zachowuje F-Address — nie trzeba ponownie przypisywać PROFIsafe address
+
+**Procedura krok po kroku:**
+1. **Identyfikacja uszkodzonego modułu** — w TIA Portal online: moduł z czerwonym statusem lub w Diagnostic Buffer. Fizycznie: czerwona/pomarańczowa dioda LED na module
+2. **Odłóż moduł** — odblokuj zatrzask, wysuń moduł elektroniczny z BaseUnit. Stacja kontynuuje pracę — pozostałe moduły nie tracą komunikacji
+3. **Włóż nowy moduł** — ten sam typ → moduł automatycznie przejmuje konfigurację. Diody przechodzą z pomarańczowej na zieloną w ciągu kilku sekund
+4. **Weryfikacja** — TIA Portal online: moduł zielony, brak nowych wpisów diagnostycznych. Dla modułów F: sprawdź `PASS_OUT = FALSE` (brak passivation)
+5. **Jeśli moduł F był w stanie passivation** — może wymagać reintegration (ACK z programu Safety lub przycisk Reset na HMI)
+
+**Czego NIE wymaga wymiana identycznego modułu:**
+- Nie trzeba download do PLC
+- Nie trzeba ponownej konfiguracji w TIA Portal
+- Nie trzeba Assign PROFIsafe address (dla ET200SP — adres w EK na BaseUnit)
+
+**Praktyka commissioning:** Trzymaj zapas modułów na obiekcie — szczególnie F-DI i F-DO. Czas wymiany modułu ET200SP to dosłownie 30 sekund, ale czas oczekiwania na dostawę może być tygodniami. Zawsze zaznacz na schemacie elektrycznym który slot używa jakiego modułu.
+
+*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, procedura hot swap standardowa dla ET200SP*
