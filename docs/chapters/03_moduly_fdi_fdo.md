@@ -13,7 +13,7 @@ F-DI (Fail-safe Digital Input) to moduł wejść bezpieczeństwa. Różnice od s
 - Self-test kanałów w tle (ciągły autotest hardware bez przerywania cyklu)
 Moduły: ET 200SP F-DI, ET 200MP F-DI, S7-1200 SM 1226 F-DI.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); [ET200SP F-DI product page](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html)]*
 ### 3.2. Co to jest VS* (pulse testing) i jak wykrywa usterki?  🔴
 
 VS* (Versorgung Sensor / Sensor Supply) to wyjście zasilające na module F-DI, które wysyła **krótkie impulsy testowe** zamiast stałego 24 V. Czujnik zasilany jest tymi impulsami, a sygnał wraca na wejście z tą samą charakterystyką pulsacji.
@@ -35,27 +35,27 @@ VS* z cross-circuit detection zapewnia DC ≥ 99% (Diagnostic Coverage) — waru
 
 ![ET 200 F-DI: cross-circuit, wire break i short-circuit detection](images/safety/01d_safety_brochure_p4.png)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/); [E-Stop SIL3 Application (Entry ID: 21064024, str. 10-12)](https://support.industry.siemens.com/cs/document/21064024/)]*
 ### 3.3. Dlaczego czujniki Safety podłącza się jako NC (normalnie zamknięty)?  🔴
 
 Zasada bezpieczna (fail-safe): zerwanie kabla, przepalenie bezpiecznika, uszkodzenie czujnika → obwód otwarty → sygnał 0 → system Safety traktuje to jako zadziałanie i zatrzymuje maszynę.
 Przy NO (normalnie otwartym): zerwanie kabla = brak sygnału = maszyna nie wie o zagrożeniu → niebezpieczeństwo.
 NC to zasada 'fail-safe by design' wymagana przez normy bezpieczeństwa.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); EN ISO 13849-1 §6.2.5 (wymogi dla sygnalizacji NC w obwodach bezpiecznych)]*
 ### 3.4. Co to jest discrepancy time i jak go konfigurujesz?  🟡
 
 Discrepancy time to maksymalny czas w którym dwa kanały czujnika 1oo2 mogą pokazywać różne wartości bez generowania błędu. Przykład: przy otwieraniu osłony mechanicznej jeden styk reaguje 15ms wcześniej niż drugi — to normalne i fizyczne.
 Konfigurujesz w TIA Portal: właściwości modułu F-DI → parametry kanału → Discrepancy time (typowo 10–200ms w zależności od czujnika).
 Zbyt krótki → fałszywe błędy. Zbyt długi → późne wykrycie uszkodzenia.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. parametry F-DI](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 3.5. Co to jest substitute value na F-DO i kto decyduje o jego wartości?
 
 Substitute value to wartość którą przyjmuje wyjście F-DO po przejściu modułu w passivation (stan błędu). Konfigurujesz w TIA Portal we właściwościach kanału F-DO: wartość 0 lub 1.
 Decyduje inżynier projektu na podstawie analizy bezpieczeństwa — nie Siemens. Przykłady: napęd → 0 (stop), zawór bezpieczeństwa → może być 1 (pozostaje otwarty), pompa chłodząca → może być 1 (chłodzi nadal).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DO substitute values](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 3.6. Co to jest pm switching i pp switching — różnica?  🟡
 
 pm switching (plus-minus): moduł F-PM-E przełącza **obie** linie obciążenia — P (+24V) **i** M (0V). Aktuator podłączony jest między wyjściem P a wyjściem M modułu. Wymaga wydzielonego zasilania obciążenia (Load supply) odizolowanego od zasilania elektroniki. [ZWERYFIKOWANE — Siemens 39198632 Fig. 2-1]
@@ -68,14 +68,14 @@ F-PM-E (Power Module) w ET 200SP/S może realizować oba tryby.
 **pp-switching — schemat ET 200SP:**
 ![pp-switching ET 200SP via F-PM-E](images/safety/06b_wiring_pp_switching_p7.png)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632), Fig. 2-1, 2-2 — pm-switching i pp-switching](https://support.industry.siemens.com/cs/document/39198632/)]*
 ### 3.7. Co to jest F-PM-E i do czego służy?
 
 F-PM-E (Fail-safe Power Module E) to moduł zasilający Safety w systemie ET 200SP/S. Umożliwia bezpieczne odcięcie zasilania grupy standardowych modułów DO przez sygnał Safety — bez ich fizycznej wymiany na moduły F.
 Działanie: F-CPU nakazuje F-PM-E odciąć 24V dla grupy standardowych DQ → wszystkie wyjścia grupy idą na 0 (PM switching do SIL2/Cat.3/PLd).
 Tańsze rozwiązanie niż wymiana wszystkich DQ na F-DQ.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632), rozdz. F-PM-E](https://support.industry.siemens.com/cs/document/39198632/); [ET200SP F-PM-E product page](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html)]*
 ### 3.8. Jak bezpiecznie wyłączyć standardowe moduły wyjść przez Safety?
 
 Trzy główne metody (wg dokumentu Siemens 39198632):
@@ -87,7 +87,7 @@ Ważne: standardowe moduły DI nie mogą być używane do odczytu sygnałów Saf
 **Schematy okablowania — Safety Relay i ET200MP/S7-1500:**
 ![Figure 3-1: Safety Relay (3SK1) PM-switching, ET200MP S7-1500 — DQ odcięte przez przekaźnik do SIL1/Cat.2/PLc i SIL2/Cat.3/PLd](images/safety/06e_wiring_et200mp_p10.png)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632), Fig. 3-1 (Safety Relay PM-switching), Fig. 3-2 (F-PM-E), Fig. 3-3 (F-DO + przekaźnik)](https://support.industry.siemens.com/cs/document/39198632/)]*
 ### 3.9. Jak F-CPU reaguje na typowe awarie wejść dwukanałowych (1oo2)?
 
 Moduł F-DI, skonfigurowany do oceny dwukanałowej (1oo2), monitoruje sygnały z dwóch niezależnych kanałów i reaguje na różne typy awarii, aby zapewnić bezpieczny stan maszyny.

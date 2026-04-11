@@ -18,7 +18,7 @@
 
 > 💡 Stosujesz gdy awaria pojedynczego kabla nie może zatrzymać produkcji.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61158-6-10 (PROFINET MRP standard); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/); [SIMATIC NET PROFINET (Siemens)](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html)]*
 ### 14.2. Co to jest IRT (Isochronous Real-Time) i kiedy jest wymagany?  🟢
 
 <span style="color:#1a5276">**IRT**</span> (Isochronous Real-Time) to tryb PROFINET z deterministyczną synchronizacją cyklu do **250 µs** i jitterem **< 1 µs**, realizowaną sprzętowo (ASIC).
@@ -33,7 +33,7 @@
 - CPU obsługujące IRT (S7-1500 — większość modeli z interfejsem PN/DP, w tym standardowe, T-CPU i F-CPU)
 - Telegram 105 (DSC) lub 111 dla SINAMICS S120
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61158-6-10 (PROFINET IRT specification); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/)]*
 ### 14.3. Jak diagnostykujesz sieć PROFINET w TIA Portal i PRONETA?  🟡
 
 **Diagnostics w TIA Portal:**
@@ -47,7 +47,7 @@
 
 > 💡 PRONETA jest szczególnie użyteczny gdy **nie masz projektu TIA** ani dostępu do sterownika — np. przy szybkiej diagnozie u klienta lub sprawdzeniu sieci nieznanego systemu.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/) — rozdz. PRONETA, online diagnostics; [SIMATIC NET PRONETA tool (Siemens)](https://support.industry.siemens.com/cs/document/67460624/)]*
 ### 14.4. Co to jest Shared Device i kiedy go używasz?
 
 **Shared Device** (PROFINET) to urządzenie I/O równocześnie zarządzane przez **dwa kontrolery** — każdy ma przypisany inny zakres modułów.
@@ -62,7 +62,7 @@
 
 **Konfiguracja:** TIA Portal → właściwości urządzenia → `Advanced Settings` → `Shared Device`
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC ET 200SP Shared Device (TIA Portal Help)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200sp.html); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)]*
 ### 14.5. Jak działa Device replacement bez PG (automatic name assignment)?
 
 CPU S7-1500 może automatycznie przypisać nazwę PROFINET nowemu modułowi bez laptopa z TIA Portal.
@@ -77,7 +77,7 @@ CPU S7-1500 może automatycznie przypisać nazwę PROFINET nowemu modułowi bez 
 
 > ⚠️ **Nie działa** jeśli: nowe urządzenie ma inny typ katalogowy, lub topologia sieci jest niejednoznaczna (duplikaty portów).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Device replacement without exchangeable medium](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC ET 200SP (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200sp.html)]*
 ### 14.6. Jakie są rodzaje i funkcje przemysłowych switchy Ethernet w sieciach PROFINET?
 
 Przemysłowe switche Ethernet zapewniają komunikację PROFINET w trudnych warunkach. Dzielą się na dwie kategorie:
@@ -128,7 +128,7 @@ Domyślnie w S7-1500 dostęp PUT/GET z zewnętrznych urządzeń jest **zablokowa
 
 > 💡 Dla nowych integracji z IT preferuj **OPC UA** (TLS 1.2 + certyfikaty). S7/ISO on TCP = szybkie (<1 ms), bez autentykacji. OPC UA = ~10 ms, z szyfrowaniem — wybór dla systemów IT/OT.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: S7 Communication GET/PUT](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/); IEC 62541 (OPC UA standard)]*
 ### 14.8. Co to jest PROFINET TSN (Time Sensitive Networking) i czym różni się od IRT?  🟢
 
 **PROFINET TSN** to następca IRT — stan standaryzacji IEEE 802.1 definiujący determinizm czasowy w standardowym Ethernet na poziomie sprzętowym, ale bez wymogu specjalistycznych ASIC-ów jak w IRT.

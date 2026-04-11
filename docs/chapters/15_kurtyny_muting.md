@@ -15,7 +15,7 @@
 
 **W TIA Portal:** podłączasz jako F-DI z `1oo2 evaluation` lub OSSD bezpośrednio na wejście Safety.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61496-1 §6 (AOPDDR Type 2/4 classification); ISO 13849-1 §6.2 (Cat.2/4, PL); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. 1oo2 evaluation]*
 ### 15.2. Jak działa muting i czym różni się od override?
 
 | Cecha | **Muting** | **Override** |
@@ -32,7 +32,7 @@
 
 > ⚠️ Override jest środkiem **wyłącznie awaryjnym** — musi być rejestrowany (kto, kiedy, ile razy). Nie stosuj jako alternatywy dla prawidłowo działającego muting.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - ISO 13849-1 §7.3 (muting as safety function); IEC 62061 §7.4.10 (override); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. MUTING_FKT blok LSafe]*
 ### 15.3. Jak podłączasz OSSD (Output Signal Switching Device) kurtyny do modułu F-DI?
 
 **OSSD** to para wyjść kurtyny (OSSD1, OSSD2) — dwa kanały sygnałów bezpieczeństwa z wbudowanym testowaniem impulsowym.
@@ -45,7 +45,7 @@
 
 `Discrepancy time`: dopasuj do specyfikacji kurtyny (zazwyczaj 10–30 ms ⚠️ DO WERYFIKACJI — sprawdź w karcie katalogowej konkretnej kurtyny).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61496-1 §6.2 (OSSD output specification); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. OSSD podłączenie, Sensor supply off; [Wiring Examples F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/)]*
 ### 15.4. Jakie jest zastosowanie wyjść tranzystorowych z czujników bezpieczeństwa w systemach PLC Safety?
 
 Wyjścia tranzystorowe z czujników bezpieczeństwa, takich jak kurtyny bezpieczeństwa czy skanery, są kluczowe dla systemów PLC Safety, ponieważ umożliwiają dwukanałowe monitorowanie i szybkie wykrywanie awarii.

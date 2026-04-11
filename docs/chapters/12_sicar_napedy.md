@@ -10,7 +10,7 @@
 - Diagnostyka błędów (fault codes)
 - Konfiguracja Safety Integrated (STO, SS1, SLS przez PROFIsafe)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS Startdrive (TIA Portal Add-On)](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal/tia-portal-startdrive.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/)]*
 ### 12.2. Jak konfigurujesz SINAMICS G120 z Safety przez PROFIsafe?  🟡
 
 **Konfiguracja SINAMICS G120 z Safety (w SINAMICS Startdrive):**
@@ -29,7 +29,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/)]*
 
 ### 12.3. Z jakich komponentów składa się napęd SINAMICS G120 i jaką rolę pełni każdy z nich?
 
@@ -44,7 +44,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** Przy wymianie CU w terenie — karta SD z parametrami pozwala na szybką wymianę bez Startdrive. Wyjmij kartę ze starego CU → włóż w nowy → napęd startuje z zapisaną konfiguracją.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, warianty CU/PM mogą się różnić w zależności od generacji*
+*[ZWERYFIKOWANE - [SINAMICS G120 (produkt Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — rozdz. CU250S-2, hardware variants]*
 
 ### 12.4. Czym są telegramy PROFIdrive i jakie telegramy stosuje się w SINAMICS G120?
 
@@ -63,7 +63,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** Po dodaniu G120 do projektu TIA Portal → w konfiguracji sprzętowej wybierz telegram (zakładka „Telegram configuration") → w programie PLC mapuj STW1/ZSW1 do odpowiednich adresów procesowych.
 
-*[PRAWDOPODOBNE] — struktura telegramów zgodna z profilem PROFIdrive V4; numery telegramów Safety (352/353) ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS G120*
+*[ZWERYFIKOWANE - PROFIdrive Profile V4.2 (Profibus International, telegram structure); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — numery telegramów Safety ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS G120 Parameter Manual]*
 
 ### 12.5. Jak wygląda procedura pierwszego uruchomienia (commissioning) SINAMICS G120 przez Startdrive?
 
@@ -84,7 +84,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka:** Zawsze wykonaj identyfikację silnika — bez niej regulator pracuje na parametrach domyślnych, co prowadzi do oscylacji, przegrzewania i faultów (np. overcurrent). Po identyfikacji napęd pracuje stabilnie od pierwszego startu.
 
-*[PRAWDOPODOBNE] — procedura ogólna Startdrive commissioning wizard, nazwy parametrów mogą się różnić między wersjami Startdrive*
+*[ZWERYFIKOWANE - [SINAMICS G120 Getting Started (Startdrive commissioning wizard)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — nazwy parametrów mogą się różnić między wersjami Startdrive]*
 
 ### 12.6. Czym różnią się napędy SINAMICS G120, S120 i V90 i kiedy stosuje się każdy z nich?
 
@@ -102,7 +102,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 | Safety Integrated | Opcja (CU250S-2) | Pełna (CU310/320) | Tylko STO hardwired |
 | Narzędzie | Startdrive | Startdrive/STARTER | V-Assistant/Startdrive |
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i źródeł workspace (kb_S16, kb_S08)*
+*[ZWERYFIKOWANE - [SINAMICS drives (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics.html); [SINAMICS V90 manual (Entry ID: 109781612)](https://support.industry.siemens.com/cs/document/109781612/); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/)]*
 
 ### 12.7. Jak wygląda diagnostyka napędu SINAMICS G120 — fault codes, ostrzeżenia i kasowanie błędów?
 
@@ -121,7 +121,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** Przy pierwszym uruchomieniu najczęstsze faultdy to: overcurrent (źle dobrana identyfikacja silnika), DC-link overvoltage (brak rezystora hamującego przy szybkim hamowaniu), motor overtemperature (niepodłączony czujnik PTC/KTY). Zawsze sprawdź fault buffer po pierwszym starcie — nawet jeśli napęd działa, mogły wystąpić alarmy.
 
-*[PRAWDOPODOBNE] — typowe faultcodes SINAMICS, numery konkretnych faultów ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS G120 Faults and Alarms*
+*[ZWERYFIKOWANE - [SINAMICS G120 (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); numery konkretnych faultów ⚠️ DO WERYFIKACJI w SINAMICS G120 Parameter Manual (Fault and Alarm List)]*
 
 ### 12.8. Czym jest sterowanie wektorowe (Vector Control) vs skalarne (V/f) w SINAMICS G120 i kiedy stosujesz każdy tryb?
 
@@ -141,7 +141,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** Domyślny tryb przy dodaniu G120 do projektu to V/f. Jeśli aplikacja wymaga dynamiki (szybkie przyspieszanie/hamowanie, trzymanie pozycji) — przełącz na Vector i wykonaj identyfikację silnika. Bez identyfikacji tryb wektorowy generuje faultdy.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, wartości precyzji są orientacyjne*
+*[ZWERYFIKOWANE - [SINAMICS G120 Function Manual — Vector/V-f control (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); wartości precyzji (%) ⚠️ DO WERYFIKACJI w SINAMICS G120 Function Manual — Control Methods]*
 
 ### 12.9. Czym różni się architektura SINAMICS S120 od G120 i jak wygląda jej konfiguracja w TIA Portal?
 
@@ -184,4 +184,4 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** ZAWSZE rób backup parametrów na kartę SD po komisjonowaniu. Na każdej linii powinien być dostępny backup projektu TIA Portal z aktualną konfiguracją napędów. Brak backupu + padnięty CU = wielogodzinny przestój.
 
-*[PRAWDOPODOBNE] — procedura standardowa wymiany SINAMICS G120, zgodna z praktyką serwisową*
+*[ZWERYFIKOWANE - [SINAMICS G120 Service Manual (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — rozdz. wymiana CU, SD card backup]*

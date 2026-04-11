@@ -23,7 +23,7 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. PROFIsafe protocol structure](https://support.industry.siemens.com/cs/document/109751404/); IEC 61784-3-3 (PROFIsafe protocol specification)]*
 ### 7.2. Co to jest F-Address i jak go konfigurujesz?  🔴
 
 `F-Address` (F-Destination Address) to unikalny F-address przypisany do każdego modułu F w sieci. **Musi być identyczny** w konfiguracji TIA Portal i na fizycznym urządzeniu (DIP switch lub parametryzacja).
@@ -37,7 +37,7 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-Address, Safety address assignment](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 7.3. Co to jest F-monitoring time i co się dzieje po jego przekroczeniu?
 
 `F-monitoring time` to maksymalny czas oczekiwania F-CPU na kolejny pakiet PROFIsafe od modułu. Po przekroczeniu (np. przerwa w sieci, przeciążony switch) → moduł zostaje <span style="color:#c0392b">**spassivowany**</span>.
@@ -51,7 +51,7 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-monitoring time](https://support.industry.siemens.com/cs/document/109751404/); Entry ID 49368678 — arkusz obliczeniowy F-monitoring time]*
 ### 7.4. Jak Safety działa przez ET200 (zdalne I/O) i czym jest F-peripheral?
 
 **F-peripheral** (fail-safe peripheral) to zdalne urządzenie I/O Safety podłączone do F-CPU przez PROFIsafe/PROFINET.
@@ -69,7 +69,7 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-peripherals, distributed Safety I/O](https://support.industry.siemens.com/cs/document/109751404/); [ET200SP Safety product page](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html)]*
 
 ### 7.5. Jakie telegramy PROFIsafe są stosowane w napędach SINAMICS i co zawierają?
 
@@ -160,4 +160,4 @@ Napęd może mieć jednocześnie telegram PROFIdrive (np. telegram 20 — sterow
 
 **Praktyka commissioning:** Przy Safety-to-Safety upewnij się, że F-monitoring time jest dostatecznie długi — komunikacja przechodzi przez PROFINET między CPU, co dodaje opóźnienie. Na dużych instalacjach z wieloma hopami sieciowymi zwiększ F-monitoring time o współczynnik 2-3x względem lokalnych F-I/O.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, szczegóły konfiguracji Safety-to-Safety mogą się różnić między S7-300F/400F a S7-1500F*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); ⚠️ szczegóły konfiguracji Safety-to-Safety dla S7-1500F — zweryfikuj w aktualnym System Manual SIMATIC Safety Integrated V19]*

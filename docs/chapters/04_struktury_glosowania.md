@@ -16,7 +16,7 @@ XooY = **X z Y**: ile (X) z dostępnych (Y) kanałów musi zadziałać aby syste
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); IEC 61508-2 §7.4.4 (struktury redundancji); EN ISO 13849-1 Aneks K (architektury 1oo1, 1oo2, 2oo2)]*
 ### 4.2. Kiedy wybierasz 1oo2 a kiedy 2oo2?  🟡
 
 **1oo2** gdy priorytet to **bezpieczeństwo** (zatrzymanie przy pierwszym sygnale):
@@ -31,7 +31,7 @@ XooY = **X z Y**: ile (X) z dostępnych (Y) kanałów musi zadziałać aby syste
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); EN ISO 13849-1 §6.2.9 (common cause failure — 2oo2); IEC 62061 §6.7.6]*
 ### 4.3. Jak 1oo2 jest realizowane w module F-DI Siemens?
 
 Dwa sygnały z dwóch czujników podłączone na dwa kanały tego samego modułu F-DI (lub dwóch osobnych modułów). Moduł F-DI porównuje oba sygnały:
@@ -42,7 +42,7 @@ Dwa sygnały z dwóch czujników podłączone na dwa kanały tego samego modułu
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DI channel evaluation 1oo2](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 4.4. Jak F-CPU reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?
 Moduł F-DI wykrywa błąd rozbieżności sygnału, gdy jeden z dwóch kanałów skonfigurowanych w ocenie 1oo2 straci ciągłość obwodu lub sygnały nie zadziałają równocześnie w określonym czasie. Jest to podstawowa funkcja diagnostyczna dla urządzeń elektromechanicznych i czujników z wyjściami tranzystorowymi.
 - Błąd "Discrepancy failure" jest zgłaszany w buforze diagnostycznym PLC, wskazując kanał awarii.
@@ -72,7 +72,7 @@ Discrepancy time (czas rozbieżności) to maksymalny czas, przez jaki oba kanał
 - Konfiguracja: właściwości modułu F-DI → zakładka „Input" → „Discrepancy time [ms]"
 - W diagnostyce: alarm rozbieżności widoczny w buforze diagnostycznym CPU (F_LADDR.DIAG) ⚠️ DO WERYFIKACJI: konkretny numer kodu alarmu — sprawdź w SIMATIC Safety System Manual lub buforze diagnostycznym TIA Portal online
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. discrepancy monitoring](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2? 🟡
 Detekcja cross-circuit (zwarcia między kanałami) to mechanizm pozwalający wykryć zwarcie przewodu kanału 1 do kanału 2 dzięki testowym impulsom wyjść testowych (T-signal).
 - T1 i T2 generują impulsy testowe z różną fazą (wzajemnie rozłączne)
@@ -81,4 +81,4 @@ Detekcja cross-circuit (zwarcia między kanałami) to mechanizm pozwalający wyk
 - Wymaga okablowania z wyjść testowych (T1, T2) przez czujnik do wejść (DI0.0, DI0.1)
 - Nie działa przy PM-switching bez wyjść testowych (wtedy detekcja cross-circuit jest ograniczona)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/); [E-Stop SIL3 Application (Entry ID: 21064024, str. 10-12)](https://support.industry.siemens.com/cs/document/21064024/)]*

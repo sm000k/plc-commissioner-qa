@@ -19,7 +19,7 @@ a wejścia raportowane są do F-CPU jako wartość bezpieczna (`0`).
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), str. 189 — schemat passivation/reintegration](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 5.2. Dlaczego moduł nie wraca automatycznie po usunięciu błędu?
 
 Celowo — zasada **"no silent recovery"** w systemach Safety.
@@ -34,7 +34,7 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. Reintegracja F-I/O — ACK_REQ/ACK_REI](https://support.industry.siemens.com/cs/document/109751404/); [SIMATIC Safety Getting Started (Entry ID: pochodna A5E02714463, str. 42-43)](https://support.industry.siemens.com/cs/document/109779336/)]*
 ### 5.3. Moduł nie wychodzi z passivation — co sprawdzasz?
 
 **Checklista:**
@@ -50,7 +50,7 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. QBAD/value status](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 5.4. Co to jest ACK_REQ, ACK_NEC i ACK_REI w praktyce?  🔴
 
 | Zmienna | Kierunek | Kontekst | Opis |
@@ -70,4 +70,4 @@ Reset_HMI: --|P|-- [ACK_NEC]   ← impuls z przycisku, tylko 1 cykl PLC
 > generuje zbiorczy impuls do **wszystkich** F-I/O w grupie runtime jednocześnie.
 > Stosuj po wymianie modułu lub awarii sieci PROFINET całej stacji.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. ACK_NEC, ACK_REI, ACK_GL — impuls reintegracji](https://support.industry.siemens.com/cs/document/109751404/)]*

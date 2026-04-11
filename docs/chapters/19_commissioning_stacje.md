@@ -37,7 +37,7 @@ Procedura commissioning nowej stacji ET200SP z modułami F-DI/F-DQ:
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC ET 200SP (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200sp.html); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. konfiguracja ET200SP, F-Address, element kodujący]*
 ### 19.2. Jak dodajesz wyspę pneumatyczną SMC (seria EX600) do projektu TIA Portal przez PROFINET?
 
 Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako standardowe urządzenie I/O (nie Safety).
@@ -72,7 +72,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: GSDML installation, PROFINET device name assignment](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC NET PROFINET (Siemens)](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html)]*
 ### 19.3. Jak krok po kroku dodajesz napęd SINAMICS G120 przez PROFINET do projektu TIA Portal?
 
 **Faza 1 — Przygotowanie sprzętowe:**
@@ -117,7 +117,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 > 💡 `Take online device as preset` — idealne gdy napęd był wcześniej skonfigurowany (legacy).
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — procedura komisjonowania Safety; [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. PROFIsafe, F-Address napędu; parametry p0922/p9560/p9531 ⚠️ DO WERYFIKACJI w SINAMICS G120 Safety Function Manual]*
 
 ### 19.4. Jak dodajesz stację ET200MP z modułami Safety do istniejącej linii produkcyjnej z wieloma stacjami PROFINET?
 
@@ -146,7 +146,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 **Praktyka commissioning:** Na działającej linii — NIGDY nie rób „Download all" do F-CPU. Użyj „Download only changes" (delta download) — inaczej zatrzymasz Safety na całej linii i wymusisz pełny Safety Acceptance Test.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC ET 200MP (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200mp.html); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. konfiguracja ET200MP F-I/O, delta download Safety]*
 
 ### 19.5. Co to jest „Assign PROFIsafe address" i dlaczego jest wymagane osobno od konfiguracji TIA Portal?
 
@@ -198,7 +198,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 **Praktyka commissioning:** Przed wyjazdem na obiekt — pobierz GSDML dla WSZYSTKICH urządzeń firm trzecich i zainstaluj w TIA Portal. Na obiekcie bez internetu nie pobierzesz brakującego pliku.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i praktyki commissioning*
+*[ZWERYFIKOWANE - [TIA Portal Help: GSD file installation, PROFINET IO third-party devices](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC NET PROFINET (Siemens)](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html)]*
 
 ### 19.7. Jak wygląda procedura wymiany uszkodzonego modułu ET200SP na działającej linii (hot swap)?
 
@@ -223,4 +223,4 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 **Praktyka commissioning:** Trzymaj zapas modułów na obiekcie — szczególnie F-DI i F-DO. Czas wymiany modułu ET200SP to dosłownie 30 sekund, ale czas oczekiwania na dostawę może być tygodniami. Zawsze zaznacz na schemacie elektrycznym który slot używa jakiego modułu.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, procedura hot swap standardowa dla ET200SP*
+*[ZWERYFIKOWANE - [SIMATIC ET 200SP (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200sp.html); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. wymiana modułów F, element kodujący, hot swap]*

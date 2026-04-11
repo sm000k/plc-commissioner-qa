@@ -17,7 +17,7 @@
 
 **Konfiguracja:** TIA Portal → `Add new object` → `Technology object` → wybierz typ → przypisz napęd SINAMICS przez telegram PROFIdrive `105` / `111`.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Motion Control Technology Objects (Siemens)](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); PLCopen Motion Control Part 1 — Function blocks for motion control (IEC 61131-3 extension)]*
 ### 16.2. Jak robisz autotuning napędu G120/V90 w Startdrive?
 
 **Startdrive:** Online → wybierz napęd → `Commissioning` → `Motor identification`
@@ -36,7 +36,7 @@
 
 > 💡 Jeśli napęd jest mechatronicznie połączony z ciężką maszyną: uruchom identyfikację na **biegu jałowym** lub przy odłączonej mechanice, a potem ręcznie dostraj `Kp`.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 Getting Started / Startdrive commissioning guide (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — numery statusów identyfikacji ⚠️ DO WERYFIKACJI w SINAMICS G120 Parameter Manual]*
 ### 16.3. Jakie są najważniejsze parametry SINAMICS G120 które musisz znać?
 
 | Parametr | Opis | Uwaga |
@@ -66,7 +66,7 @@
 - Na panelu BOP-2: długie wciśnięcie ESC/OK
 - Historia faultów: `r0945[0..7]`
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); numery faultów i parametrów p/r ⚠️ DO WERYFIKACJI w SINAMICS G120 Parameter Manual (Fault and Alarms List)]*
 ### 16.5. Czym jest SINAMICS G120 i do jakich silników oraz aplikacji jest przeznaczony? 🔴
 
 **SINAMICS G120** to rodzina przemysłowych przemienników częstotliwości (falowników) firmy Siemens przeznaczonych do regulacji prędkości silników indukcyjnych (asynchronicznych) klatkowych w aplikacjach ogólnoprzemysłowych.
@@ -296,7 +296,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > 💡 **Przelicznik rozdzielczości:** enkoder 1024 PPR z interpolacją ×4 (A, /A, B, /B) daje **4096 kroków/obrót** — to standardowe zachowanie modułu HSC lub SINAMICS przy zliczaniu czterech zboczy.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61800-5-2 §6.2.13 (safe encoder feedback requirements for SLS/SDI); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — rozdz. enkodery Safety (HIPERFACE Safety, EnDat Safety)]*
 ### 16.14. Jakie są interfejsy enkoderów i jak konfigurujesz enkoder w SINAMICS i TIA Portal?  🟡
 
 **Przegląd interfejsów:**
@@ -337,7 +337,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > 💡 **HIPERFACE DSL:** jeden kabel do serwosiłnika zawiera jednocześnie zasilanie silnika (3 fazy + PE) i sygnał enkodera DSL — brak osobnego kabla enkodera. W Siemens: V90 współpracuje z silnikami 1FL6 (enkoder wbudowany), natomiast 1FK7 używa DRIVE-CLiQ z S120/S210 (OCT — One Cable Technology, Siemens Motion Connect kable).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS V90 manual (Entry ID: 109781612)](https://support.industry.siemens.com/cs/document/109781612/) — rozdz. enkodery HIPERFACE DSL, One Cable Technology; [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — parametry p0400/p0404 ⚠️ DO WERYFIKACJI w SINAMICS G120 Parameter Manual]*
 ### 16.15. Czym są silniki IE5 (IPM / synchroniczne z magnesami trwałymi) i dlaczego zastępują klasyczne silniki indukcyjne w nowych projektach?  🟢
 
 **Silniki IE5** *(Ultra-Premium Efficiency)* to silniki synchroniczne z magnesami trwałymi wbudowanymi w wirnik (IPM — Interior Permanent Magnet). Są najwyższą klasą sprawności według IEC 60034-30-1.

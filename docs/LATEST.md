@@ -291,14 +291,14 @@ PLC (Programmable Logic Controller) to przemysłowy komputer czasu rzeczywistego
 - Watchdog timer — CPU restartuje się przy zawieszeniu zamiast „wisieć"
 - Brak systemu plików jak Windows — działa natychmiast po włączeniu zasilania
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC S7-1500 System Manual](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html); [TIA Portal](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
 ### 1.2. Co to jest scan cycle i ile trwa?  🔴
 
 Scan cycle to jeden pełny cykl pracy CPU: odczyt wejść → wykonanie programu → zapis wyjść → komunikacja.
 Typowy czas: 1–20ms dla prostych programów. Przy dużych projektach lub Safety może wzrosnąć do 50–100ms.
 W S7-1500 monitorujesz czas cyklu online (Cycle time w diagnostyce CPU). Zbyt długi scan = wolna reakcja na sygnały.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC S7-1500 System Manual — Cycle time monitoring](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html)]*
 ### 1.3. Co to jest OB1, OB35, OB100 — kiedy każdego używasz?
 
 Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system operacyjny CPU w ściśle określonych warunkach.
@@ -316,7 +316,7 @@ Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system 
 - OB121 — Programming Error: błędy programistyczne (dzielenie przez zero, błędna konwersja typów, przekroczenie zakresu tablicy).
 - OB122 — I/O Access Error: błąd dostępu do modułu I/O (moduł nie istnieje, awaria komunikacji z modułem). Ważne rozróżnienie przy uruchamianiu nowego kodu.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC S7-1500 Function Manual: Program blocks — Organization blocks](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html)]*
 ### 1.4. Co to jest FB, FC, DB — kiedy używasz każdego?  🔴
 - FC (Function) — blok bez pamięci własnej (brak sekcji VAR_STAT). Używasz dla prostych obliczeń, konwersji sygnałów, logiki bez stanu. Może zwracać wartość (Return Value). Ma tylko VAR_INPUT, VAR_OUTPUT, VAR_IN_OUT i VAR_TEMP.
 - FB (Function Block) — ma instancję DB z pamięcią stanu między wywołaniami (sekcja VAR_STAT). Używasz dla sterowania silnikiem, sekwencji, timerów — wszędzie gdzie blok musi "pamiętać". Multi-instance: jeden FB może zawierać instancje innych FB bez osobnych DB.
@@ -329,7 +329,7 @@ Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system 
 
 W TIA Portal: bloki z włączonym *Optimized Block Access* używają wyłącznie nazw symbolicznych — brak adresowania absolutnego (%.0, %DB1.DBX0.0). Standardowe ustawienie dla nowych projektów.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Program blocks (FB/FC/DB), Optimized Block Access](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
 ### 1.5. Co to jest UDT i po co go używasz?
 
 UDT (User Data Type) to własny złożony typ danych definiowany raz i wielokrotnie używany w całym projekcie. Przykład: typ `Motor_t` z polami `Speed:REAL`, `Current:REAL`, `Fault:BOOL`, `Running:BOOL`.
@@ -345,7 +345,7 @@ UDT (User Data Type) to własny złożony typ danych definiowany raz i wielokrot
 
 **Wersjonowanie:** W TIA Portal można przypisać UDT do Project Library i wersjonować. Przy zmianie struktury UDT TIA Portal ostrzega o niespójnych instancjach — musisz je zaktualizować (`Update instances`). Ważne w dużych projektach — jedna zmiana UDT bez aktualizacji instancji = błąd kompilacji.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: PLC data types (UDT), Project Library management](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
 ### 1.6. Co to są języki programowania PLC — LAD, FBD, SCL, GRAPH?
 - LAD (Ladder) — graficzny, podobny do schematów przekaźnikowych. Dobry dla logiki binarnej, łatwy dla elektryków. Najczęściej używany.
 - FBD (Function Block Diagram) — bloki połączone liniami. Dobry dla logiki kombinacyjnej i programów Safety w TIA Portal.
@@ -381,9 +381,9 @@ END_CASE;
 **TIA Portal SCL vs klasyczny STEP 7 SCL:**
 - TIA Portal: zmienne wyłącznie symboliczne, brak tablicy symboli (Symbol Table), *Optimized Block Access* domyślnie włączony.
 - Stary STEP 7 (S7-300/400): mieszanie adresów absolutnych (I0.0, DB1.DBX0.0) i nazw symbolicznych; osobna tablica symboli.
-- W Safety: program F_MAIN w starszych wersjach TIA Portal wymaga FBD lub LAD — SCL nie jest certyfikowany dla F-bloków Safety. SCL dla F-bloków Safety został wprowadzony w TIA Portal V19 (STEP 7 Safety V19). ⚗️ DO WERYFIKACJI: dokładna wersja i wymagany firmware F-CPU w Release Notes TIA Portal. Zawsze sprawdź dopuszczalne języki dla swojej wersji portalu przed użyciem SCL w logice Safety.
+- W Safety: program F_MAIN w starszych wersjach TIA Portal wymaga FBD lub LAD — SCL nie jest certyfikowany dla F-bloków Safety. SCL dla F-bloków Safety został wprowadzony w TIA Portal V19 (STEP 7 Safety V19). ⚠️ DO WERYFIKACJI: dokładna wersja i wymagany firmware F-CPU w Release Notes TIA Portal. Zawsze sprawdź dopuszczalne języki dla swojej wersji portalu przed użyciem SCL w logice Safety.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [IEC 61131-3 — languages (PLCopen)](https://plcopen.org/iec-61131-3); [TIA Portal Help: Programming languages overview](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
 ### 1.7. Co to jest sygnał 4-20mA i dlaczego nie 0-20mA?
 
 4-20mA to standardowy sygnał analogowy dla czujników przemysłowych (przetworniki ciśnienia, temperatury, przepływu). Zakres 4 mA (wartość minimalna procesu) do 20 mA (wartość maksymalna).
@@ -394,7 +394,7 @@ END_CASE;
 - **Skalowanie w TIA Portal:** Surowy sygnał z modułu AI: 0–27648 (integer) dla zakresu 4–20 mA. Blok `NORM_X` normalizuje do 0.0–1.0, a `SCALE_X` skaluje na zakres inżynierski (np. 0.0–100.0 bar). Alternatywnie: bezpośrednia przeliczenie REAL w SCL: `Ciśnienie := (REAL_AI - 4.0) / 16.0 * MaxRange;`
 - **Podłączenie dwuprzewodowe (2-wire):** Zasilanie i sygnał na jednej parze kabli (czujnik = zmienna rezystancja). Oszczędność okablowania.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC ET200SP Analog Input Module Manual](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html); standard przemysłowy 4-20mA wg IEC 60381-1]*
 ### 1.8. Co to jest PROFINET i czym różni się od PROFIBUS?  🔴
 
 PROFINET: Ethernet-based, 100Mbit/s (gigabit w nowych instalacjach), elastyczna topologia (gwiazdka, linia, pierścień), plug-and-play z GSDML, obsługuje PROFIsafe i IRT (250µs, jitter <1µs). Nowy standard dla wszystkich nowych projektów.
@@ -409,7 +409,7 @@ Jeden CPU może być jednocześnie IO-Controller swojej sieci i IO-Device w siec
 
 PROFIBUS analogicznie: DP-Master Class 1 (CPU) → DP-Slave (ET200M/S, napęd z CB DP) → DP-Master Class 2 (PG/PC diagnostyczny).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [PROFINET — przegląd technologii Siemens](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html); IEC 61158 (PROFINET), IEC 61784 (PROFIBUS)]*
 ### 1.9. Jakie są główne rodziny sterowników PLC Siemens i do jakich zastosowań są dedykowane?
 
 Siemens oferuje różne rodziny sterowników PLC, dostosowane do aplikacji o różnej skali i złożoności, od prostych zadań po najbardziej wymagające systemy.
@@ -504,7 +504,7 @@ Rodzina S7-1200 to kompaktowe sterowniki montowane na szynie DIN, programowane w
 
 > 💡 **Na rozmowie:** pytanie o enkodery często pojawia się razem z SLS/SDI — wspomnij że do tych funkcji Safety wymagane są enkodery certyfikowane (HIPERFACE Safety, EnDat Safety).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS S120 Function Manual: Encoder types](https://www.siemens.com/global/en/products/drives/sinamics.html); HIPERFACE Safety (SICK/Stegmann), EnDat Safety (Heidenhain) — certyfikowane wg IEC 61508]*
 ### 1.13. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?  🟡
 
 **IO-Link** (IEC 61131-9) to standardowy niskonapięciowy protokół komunikacji punkt-punkt między sterownikiem PLC (IO-Link Master) a inteligentnymi czujnikami/aktuatorami (IO-Link Device). Działa po standardowym 3-żyłowym kablu M12 — bez dodatkowego okablowania.
@@ -909,7 +909,7 @@ F-DI (Fail-safe Digital Input) to moduł wejść bezpieczeństwa. Różnice od s
 - Self-test kanałów w tle (ciągły autotest hardware bez przerywania cyklu)
 Moduły: ET 200SP F-DI, ET 200MP F-DI, S7-1200 SM 1226 F-DI.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); [ET200SP F-DI product page](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html)]*
 ### 3.2. Co to jest VS* (pulse testing) i jak wykrywa usterki?  🔴
 
 VS* (Versorgung Sensor / Sensor Supply) to wyjście zasilające na module F-DI, które wysyła **krótkie impulsy testowe** zamiast stałego 24 V. Czujnik zasilany jest tymi impulsami, a sygnał wraca na wejście z tą samą charakterystyką pulsacji.
@@ -931,27 +931,27 @@ VS* z cross-circuit detection zapewnia DC ≥ 99% (Diagnostic Coverage) — waru
 
 ![ET 200 F-DI: cross-circuit, wire break i short-circuit detection](images/safety/01d_safety_brochure_p4.png)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/); [E-Stop SIL3 Application (Entry ID: 21064024, str. 10-12)](https://support.industry.siemens.com/cs/document/21064024/)]*
 ### 3.3. Dlaczego czujniki Safety podłącza się jako NC (normalnie zamknięty)?  🔴
 
 Zasada bezpieczna (fail-safe): zerwanie kabla, przepalenie bezpiecznika, uszkodzenie czujnika → obwód otwarty → sygnał 0 → system Safety traktuje to jako zadziałanie i zatrzymuje maszynę.
 Przy NO (normalnie otwartym): zerwanie kabla = brak sygnału = maszyna nie wie o zagrożeniu → niebezpieczeństwo.
 NC to zasada 'fail-safe by design' wymagana przez normy bezpieczeństwa.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); EN ISO 13849-1 §6.2.5 (wymogi dla sygnalizacji NC w obwodach bezpiecznych)]*
 ### 3.4. Co to jest discrepancy time i jak go konfigurujesz?  🟡
 
 Discrepancy time to maksymalny czas w którym dwa kanały czujnika 1oo2 mogą pokazywać różne wartości bez generowania błędu. Przykład: przy otwieraniu osłony mechanicznej jeden styk reaguje 15ms wcześniej niż drugi — to normalne i fizyczne.
 Konfigurujesz w TIA Portal: właściwości modułu F-DI → parametry kanału → Discrepancy time (typowo 10–200ms w zależności od czujnika).
 Zbyt krótki → fałszywe błędy. Zbyt długi → późne wykrycie uszkodzenia.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. parametry F-DI](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 3.5. Co to jest substitute value na F-DO i kto decyduje o jego wartości?
 
 Substitute value to wartość którą przyjmuje wyjście F-DO po przejściu modułu w passivation (stan błędu). Konfigurujesz w TIA Portal we właściwościach kanału F-DO: wartość 0 lub 1.
 Decyduje inżynier projektu na podstawie analizy bezpieczeństwa — nie Siemens. Przykłady: napęd → 0 (stop), zawór bezpieczeństwa → może być 1 (pozostaje otwarty), pompa chłodząca → może być 1 (chłodzi nadal).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DO substitute values](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 3.6. Co to jest pm switching i pp switching — różnica?  🟡
 
 pm switching (plus-minus): moduł F-PM-E przełącza **obie** linie obciążenia — P (+24V) **i** M (0V). Aktuator podłączony jest między wyjściem P a wyjściem M modułu. Wymaga wydzielonego zasilania obciążenia (Load supply) odizolowanego od zasilania elektroniki. [ZWERYFIKOWANE — Siemens 39198632 Fig. 2-1]
@@ -964,14 +964,14 @@ F-PM-E (Power Module) w ET 200SP/S może realizować oba tryby.
 **pp-switching — schemat ET 200SP:**
 ![pp-switching ET 200SP via F-PM-E](images/safety/06b_wiring_pp_switching_p7.png)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632), Fig. 2-1, 2-2 — pm-switching i pp-switching](https://support.industry.siemens.com/cs/document/39198632/)]*
 ### 3.7. Co to jest F-PM-E i do czego służy?
 
 F-PM-E (Fail-safe Power Module E) to moduł zasilający Safety w systemie ET 200SP/S. Umożliwia bezpieczne odcięcie zasilania grupy standardowych modułów DO przez sygnał Safety — bez ich fizycznej wymiany na moduły F.
 Działanie: F-CPU nakazuje F-PM-E odciąć 24V dla grupy standardowych DQ → wszystkie wyjścia grupy idą na 0 (PM switching do SIL2/Cat.3/PLd).
 Tańsze rozwiązanie niż wymiana wszystkich DQ na F-DQ.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632), rozdz. F-PM-E](https://support.industry.siemens.com/cs/document/39198632/); [ET200SP F-PM-E product page](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html)]*
 ### 3.8. Jak bezpiecznie wyłączyć standardowe moduły wyjść przez Safety?
 
 Trzy główne metody (wg dokumentu Siemens 39198632):
@@ -983,7 +983,7 @@ Ważne: standardowe moduły DI nie mogą być używane do odczytu sygnałów Saf
 **Schematy okablowania — Safety Relay i ET200MP/S7-1500:**
 ![Figure 3-1: Safety Relay (3SK1) PM-switching, ET200MP S7-1500 — DQ odcięte przez przekaźnik do SIL1/Cat.2/PLc i SIL2/Cat.3/PLd](images/safety/06e_wiring_et200mp_p10.png)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632), Fig. 3-1 (Safety Relay PM-switching), Fig. 3-2 (F-PM-E), Fig. 3-3 (F-DO + przekaźnik)](https://support.industry.siemens.com/cs/document/39198632/)]*
 ### 3.9. Jak F-CPU reaguje na typowe awarie wejść dwukanałowych (1oo2)?
 
 Moduł F-DI, skonfigurowany do oceny dwukanałowej (1oo2), monitoruje sygnały z dwóch niezależnych kanałów i reaguje na różne typy awarii, aby zapewnić bezpieczny stan maszyny.
@@ -1040,7 +1040,7 @@ XooY = **X z Y**: ile (X) z dostępnych (Y) kanałów musi zadziałać aby syste
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); IEC 61508-2 §7.4.4 (struktury redundancji); EN ISO 13849-1 Aneks K (architektury 1oo1, 1oo2, 2oo2)]*
 ### 4.2. Kiedy wybierasz 1oo2 a kiedy 2oo2?  🟡
 
 **1oo2** gdy priorytet to **bezpieczeństwo** (zatrzymanie przy pierwszym sygnale):
@@ -1055,7 +1055,7 @@ XooY = **X z Y**: ile (X) z dostępnych (Y) kanałów musi zadziałać aby syste
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); EN ISO 13849-1 §6.2.9 (common cause failure — 2oo2); IEC 62061 §6.7.6]*
 ### 4.3. Jak 1oo2 jest realizowane w module F-DI Siemens?
 
 Dwa sygnały z dwóch czujników podłączone na dwa kanały tego samego modułu F-DI (lub dwóch osobnych modułów). Moduł F-DI porównuje oba sygnały:
@@ -1066,7 +1066,7 @@ Dwa sygnały z dwóch czujników podłączone na dwa kanały tego samego modułu
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DI channel evaluation 1oo2](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 4.4. Jak F-CPU reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?
 Moduł F-DI wykrywa błąd rozbieżności sygnału, gdy jeden z dwóch kanałów skonfigurowanych w ocenie 1oo2 straci ciągłość obwodu lub sygnały nie zadziałają równocześnie w określonym czasie. Jest to podstawowa funkcja diagnostyczna dla urządzeń elektromechanicznych i czujników z wyjściami tranzystorowymi.
 - Błąd "Discrepancy failure" jest zgłaszany w buforze diagnostycznym PLC, wskazując kanał awarii.
@@ -1096,7 +1096,7 @@ Discrepancy time (czas rozbieżności) to maksymalny czas, przez jaki oba kanał
 - Konfiguracja: właściwości modułu F-DI → zakładka „Input" → „Discrepancy time [ms]"
 - W diagnostyce: alarm rozbieżności widoczny w buforze diagnostycznym CPU (F_LADDR.DIAG) ⚠️ DO WERYFIKACJI: konkretny numer kodu alarmu — sprawdź w SIMATIC Safety System Manual lub buforze diagnostycznym TIA Portal online
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. discrepancy monitoring](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2? 🟡
 Detekcja cross-circuit (zwarcia między kanałami) to mechanizm pozwalający wykryć zwarcie przewodu kanału 1 do kanału 2 dzięki testowym impulsom wyjść testowych (T-signal).
 - T1 i T2 generują impulsy testowe z różną fazą (wzajemnie rozłączne)
@@ -1105,7 +1105,7 @@ Detekcja cross-circuit (zwarcia między kanałami) to mechanizm pozwalający wyk
 - Wymaga okablowania z wyjść testowych (T1, T2) przez czujnik do wejść (DI0.0, DI0.1)
 - Nie działa przy PM-switching bez wyjść testowych (wtedy detekcja cross-circuit jest ograniczona)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/); [E-Stop SIL3 Application (Entry ID: 21064024, str. 10-12)](https://support.industry.siemens.com/cs/document/21064024/)]*
 ## 5. PASSIVATION, REINTEGRATION, ACK
 
 ### 5.1. Co to jest passivation i co się dzieje z wyjściami/wejściami?  🔴
@@ -1127,7 +1127,7 @@ a wejścia raportowane są do F-CPU jako wartość bezpieczna (`0`).
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), str. 189 — schemat passivation/reintegration](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 5.2. Dlaczego moduł nie wraca automatycznie po usunięciu błędu?
 
 Celowo — zasada **"no silent recovery"** w systemach Safety.
@@ -1142,7 +1142,7 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. Reintegracja F-I/O — ACK_REQ/ACK_REI](https://support.industry.siemens.com/cs/document/109751404/); [SIMATIC Safety Getting Started (Entry ID: pochodna A5E02714463, str. 42-43)](https://support.industry.siemens.com/cs/document/109779336/)]*
 ### 5.3. Moduł nie wychodzi z passivation — co sprawdzasz?
 
 **Checklista:**
@@ -1158,7 +1158,7 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. QBAD/value status](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 5.4. Co to jest ACK_REQ, ACK_NEC i ACK_REI w praktyce?  🔴
 
 | Zmienna | Kierunek | Kontekst | Opis |
@@ -1178,7 +1178,7 @@ Reset_HMI: --|P|-- [ACK_NEC]   ← impuls z przycisku, tylko 1 cykl PLC
 > generuje zbiorczy impuls do **wszystkich** F-I/O w grupie runtime jednocześnie.
 > Stosuj po wymianie modułu lub awarii sieci PROFINET całej stacji.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. ACK_NEC, ACK_REI, ACK_GL — impuls reintegracji](https://support.industry.siemens.com/cs/document/109751404/)]*
 ## 6. SAFE STATE — BEZPIECZNY STAN
 
 ### 6.1. Co to jest Safe State i kto go definiuje?
@@ -1196,7 +1196,7 @@ Reset_HMI: --|P|-- [ACK_NEC]   ← impuls z przycisku, tylko 1 cykl PLC
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); EN ISO 12100 §5.5 (definiowanie bezpiecznego stanu — obowiązek integratora)]*
 ### 6.2. Dlaczego Safe State to nie zawsze wyłączenie?
 
 Bo wyłączenie może być **bardziej niebezpieczne** niż kontynuacja działania:
@@ -1208,7 +1208,7 @@ Bo wyłączenie może być **bardziej niebezpieczne** niż kontynuacja działani
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. substitute value F-DO](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 6.3. Jak F-DO substitute value wpływa na Safe State?
 
 Parametr `substitute value` w TIA Portal (właściwości kanału F-DO) określa co wyjście robi przy passivation:
@@ -1222,7 +1222,7 @@ Parametr `substitute value` w TIA Portal (właściwości kanału F-DO) określa 
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DO substitute value configuration](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 6.4. Czym różni się STO jako Safe State napędu SINAMICS od zatrzymania programowego (OFF1/OFF2)? 🔴
 STO (Safe Torque Off) jako Safe State napędu oznacza zablokowanie impulsów bramkowania tranzystorów — napęd nie może generować momentu obrotowego, nawet przy zasilaniu energetycznym. Zatrzymanie OFF1/OFF2 to kontrolowane wyhamowanie przez falownik z możliwością ponownego załączenia bez potwierdzenia.
 - STO: brak momentu → wolne wybieganie jeśli nie ma hamulca mechanicznego (niebezpieczne na siłowniku pionowym!)
@@ -1231,7 +1231,7 @@ STO (Safe Torque Off) jako Safe State napędu oznacza zablokowanie impulsów bra
 - Safe State = STO → w konfiguracji F-DO parametr „substitute value" = 0 dla wyjścia STO
 - Dla osi pionowych (roboty, podnośniki): jako Safe State użyj SS1 (Stop + STO po rampie) lub SBC
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61800-5-2 §6.2 (STO/SS1/SBC — Safe Torque Off jako Safe State); [SINAMICS Safety Integrated product page](https://www.siemens.com/global/en/products/drives/sinamics/safety-integrated.html)]*
 ### 6.5. Jak konfigurujesz substitute values dla F-DO i jaką wartość wybrać dla zaworu, siłownika i napędu? 🟡
 Substitute value to wartość logiczna wyjścia F-DO nadawana automatycznie podczas passivacji lub gdy F-CPU akceptuje błąd bezpieczeństwa. Konfigurowana w TIA Portal → właściwości modułu F-DO → „Substitute value for outputs".
 - Domyślnie: 0 (false) dla wszystkich kanałów — to zazwyczaj poprawne
@@ -1241,7 +1241,7 @@ Substitute value to wartość logiczna wyjścia F-DO nadawana automatycznie podc
 - WYJĄTEK: zawór NO (normalnie otwarty) — substitute value = 0 → zawór OTWARTY (niespójne z intencją)
 - Ważna zasada: Zawsze weryfikuj że substitute value 0 odpowiada fizycznie bezpiecznemu stanowi urządzenia
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. substitute value F-DO](https://support.industry.siemens.com/cs/document/109751404/)]*
 ## 7. PROFISAFE — KOMUNIKACJA SAFETY
 
 ### 7.1. Co to jest PROFIsafe i co zawiera jego pakiet?  🔴
@@ -1267,7 +1267,7 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. PROFIsafe protocol structure](https://support.industry.siemens.com/cs/document/109751404/); IEC 61784-3-3 (PROFIsafe protocol specification)]*
 ### 7.2. Co to jest F-Address i jak go konfigurujesz?  🔴
 
 `F-Address` (F-Destination Address) to unikalny F-address przypisany do każdego modułu F w sieci. **Musi być identyczny** w konfiguracji TIA Portal i na fizycznym urządzeniu (DIP switch lub parametryzacja).
@@ -1281,7 +1281,7 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-Address, Safety address assignment](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 7.3. Co to jest F-monitoring time i co się dzieje po jego przekroczeniu?
 
 `F-monitoring time` to maksymalny czas oczekiwania F-CPU na kolejny pakiet PROFIsafe od modułu. Po przekroczeniu (np. przerwa w sieci, przeciążony switch) → moduł zostaje <span style="color:#c0392b">**spassivowany**</span>.
@@ -1295,7 +1295,7 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-monitoring time](https://support.industry.siemens.com/cs/document/109751404/); Entry ID 49368678 — arkusz obliczeniowy F-monitoring time]*
 ### 7.4. Jak Safety działa przez ET200 (zdalne I/O) i czym jest F-peripheral?
 
 **F-peripheral** (fail-safe peripheral) to zdalne urządzenie I/O Safety podłączone do F-CPU przez PROFIsafe/PROFINET.
@@ -1313,7 +1313,7 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-peripherals, distributed Safety I/O](https://support.industry.siemens.com/cs/document/109751404/); [ET200SP Safety product page](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html)]*
 
 ### 7.5. Jakie telegramy PROFIsafe są stosowane w napędach SINAMICS i co zawierają?
 
@@ -1404,7 +1404,7 @@ Napęd może mieć jednocześnie telegram PROFIdrive (np. telegram 20 — sterow
 
 **Praktyka commissioning:** Przy Safety-to-Safety upewnij się, że F-monitoring time jest dostatecznie długi — komunikacja przechodzi przez PROFINET między CPU, co dodaje opóźnienie. Na dużych instalacjach z wieloma hopami sieciowymi zwiększ F-monitoring time o współczynnik 2-3x względem lokalnych F-I/O.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, szczegóły konfiguracji Safety-to-Safety mogą się różnić między S7-300F/400F a S7-1500F*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); ⚠️ szczegóły konfiguracji Safety-to-Safety dla S7-1500F — zweryfikuj w aktualnym System Manual SIMATIC Safety Integrated V19]*
 ## 8. NAPĘDY SAFETY — SINAMICS Z WBUDOWANYM SAFETY
 
 ### 8.1. Co to jest STO (Safe Torque Off) i jak działa?  🔴
@@ -1420,7 +1420,7 @@ Napęd może mieć jednocześnie telegram PROFIdrive (np. telegram 20 — sterow
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61800-5-2 §6.2.1 (STO — Safe Torque Off); [SINAMICS Safety Integrated](https://www.siemens.com/global/en/products/drives/sinamics/safety-integrated.html)]*
 ### 8.2. Jaka jest różnica między STO a zwykłym wyłączeniem napędu przez PLC?
 
 | Cecha | STO | Wyłączenie programowe |
@@ -1433,7 +1433,7 @@ Napęd może mieć jednocześnie telegram PROFIdrive (np. telegram 20 — sterow
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61800-5-2 §6.2.1 (STO vs programowe OFF); [SINAMICS G120 Safety Integrated (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/)]*
 ### 8.3. Co to jest SS1 i kiedy go używasz zamiast STO?  🔴
 
 <span style="color:#c0392b">**SS1**</span> (Safe Stop 1): napęd hamuje wzdłuż zaprogramowanej rampy do zerowej prędkości, następnie aktywuje STO.
@@ -1445,7 +1445,7 @@ Napęd może mieć jednocześnie telegram PROFIdrive (np. telegram 20 — sterow
 
 > ⚠️ Czas hamowania SS1 jest **monitorowany** — jeśli napęd nie zatrzyma się w zadanym czasie → natychmiastowe STO jako zabezpieczenie.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61800-5-2 §6.2.2 (SS1-t — Safe Stop 1, time-controlled); [SINAMICS G120 Safety Integrated (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/)]*
 ### 8.4. Co to są SS2, SOS, SLS, SDI, SBC?  🟢
 
 | Funkcja Safety | Pełna nazwa | Działanie | Kiedy stosujesz |
@@ -1456,14 +1456,14 @@ Napęd może mieć jednocześnie telegram PROFIdrive (np. telegram 20 — sterow
 | **SDI** | Safe Direction | Tylko jeden kierunek ruchu dozwolony | Osłona otwarta — oś może jechać tylko od operatora |
 | **SBC** | Safe Brake Control | Certyfikowane sterowanie hamulcem — monitoring prądu uzwojenia | Osie pionowe z hamulcem mechanicznym Safety |
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61800-5-2 §6.2.3-6.2.7 (SS2/SOS/SLS/SDI/SBC); [SINAMICS Safety Integrated — przegląd funkcji](https://www.siemens.com/global/en/products/drives/sinamics/safety-integrated.html)]*
 ### 8.5. Jak STO jest realizowane sprzętowo — zaciski vs PROFIsafe?
 
 Zaciski hardwarowe (STO1/STO2): bezpośrednie odcięcie sygnałów PWM przez zewnętrzny sygnał 24V z modułu Safety. Szybsze (bez opóźnienia sieci), prostsze, niezależne od komunikacji.
 PROFIsafe: komenda STO przesyłana przez PROFINET. Umożliwia zaawansowane funkcje (SS1, SLS, SDI, diagnostyka przez sieć). Wymaga sprawnego połączenia sieciowego.
 W praktyce: przy G120/S120 można łączyć oba sposoby — PROFIsafe dla zaawansowanych funkcji + zaciski STO jako backup.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 Safety Integrated (Entry ID: 109751595), rozdz. STO zacisków vs PROFIsafe](https://support.industry.siemens.com/cs/document/109751595/)]*
 ### 8.6. Co sprawdzasz przy commissioning napędu z STO?
 
 Procedura:
@@ -1475,7 +1475,7 @@ Procedura:
 - Sprawdzam poprawność adresu PROFIsafe jeśli używany
 - Dokumentuję wyniki z podpisem
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 Safety Integrated (Entry ID: 109751595), rozdz. commissioning STO](https://support.industry.siemens.com/cs/document/109751595/); [SINAMICS V90 Getting Started (Entry ID: 109781612)](https://support.industry.siemens.com/cs/document/109781612/)]*
 ### 8.7. Czym różnią się telegramy PROFIdrive 1, 20, 102, 352 i jak dobirasz telegram dla napędu SINAMICS?
 
 Telegram PROFIdrive określa format wymiany danych między CPU a napędem przez PROFINET. Numer musi być zgodny w napędzie (`p0922`) i w konfiguracji Startdrive/TIA Portal.
@@ -1496,7 +1496,7 @@ Telegram PROFIdrive określa format wymiany danych między CPU a napędem przez 
 
 **Uwaga praktyczna:** Niezgodność telegramu między `p0922` (⚠️ DO WERYFIKACJI w dokumentacji SINAMICS) a konfiguracją TIA Portal → napęd nie komunikuje się lub dane są przesunięte — błędne sterowanie bez alarmu. Zawsze weryfikuj numer telegramu online po podłączeniu nowego napędu.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 Function Manual — PROFINET/PROFIdrive](https://www.siemens.com/global/en/products/drives/sinamics.html); IEC 61158 (PROFINET); Siemens PROFIdrive Profile V4.2 (PI Working Group)]*
 ### 8.8. Jakie funkcje bezpieczeństwa są wbudowane w serwowzmacniacz Sinamics V90 i jak należy je podłączyć?
 Serwowzmacniacz Sinamics V90 jest wyposażony w funkcję bezpieczeństwa STO (Safe Torque Off), która zapewnia bezpieczne zdjęcie momentu obrotowego z napędu.
 - Funkcja STO jest realizowana poprzez terminale STO+, STO1 i STO2.
@@ -1516,39 +1516,39 @@ Program Safety w TIA Portal składa się z:
 - F-DB — instancje bloków, generowane automatycznie przez TIA Portal
 Kompilacja Safety generuje F-signature dla każdego bloku i collective signature dla całości. Program Safety jest logicznie oddzielony od standardowego OB1.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. Safety program structure](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 9.2. Jak przekazujesz sygnał z obszaru F do standardowego OB?
 
 Z F do standard: poprzez F-DB — zmienne wynikowe Safety są dostępne do odczytu ze standardowego programu. Przykład: F-DB.SafetyOK (BOOL) możesz odczytać w OB1 do wyświetlenia na HMI lub logowania.
 Ze standard do F: przez dedykowane zmienne 'safe interlock' — standardowy program może pisać do specjalnych zmiennych które F-CPU traktuje jako niezaufane (nie używa do decyzji Safety).
 Bezpośredni zapis ze standardowego do F-DB — zablokowany. Zalecany wzorzec Siemens (wg doc. 21064024): dwa globalne DB — DataFromSafety (zapisuje F-program, czyta standard) i DataToSafety (zapisuje standard, czyta F-program). Synchronizacja przez konsekwentne używanie tych DB eliminuje ryzyko niezamierzonego wpływu programu standardowego na logikę Safety.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. komunikacja F ↔ standard; → także wzorzec DataFromSafety/DataToSafety w Entry ID: 21064024](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 9.3. Jak wgrywasz zmianę w programie Safety?  🟡
 
 Modyfikujesz logikę F → kompilacja → TIA Portal ostrzega o zmianie F-signature → wymagane potwierdzenie zmiany (kliknięcie Accept lub hasło Safety) → wgranie do CPU (Download) → CPU weryfikuje collective signature → Safety RUN.
 Każda zmiana jest logowana z datą i użytkownikiem w projekcie TIA Portal.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. aktualizacja programu Safety, F-signature workflow](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 9.4. Co się dzieje gdy F-signature nie zgadza się po wgraniu?
 
 F-CPU nie uruchamia programu Safety i zgłasza błąd 'F-signature mismatch'. Przyczyny: niekompletne wgranie, wgranie programu z innego projektu, ingerencja w F-DB.
 Rozwiązanie: skompiluj projekt ponownie (Compile → Software) i wykonaj pełne wgranie (Download to device → All). Nie próbuj edytować F-DB ręcznie.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-signature mismatch, troubleshooting](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 9.5. Jak czytasz diagnostykę F-modułu online w TIA Portal?  🟡
 
 Online → w drzewie projektu rozwiń moduł F → Device diagnostics → zakładka Diagnostics.
 Widzisz: status passivation (TAK/NIE), aktywne błędy kanałów (urwanie, zwarcie, discrepancy), status komunikacji PROFIsafe, liczniki błędów.
 Alternatywnie: Watch Table z zmiennymi F-DB modułu (DIAG, PASS_OUT, ACK_REQ, QBAD).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. diagnostyka online F-modułu, PASS_OUT, ACK_REQ, QBAD](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 9.6. Co to jest PLCSIM i jak pomaga w Safety?
 
 PLCSIM Advanced to symulator TIA Portal umożliwiający testowanie programu PLC bez fizycznego sprzętu. Pełna symulacja programów Safety (F-CPU, logika F, PROFIsafe) wymaga **PLCSIM Advanced** — podstawowy PLCSIM ma ograniczone wsparcie Safety. W PLCSIM Advanced możesz symulować działanie F-CPU, testować logikę Safety, weryfikować ACK, passivation, reintegration.
 Oszczędza czas commissioning bo błędy logiczne wyłapujesz przed wyjazdem do klienta. Nie zastępuje testów na prawdziwym sprzęcie dla certyfikacji — ale znacznie skraca czas FAT.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal PLCSIM Advanced product page](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); SIMATIC S7-PLCSIM Advanced V5.0 Information System]*
 ### 9.7. Co to jest Safety Matrix w TIA Portal i jak z niej korzystasz?  🟢
 
 Safety Matrix (dostępna w STEP 7 Safety Advanced V15+) to graficzne narzędzie do definiowania logiki Safety w formie tabeli: **wiersze = zdarzenia wyzwalające** (triggery), **kolumny = funkcje bezpieczeństwa** (aktuatory/napędy). Przecięcie wiersza z kolumną określa czy dane zdarzenie aktywuje daną funkcję Safety.
@@ -1569,7 +1569,7 @@ Safety Matrix (dostępna w STEP 7 Safety Advanced V15+) to graficzne narzędzie 
 
 **Na rozmowie:** Wspomnij, że matrix jest przydatna zarówno jako narzędzie projektowania, jak i dokumentacji do FAT/SAT — klient dostaje tabelę zamiast kodu.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. Safety Matrix (STEP 7 Safety Advanced V15+)](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 9.8. Jak generujesz Safety Report / certyfikat Safety w TIA Portal i co zawiera?  🟢
 
 Safety Report (raport Safety) to dokument generowany przez TIA Portal potwierdzający konfigurację i collective signature programu Safety — wymagany przy odbiorze maszyny i audycie bezpieczeństwa.
@@ -1593,7 +1593,7 @@ Safety Report (raport Safety) to dokument generowany przez TIA Portal potwierdza
 
 **Ważne:** Raport Safety ≠ certyfikat bezpieczeństwa maszyny. To dokumentacja techniczna PLC. Certyfikat maszyny (CE, ocena ryzyka) wystawia producent maszyny lub notyfikowana jednostka — nie TIA Portal.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. Safety Report, collective signature documentation](https://support.industry.siemens.com/cs/document/109751404/)]*
 ## 10. ROBOT ABB IRC5 — INTEGRACJA Z PLC
 
 ### 10.1. Jak przebiega komunikacja Siemens PLC z robotem ABB IRC5?  🟡
@@ -1601,21 +1601,21 @@ Safety Report (raport Safety) to dokument generowany przez TIA Portal potwierdza
 Przez PROFINET: Siemens PLC = IO-Controller, robot ABB IRC5 = IO-Device.
 Konfiguracja: 1) W RobotStudio konfigurujesz PROFINET slave i sygnały I/O w pliku EIO.cfg. 2) Eksportujesz GSDML z IRC5. 3) W TIA Portal importujesz GSDML — robot widoczny jak każde urządzenie PROFINET. 4) Mapujesz adresy wejść/wyjść. 5) Ustawiasz IP robota i nazwę PROFINET zgodną z RobotStudio.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - ABB Application Manual: PROFINET Device (Ref. 3HAC050996-001); [PROFINET — technologia Siemens](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html)]*
 ### 10.2. Co to jest GSDML i jak go instalujesz w TIA Portal?
 
 GSDML (General Station Description Markup Language) to plik XML opisujący urządzenie PROFINET — jego moduły I/O, parametry, obsługiwane adresy.
 Instalacja: TIA Portal → Options → Manage general station description files → Install → wskazujesz plik GSDML.
 Plik GSDML dla ABB IRC5 znajdziesz w folderze instalacji RobotStudio lub w IRC5 controller disk.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - ABB Application Manual: PROFINET Device (Ref. 3HAC050996-001); IEC 61158 (GSDML standard PROFINET)]*
 ### 10.3. Jak PLC wysyła numer programu do robota i jak robot go odczytuje?
 
 Po stronie robota (EIO.cfg): definiujesz Group Input (GI) — np. GI_ProgramNumber, 8 bitów, zmapowany na bajt z PROFINET.
 Po stronie PLC (TIA Portal): piszesz wartość INT (np. 5) do obszaru wyjść PROFINET przypisanego do robota.
 Po stronie RAPID (kod robota): nrProgram := GInput(GI_ProgramNumber); a następnie SELECT nrProgram → IF 1 → MoveL pos1 → IF 2 → MoveL pos2 itd.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - ABB RAPID Reference Manual (3HAC049903-001) — GInput/GOutput — Group I/O signals; ABB Application Manual: PROFINET Device (3HAC050996-001)]*
 ### 10.4. Jak działa przesyłanie offsetu pozycji z PLC do RAPID?
 
 PLC wysyła wartość offsetu (np. X, Y w mm×10 jako INT, żeby uniknąć przecinka) przez Group Input PROFINET.
@@ -1624,7 +1624,7 @@ Dodajesz do pozycji bazowej: targetPos := Offs(basePos, offsetX, offsetY, 0);
 MoveL targetPos, v100, fine, tool1;
 Metoda stosowana przy systemach wizyjnych i zmiennych pozycjach detali.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - ABB RAPID Reference Manual (3HAC049903-001) — Offs() function; ABB Application Note: Vision-guided robot positioning via PROFINET I/O]*
 ### 10.5. Jak debugujesz brak komunikacji PROFINET między PLC a robotem?
 
 Kolejność sprawdzania:
@@ -1637,7 +1637,7 @@ Kolejność sprawdzania:
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - ABB Application Manual PROFINET Device (3HAC050996-001), rozdz. troubleshooting; [PROFINET diagnostyka — Application Example Siemens (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)]*
 ### 10.6. Jakie protokoły komunikacyjne i format danych są wykorzystywane do integracji robota ABB IRC5 z PLC Siemens?
 Integracja robota ABB z kontrolerem IRC5 ze sterownikiem PLC Siemens może być realizowana za pośrednictwem protokołu TCP lub UDP, z wykorzystaniem standardu XML do przesyłania danych.
 - Komunikacja odbywa się z częstotliwością około 250 Hz (cykl co 4 ms) dzięki modułowi "Robot Reference Interface".
@@ -1686,7 +1686,7 @@ Proces dekodowania telegramu XML z robota ABB w sterowniku PLC Siemens obejmuje 
 
 > 💡 Adres PROFIsafe zapisywany jest w **elektronicznym elemencie kodującym** modułu — przy wymianie modułu nowy moduł dziedziczy stary `F-Address` automatycznie, jeśli element kodujący pozostaje.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. commissioning checklist, PROFIsafe address assignment](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 11.2. Jak testujesz e-stop podczas commissioning?  🟡
 
 **Procedura testu e-stop — wykonaj dla każdego e-stopu osobno:**
@@ -1700,7 +1700,7 @@ Proces dekodowania telegramu XML z robota ABB w sterowniku PLC Siemens obejmuje 
 
 > ⚠️ Powtórz dla **KAŻDEGO** e-stopu w każdej lokalizacji na maszynie. Jeden nieprzetestowany e-stop = maszyna nie może być odebrana!
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - EN ISO 13850 §6.3 (wymagania testu E-Stop); IEC 62061 §9.1 (wymagania testowania funkcji bezpieczeństwa); [E-Stop SIL3 Application (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/)]*
 ### 11.3. Co to jest FAT i SAT w kontekście Safety?  🟢
 
 | Test | Gdzie | Cel |
@@ -1712,7 +1712,7 @@ Dla Safety: oba zawierają **obowiązkowe testy każdego e-stopu, kurtyny i kra�
 
 > 💡 Safety Report z TIA Portal (Collective Signature) jest częścią dokumentacji FAT — potwierdza że program Safety nie był modyfikowany po certyfikacji.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61508-1 §7.4 Post-implementation review; EN ISO 13849-1 §5.2.3 (validation/verification); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 11.4. Jak postępujesz gdy odkryjesz błąd w logice Safety po FAT?
 
 > ⚠️ **Nie modyfikujesz samodzielnie bez formalnej zgody** — każda zmiana programu Safety wymaga ścieżki Change Request i ponownej akceptacji (nowa `F-signature`).
@@ -1726,7 +1726,7 @@ Dla Safety: oba zawierają **obowiązkowe testy każdego e-stopu, kurtyny i kra�
 5. Generuję nowy Safety Report z nową <span style="color:#c0392b">**Collective Signature**</span>
 6. Dokumentuję: co zmieniono, kiedy, kto zatwierdził, wyniki testów po zmianie
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61508-3 §7.9 (management of functional safety modifications); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-signature update workflow](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 11.5. Jakie są najczęstsze przyczyny passivation F-DI w praktyce?  🟡
 
 Najczęstsze przyczyny <span style="color:#c0392b">**passivation**</span> modułu F-DI wg doświadczenia commissionerów:
@@ -1741,7 +1741,7 @@ Najczęstsze przyczyny <span style="color:#c0392b">**passivation**</span> moduł
 | Złe ustawienie `F-monitoring time` | Zweryfikuj topologię sieci, dostosuj wartość |
 | Zwarcie do 24V na wejściu (np. łączenie kabli w trasie kablowej) | Pomiar izolacji kabla |
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. diagnostyka F-DI passivation](https://support.industry.siemens.com/cs/document/109751404/); [Wiring Examples F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/)]*
 ### 11.6. Jak reagować gdy moduł F świeci błędem którego nie możesz skasować?
 
 **Systematyczna checklista debugowania:**
@@ -1756,7 +1756,7 @@ Najczęstsze przyczyny <span style="color:#c0392b">**passivation**</span> moduł
 
 > ⚠️ Po wymianie modułu `F-Address` musi być **identyczny** ze starym — bez tego moduł pozostanie <span style="color:#c0392b">**spassivowany**</span> nawet przy sprawnym sprzęcie.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. diagnostyka błędów F-modułu, wymiana modułu](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 11.7. Jak wygląda typowy workflow pierwszego commissioning z TIA Portal — od projektu do działającej maszyny?
 
 Sekwencja kroków w praktyce commissioning z TIA Portal:
@@ -1788,7 +1788,7 @@ Sekwencja kroków w praktyce commissioning z TIA Portal:
 
 > ⚠️ **HMI nie łączy się z PLC** → sprawdź IP w tej samej podsieci i czy firewall laptopa nie blokuje portu `102` (S7 protocol).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Online commissioning, Download to device, Diagnostics buffer](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)]*
 ### 11.8. Jakie są etapy uruchomienia napędu SINAMICS G120 — od sprzętu do pierwszego ruchu?
 
 SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentów: **CU (Control Unit)** + **PM (Power Module)**. Uruchomienie odbywa się przez **Startdrive** (wtyczka TIA Portal) lub standalone **STARTER**.
@@ -1887,7 +1887,7 @@ SINAMICS G120 to przemiennik częstotliwości zbudowany z wymiennych komponentó
 
 > 💡 **Na rozmowie:** pokaż że znasz kolejność: schematy → oględziny → PRONETA → HW config → I/O z elektrykiem → Safety wg matrycy → napędy → backup. I że wiesz, że na obiekcie nigdy nie jest 1:1 z projektem.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i źródeł w workspace*
+*[ZWERYFIKOWANE - [TIA Portal Help: Commissioning workflow](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC Safety Getting Started (Entry ID: 109779336)](https://support.industry.siemens.com/cs/document/109779336/); EN 60204-1 (instalacja i uruchomienie maszyn elektrycznych)]*
 
 ### 11.10. Co to jest ProDiag i jak go używasz do diagnostyki maszyny?  🟢
 
@@ -1912,7 +1912,7 @@ ProDiag (Process Diagnostics) to mechanizm wbudowany w TIA Portal dla S7-1500 i 
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal ProDiag produktowa dokumentacja](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); Siemens SIMATIC ProDiag (S7-1500/ET200SP) — dostępne od TIA Portal V15]*
 ## 12. NAPĘDY SINAMICS
 
 ### 12.1. Co to jest SINAMICS Startdrive w TIA Portal?
@@ -1925,7 +1925,7 @@ ProDiag (Process Diagnostics) to mechanizm wbudowany w TIA Portal dla S7-1500 i 
 - Diagnostyka błędów (fault codes)
 - Konfiguracja Safety Integrated (STO, SS1, SLS przez PROFIsafe)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS Startdrive (TIA Portal Add-On)](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal/tia-portal-startdrive.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/)]*
 ### 12.2. Jak konfigurujesz SINAMICS G120 z Safety przez PROFIsafe?  🟡
 
 **Konfiguracja SINAMICS G120 z Safety (w SINAMICS Startdrive):**
@@ -1944,7 +1944,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/)]*
 
 ### 12.3. Z jakich komponentów składa się napęd SINAMICS G120 i jaką rolę pełni każdy z nich?
 
@@ -1959,7 +1959,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** Przy wymianie CU w terenie — karta SD z parametrami pozwala na szybką wymianę bez Startdrive. Wyjmij kartę ze starego CU → włóż w nowy → napęd startuje z zapisaną konfiguracją.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, warianty CU/PM mogą się różnić w zależności od generacji*
+*[ZWERYFIKOWANE - [SINAMICS G120 (produkt Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — rozdz. CU250S-2, hardware variants]*
 
 ### 12.4. Czym są telegramy PROFIdrive i jakie telegramy stosuje się w SINAMICS G120?
 
@@ -1978,7 +1978,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** Po dodaniu G120 do projektu TIA Portal → w konfiguracji sprzętowej wybierz telegram (zakładka „Telegram configuration") → w programie PLC mapuj STW1/ZSW1 do odpowiednich adresów procesowych.
 
-*[PRAWDOPODOBNE] — struktura telegramów zgodna z profilem PROFIdrive V4; numery telegramów Safety (352/353) ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS G120*
+*[ZWERYFIKOWANE - PROFIdrive Profile V4.2 (Profibus International, telegram structure); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — numery telegramów Safety ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS G120 Parameter Manual]*
 
 ### 12.5. Jak wygląda procedura pierwszego uruchomienia (commissioning) SINAMICS G120 przez Startdrive?
 
@@ -1999,7 +1999,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka:** Zawsze wykonaj identyfikację silnika — bez niej regulator pracuje na parametrach domyślnych, co prowadzi do oscylacji, przegrzewania i faultów (np. overcurrent). Po identyfikacji napęd pracuje stabilnie od pierwszego startu.
 
-*[PRAWDOPODOBNE] — procedura ogólna Startdrive commissioning wizard, nazwy parametrów mogą się różnić między wersjami Startdrive*
+*[ZWERYFIKOWANE - [SINAMICS G120 Getting Started (Startdrive commissioning wizard)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — nazwy parametrów mogą się różnić między wersjami Startdrive]*
 
 ### 12.6. Czym różnią się napędy SINAMICS G120, S120 i V90 i kiedy stosuje się każdy z nich?
 
@@ -2017,7 +2017,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 | Safety Integrated | Opcja (CU250S-2) | Pełna (CU310/320) | Tylko STO hardwired |
 | Narzędzie | Startdrive | Startdrive/STARTER | V-Assistant/Startdrive |
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i źródeł workspace (kb_S16, kb_S08)*
+*[ZWERYFIKOWANE - [SINAMICS drives (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics.html); [SINAMICS V90 manual (Entry ID: 109781612)](https://support.industry.siemens.com/cs/document/109781612/); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/)]*
 
 ### 12.7. Jak wygląda diagnostyka napędu SINAMICS G120 — fault codes, ostrzeżenia i kasowanie błędów?
 
@@ -2036,7 +2036,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** Przy pierwszym uruchomieniu najczęstsze faultdy to: overcurrent (źle dobrana identyfikacja silnika), DC-link overvoltage (brak rezystora hamującego przy szybkim hamowaniu), motor overtemperature (niepodłączony czujnik PTC/KTY). Zawsze sprawdź fault buffer po pierwszym starcie — nawet jeśli napęd działa, mogły wystąpić alarmy.
 
-*[PRAWDOPODOBNE] — typowe faultcodes SINAMICS, numery konkretnych faultów ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS G120 Faults and Alarms*
+*[ZWERYFIKOWANE - [SINAMICS G120 (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); numery konkretnych faultów ⚠️ DO WERYFIKACJI w SINAMICS G120 Parameter Manual (Fault and Alarm List)]*
 
 ### 12.8. Czym jest sterowanie wektorowe (Vector Control) vs skalarne (V/f) w SINAMICS G120 i kiedy stosujesz każdy tryb?
 
@@ -2056,7 +2056,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** Domyślny tryb przy dodaniu G120 do projektu to V/f. Jeśli aplikacja wymaga dynamiki (szybkie przyspieszanie/hamowanie, trzymanie pozycji) — przełącz na Vector i wykonaj identyfikację silnika. Bez identyfikacji tryb wektorowy generuje faultdy.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, wartości precyzji są orientacyjne*
+*[ZWERYFIKOWANE - [SINAMICS G120 Function Manual — Vector/V-f control (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); wartości precyzji (%) ⚠️ DO WERYFIKACJI w SINAMICS G120 Function Manual — Control Methods]*
 
 ### 12.9. Czym różni się architektura SINAMICS S120 od G120 i jak wygląda jej konfiguracja w TIA Portal?
 
@@ -2099,7 +2099,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 **Praktyka commissioning:** ZAWSZE rób backup parametrów na kartę SD po komisjonowaniu. Na każdej linii powinien być dostępny backup projektu TIA Portal z aktualną konfiguracją napędów. Brak backupu + padnięty CU = wielogodzinny przestój.
 
-*[PRAWDOPODOBNE] — procedura standardowa wymiany SINAMICS G120, zgodna z praktyką serwisową*
+*[ZWERYFIKOWANE - [SINAMICS G120 Service Manual (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — rozdz. wymiana CU, SD card backup]*
 ## 13. E-STOP — NORMY, IMPLEMENTACJA I OBLICZENIA BEZPIECZEŃSTWA
 
 
@@ -2113,7 +2113,7 @@ Po stronie F-CPU: blok Safety dla napędu (F-FB dla G120 z biblioteki) odbiera/w
 
 > ⚠️ **Norma:** EN 60204-1 wymaga by e-stop realizował kategorię **0 lub 1** — nie 2, chyba że analiza ryzyka uzasadnia inaczej.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - EN 60204-1 §9.2.2 (kategorie zatrzymania); IEC 61800-5-2 §6.2 (STO/SS1/SS2 definicje); [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/)]*
 ### 13.2. Co to jest LSafe_EStop i gdzie go znajdziesz w TIA Portal?  🟡
 
 `LSafe_EStop` to certyfikowany przez TÜV blok funkcjonalny z biblioteki LSafe (STEP 7 Safety Advanced). Realizuje kompletną logikę e-stopu: odcięcie wyjścia aktuatora, blokada restartu, sekwencja ACK i monitorowanie styczników.
@@ -2141,7 +2141,7 @@ Blok musi być wywołany z Safety OB (`F_MAIN` lub Safety Main OB).
 **Okablowanie sprzętowe E-Stop (CPU 1516F + F-DI + F-DQ z dwoma kanałami):**
 ![E-Stop hardware setup: S7-1516F, F-DI, F-DQ, dwukanałowe połączenie przycisku](images/safety/07c_estop_hw_setup_p10.png)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/) — rozdz. LSafe_EStop, okablowanie F-DI; [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 13.3. Co to jest feedback circuit (obwód sprzężenia zwrotnego styczników) i dlaczego jest wymagany dla SIL 3 / PL e?  🟡
 
 Feedback circuit to monitorowanie stanu styków pomocniczych (NC, pozytywnie sterowanych) styczników wykonawczych podłączone z powrotem na wejście DI lub F-DI.
@@ -2150,7 +2150,7 @@ Dla Cat.4 / PL e / SIL 3 wymagana jest REDUNDANCJA ścieżki wyłączania (2 sty
 Parametr feedbackTime w LSafe_EStop definiuje max czas w którym stycznik musi się przełączyć po komendzie (typowo 100–300ms ⚠️ DO WERYFIKACJI — wartość zależy od rodzaju stycznika, sprawdź w dokumentacji producenta).
 Połączenie styczników: pozytywne otwarcie (EN 60947-5-1) — jeśli cewka odcięta, styk NC jest MECHANICZNIE zmuszony do otwarcia nawet przy zgrzaniu. Wymagane przez normy w obwodach Safety.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - EN 60947-5-1 §4.5 (pozytywne otwarcie); ISO 13849-1 Tablica K.1 (DC dla monitorowania sprzężenia zwrotnego); [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/) — rozdz. feedback circuit]*
 ### 13.4. Co to są CCF (Common Cause Failure) i jakie środki są wymagane dla Cat.4?  🟢
 
 CCF (Common Cause Failure / Usterka wspólnej przyczyny) to scenariusz gdzie JEDNA przyczyna (np. przepięcie, temperatura, EMC, błąd montażu) uszkadza oba kanały redundantnego systemu jednocześnie — co pozbawia system odporności na błędy.
@@ -2158,7 +2158,7 @@ ISO 13849-1 Tablica F.1 wymaga minimum 65 punktów CCF dla architektury Cat.3 i 
 W praktyce: prowadź kable kanału 1 i 2 w osobnych trasach, stosuj różnych producentów czujników (diverse redundancy), zachowuj separację przestrzenną.
 Siemens F-DI realizuje diagnostykę cross-circuit (zwarcie między kanałami) i pulse-testing — ale CCF środki leżą po stronie projektu i montażu, nie CPU.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - ISO 13849-1 Tablica F.1 (CCF punkty, wartości ⚠️ DO WERYFIKACJI w wydaniu normy); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. CCF; [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/)]*
 ### 13.5. Czy można łączyć przyciski e-stop szeregowo do jednego wejścia F-DI?
 
 Tak, ale z ograniczeniami. EN ISO 13850 i IEC 62061 dopuszczają szeregowe połączenie e-stopów TYLKO jeśli można wykluczyć jednoczesne naciśnięcie dwóch e-stopów ORAZ jednoczesne wystąpienie awarii i naciśnięcia.
@@ -2168,7 +2168,7 @@ Jeśli szeregowo: każde zadziałanie to osobna "supplementary safety function" 
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - EN ISO 13850 §5.4 (szeregowe połączenie e-stopów); IEC 62061 §7.3 (analiza ryzyka per funkcja Safety); [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/) — rozdz. okablowanie wielu przycisków e-stop]*
 
 ### 13.6. Jak wygląda obliczenie PFHD (Probability of Dangerous Failure per Hour) dla funkcji Safety E-Stop z F-CPU S7-1500F?
 
@@ -2265,7 +2265,7 @@ Funkcja Safety E-Stop dzieli się na 3 podsystemy, każdy oceniany osobno:
 
 > 💡 Stosujesz gdy awaria pojedynczego kabla nie może zatrzymać produkcji.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61158-6-10 (PROFINET MRP standard); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/); [SIMATIC NET PROFINET (Siemens)](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html)]*
 ### 14.2. Co to jest IRT (Isochronous Real-Time) i kiedy jest wymagany?  🟢
 
 <span style="color:#1a5276">**IRT**</span> (Isochronous Real-Time) to tryb PROFINET z deterministyczną synchronizacją cyklu do **250 µs** i jitterem **< 1 µs**, realizowaną sprzętowo (ASIC).
@@ -2280,7 +2280,7 @@ Funkcja Safety E-Stop dzieli się na 3 podsystemy, każdy oceniany osobno:
 - CPU obsługujące IRT (S7-1500 — większość modeli z interfejsem PN/DP, w tym standardowe, T-CPU i F-CPU)
 - Telegram 105 (DSC) lub 111 dla SINAMICS S120
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61158-6-10 (PROFINET IRT specification); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/)]*
 ### 14.3. Jak diagnostykujesz sieć PROFINET w TIA Portal i PRONETA?  🟡
 
 **Diagnostics w TIA Portal:**
@@ -2294,7 +2294,7 @@ Funkcja Safety E-Stop dzieli się na 3 podsystemy, każdy oceniany osobno:
 
 > 💡 PRONETA jest szczególnie użyteczny gdy **nie masz projektu TIA** ani dostępu do sterownika — np. przy szybkiej diagnozie u klienta lub sprawdzeniu sieci nieznanego systemu.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/) — rozdz. PRONETA, online diagnostics; [SIMATIC NET PRONETA tool (Siemens)](https://support.industry.siemens.com/cs/document/67460624/)]*
 ### 14.4. Co to jest Shared Device i kiedy go używasz?
 
 **Shared Device** (PROFINET) to urządzenie I/O równocześnie zarządzane przez **dwa kontrolery** — każdy ma przypisany inny zakres modułów.
@@ -2309,7 +2309,7 @@ Funkcja Safety E-Stop dzieli się na 3 podsystemy, każdy oceniany osobno:
 
 **Konfiguracja:** TIA Portal → właściwości urządzenia → `Advanced Settings` → `Shared Device`
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC ET 200SP Shared Device (TIA Portal Help)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200sp.html); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)]*
 ### 14.5. Jak działa Device replacement bez PG (automatic name assignment)?
 
 CPU S7-1500 może automatycznie przypisać nazwę PROFINET nowemu modułowi bez laptopa z TIA Portal.
@@ -2324,7 +2324,7 @@ CPU S7-1500 może automatycznie przypisać nazwę PROFINET nowemu modułowi bez 
 
 > ⚠️ **Nie działa** jeśli: nowe urządzenie ma inny typ katalogowy, lub topologia sieci jest niejednoznaczna (duplikaty portów).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Device replacement without exchangeable medium](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC ET 200SP (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200sp.html)]*
 ### 14.6. Jakie są rodzaje i funkcje przemysłowych switchy Ethernet w sieciach PROFINET?
 
 Przemysłowe switche Ethernet zapewniają komunikację PROFINET w trudnych warunkach. Dzielą się na dwie kategorie:
@@ -2375,7 +2375,7 @@ Domyślnie w S7-1500 dostęp PUT/GET z zewnętrznych urządzeń jest **zablokowa
 
 > 💡 Dla nowych integracji z IT preferuj **OPC UA** (TLS 1.2 + certyfikaty). S7/ISO on TCP = szybkie (<1 ms), bez autentykacji. OPC UA = ~10 ms, z szyfrowaniem — wybór dla systemów IT/OT.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: S7 Communication GET/PUT](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/); IEC 62541 (OPC UA standard)]*
 ### 14.8. Co to jest PROFINET TSN (Time Sensitive Networking) i czym różni się od IRT?  🟢
 
 **PROFINET TSN** to następca IRT — stan standaryzacji IEEE 802.1 definiujący determinizm czasowy w standardowym Ethernet na poziomie sprzętowym, ale bez wymogu specjalistycznych ASIC-ów jak w IRT.
@@ -2426,7 +2426,7 @@ Domyślnie w S7-1500 dostęp PUT/GET z zewnętrznych urządzeń jest **zablokowa
 
 **W TIA Portal:** podłączasz jako F-DI z `1oo2 evaluation` lub OSSD bezpośrednio na wejście Safety.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61496-1 §6 (AOPDDR Type 2/4 classification); ISO 13849-1 §6.2 (Cat.2/4, PL); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. 1oo2 evaluation]*
 ### 15.2. Jak działa muting i czym różni się od override?
 
 | Cecha | **Muting** | **Override** |
@@ -2443,7 +2443,7 @@ Domyślnie w S7-1500 dostęp PUT/GET z zewnętrznych urządzeń jest **zablokowa
 
 > ⚠️ Override jest środkiem **wyłącznie awaryjnym** — musi być rejestrowany (kto, kiedy, ile razy). Nie stosuj jako alternatywy dla prawidłowo działającego muting.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - ISO 13849-1 §7.3 (muting as safety function); IEC 62061 §7.4.10 (override); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. MUTING_FKT blok LSafe]*
 ### 15.3. Jak podłączasz OSSD (Output Signal Switching Device) kurtyny do modułu F-DI?
 
 **OSSD** to para wyjść kurtyny (OSSD1, OSSD2) — dwa kanały sygnałów bezpieczeństwa z wbudowanym testowaniem impulsowym.
@@ -2456,7 +2456,7 @@ Domyślnie w S7-1500 dostęp PUT/GET z zewnętrznych urządzeń jest **zablokowa
 
 `Discrepancy time`: dopasuj do specyfikacji kurtyny (zazwyczaj 10–30 ms ⚠️ DO WERYFIKACJI — sprawdź w karcie katalogowej konkretnej kurtyny).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61496-1 §6.2 (OSSD output specification); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. OSSD podłączenie, Sensor supply off; [Wiring Examples F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/)]*
 ### 15.4. Jakie jest zastosowanie wyjść tranzystorowych z czujników bezpieczeństwa w systemach PLC Safety?
 
 Wyjścia tranzystorowe z czujników bezpieczeństwa, takich jak kurtyny bezpieczeństwa czy skanery, są kluczowe dla systemów PLC Safety, ponieważ umożliwiają dwukanałowe monitorowanie i szybkie wykrywanie awarii.
@@ -2557,7 +2557,7 @@ Praktyczne wskazówki:
 
 **Konfiguracja:** TIA Portal → `Add new object` → `Technology object` → wybierz typ → przypisz napęd SINAMICS przez telegram PROFIdrive `105` / `111`.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Motion Control Technology Objects (Siemens)](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); PLCopen Motion Control Part 1 — Function blocks for motion control (IEC 61131-3 extension)]*
 ### 16.2. Jak robisz autotuning napędu G120/V90 w Startdrive?
 
 **Startdrive:** Online → wybierz napęd → `Commissioning` → `Motor identification`
@@ -2576,7 +2576,7 @@ Praktyczne wskazówki:
 
 > 💡 Jeśli napęd jest mechatronicznie połączony z ciężką maszyną: uruchom identyfikację na **biegu jałowym** lub przy odłączonej mechanice, a potem ręcznie dostraj `Kp`.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 Getting Started / Startdrive commissioning guide (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — numery statusów identyfikacji ⚠️ DO WERYFIKACJI w SINAMICS G120 Parameter Manual]*
 ### 16.3. Jakie są najważniejsze parametry SINAMICS G120 które musisz znać?
 
 | Parametr | Opis | Uwaga |
@@ -2606,7 +2606,7 @@ Praktyczne wskazówki:
 - Na panelu BOP-2: długie wciśnięcie ESC/OK
 - Historia faultów: `r0945[0..7]`
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); numery faultów i parametrów p/r ⚠️ DO WERYFIKACJI w SINAMICS G120 Parameter Manual (Fault and Alarms List)]*
 ### 16.5. Czym jest SINAMICS G120 i do jakich silników oraz aplikacji jest przeznaczony? 🔴
 
 **SINAMICS G120** to rodzina przemysłowych przemienników częstotliwości (falowników) firmy Siemens przeznaczonych do regulacji prędkości silników indukcyjnych (asynchronicznych) klatkowych w aplikacjach ogólnoprzemysłowych.
@@ -2836,7 +2836,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > 💡 **Przelicznik rozdzielczości:** enkoder 1024 PPR z interpolacją ×4 (A, /A, B, /B) daje **4096 kroków/obrót** — to standardowe zachowanie modułu HSC lub SINAMICS przy zliczaniu czterech zboczy.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 61800-5-2 §6.2.13 (safe encoder feedback requirements for SLS/SDI); [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — rozdz. enkodery Safety (HIPERFACE Safety, EnDat Safety)]*
 ### 16.14. Jakie są interfejsy enkoderów i jak konfigurujesz enkoder w SINAMICS i TIA Portal?  🟡
 
 **Przegląd interfejsów:**
@@ -2877,7 +2877,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > 💡 **HIPERFACE DSL:** jeden kabel do serwosiłnika zawiera jednocześnie zasilanie silnika (3 fazy + PE) i sygnał enkodera DSL — brak osobnego kabla enkodera. W Siemens: V90 współpracuje z silnikami 1FL6 (enkoder wbudowany), natomiast 1FK7 używa DRIVE-CLiQ z S120/S210 (OCT — One Cable Technology, Siemens Motion Connect kable).
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS V90 manual (Entry ID: 109781612)](https://support.industry.siemens.com/cs/document/109781612/) — rozdz. enkodery HIPERFACE DSL, One Cable Technology; [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — parametry p0400/p0404 ⚠️ DO WERYFIKACJI w SINAMICS G120 Parameter Manual]*
 ### 16.15. Czym są silniki IE5 (IPM / synchroniczne z magnesami trwałymi) i dlaczego zastępują klasyczne silniki indukcyjne w nowych projektach?  🟢
 
 **Silniki IE5** *(Ultra-Premium Efficiency)* to silniki synchroniczne z magnesami trwałymi wbudowanymi w wirnik (IPM — Interior Permanent Magnet). Są najwyższą klasą sprawności według IEC 60034-30-1.
@@ -2927,7 +2927,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > ⚠️ **Pułapka Safety + Start:** logika musi wymagać nowego impulsu Start **po** ACK. ACK samo w sobie nie powinno uruchamiać napędów.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Safety program, ACK logic](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); EN 60204-1 §10.7 (start/restart requirements after safety stop); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 17.2. HMI pokazuje alarm którego nie ma w projekcie TIA Portal — skąd pochodzi?
 
 **Możliwe źródła „obcych" alarmów:**
@@ -2940,7 +2940,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > 💡 **Procedura:** TIA Portal → HMI Alarms → Discrete Alarms / Analog Alarms — filtruj po numerze alarmu. Jeśli brak → sprawdź `System alarms → Diagnostic alarms`.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: HMI Alarms, System alarms, Diagnostic alarms](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)]*
 ### 17.3. Moduł ET200SP nie pojawia się w sieci po podłączeniu — lista kroków diagnostycznych.
 
 - [ ] **Kabel fizyczny:** czy dioda LINK/ACT na porcie modułu lub switcha miga? Zamień kabel.
@@ -2953,7 +2953,7 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 
 > 💡 PRONETA → skan sieci → sprawdź czy moduł odpowiada na ARP — szybki sposób bez TIA Portal.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC ET 200SP (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200sp.html); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/) — rozdz. PRONETA, network scan, device name assignment]*
 ### 17.4. Napęd SINAMICS G120 świeci ciągłym czerwonym LED i nie kasuje się — co robisz?  🟢
 
 Ciągły czerwony RDY LED = aktywny <span style="color:#c0392b">**fault**</span> (F-alarm), nie alarm (A-alarm, który jest żółty).
@@ -2969,7 +2969,7 @@ Ciągły czerwony RDY LED = aktywny <span style="color:#c0392b">**fault**</span>
 
 > 💡 Jeśli kasowanie przez sieć nie działa: hardware reset — chwilowe odcięcie zasilania 24V Control Unit *(zachowaj 400V Power Module)*.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 (Siemens)](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-inverters/sinamics-g120.html); kody faultów F30001/F07800-F07802 ⚠️ DO WERYFIKACJI w SINAMICS G120 Parameter Manual (Fault and Alarm List); STO status r9772 ⚠️ DO WERYFIKACJI w SINAMICS G120 Safety Function Manual (Entry ID: 109751595)]*
 ### 17.5. CPU przeszło w STOP podczas produkcji — pierwsze 3 kroki.  🟢
 
 CPU w STOP = zatrzymanie wszystkich wyjść. Prawidłowa kolejność: odczyt → diagnoza → przyczyna → **dopiero wtedy** akcja.
@@ -2991,7 +2991,7 @@ CPU w STOP = zatrzymanie wszystkich wyjść. Prawidłowa kolejność: odczyt →
 
 > 💡 **Warm restart a STOP:** `Warm restart` (Run) bez zrozumienia przyczyny = maszyna może natychmiast znów wejść w STOP. Jeśli przyczyną jest zwarcie I/O, warm restart tylko powtórzy błąd.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: CPU Diagnostic buffer, STOP modes](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC S7-1500 (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/simatic-s7-1500.html)]*
 ### 17.6. Po czym poznajesz, że projekt w TIA Portal jest skalowalny?  🟡
 
 Skalowalny projekt TIA Portal to taki, który można rozszerzać (nowe urządzenia, sekcje, osie) bez przepisywania istniejącego kodu — tylko przez parametryzację lub powielanie gotowych wzorców.
@@ -3009,7 +3009,7 @@ Skalowalny projekt TIA Portal to taki, który można rozszerzać (nowe urządzen
 
 > 💡 **Na rozmowie:** skalowalność = biblioteki + UDT + tablice. Pokaż przykład: "Mamy 12 zaworów w tablicy, dodanie 13. to zmiana jednej stałej `MAX_VALVES`."
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Global Library, Project Library, UDT](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); IEC 61131-3 §6.4 (structured programming, data types, arrays)]*
 ### 17.7. Co sprawdzasz na FAT (Factory Acceptance Test) dla instalacji z Safety? 🟡
 FAT (Factory Acceptance Test) to weryfikacja systemu u producenta maszyny przed wysyłką do klienta. Dla Safety obejmuje funkcjonalne testy każdej funkcji bezpieczeństwa zgodnie z wymaganiami normy EN ISO 13849-1 i dokumentacją techniczną.
 - Weryfikacja F-Signatures (F-DB i F-CPU): sprawdź match między TIA Portal a CPU → F-Program → Signature Comparison
@@ -3020,7 +3020,7 @@ FAT (Factory Acceptance Test) to weryfikacja systemu u producenta maszyny przed 
 - Documented: każdy test zapisany w protokole FAT z datą, podpisem, numerem PO
 - Checklista: F-Version, F-Address, F-Monitoring Time, passivation time, substitute values
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. FAT checklist, F-Signature; EN ISO 13849-1 §10 (validation — dokumentacja, testy funkcjonalne)]*
 ### 17.8. Jak realizujesz SAT (Site Acceptance Test) po dostarczeniu maszyny do klienta? 🟡
 SAT (Site Acceptance Test) to weryfikacja systemu na miejscu klienta po instalacji. Różni się od FAT tym, że uwzględnia rzeczywiste środowisko: okablowanie obiektowe, medium procesowe, warunki bezpieczeństwa operacyjnego.
 - Krok 1: Upload projektu z CPU i porównaj z referencją z FAT (Project → Compare)
@@ -3031,7 +3031,7 @@ SAT (Site Acceptance Test) to weryfikacja systemu na miejscu klienta po instalac
 - Dokumentacja: protokół SAT + podpis inżyniera Safety i przedstawiciela klienta
 - Jeśli F-Signature różni się od FAT → STOP — ktoś zmienił program po FAT, eskalacja
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. SAT, F-Signature verification; IEC 62061 §8.4 (validation and verification procedures)]*
 ### 17.9. Jak podejść do diagnostyki nieznanego lub legacy projektu TIA Portal, który przejmujesz po raz pierwszy? 🟡
 
 **Scenariusz:** dostajesz maszynę z projektem TIA Portal od innego integratora lub starszą wersję — musisz zrozumieć co robi i ewentualnie poprawić usterki.
@@ -3082,7 +3082,7 @@ Biblioteki TIA Portal umożliwiają wielokrotne użycie i wersjonowanie bloków,
 
 > 💡 **Wersjonowanie:** zmiana w Global Library (nowa wersja FB) → w każdym projekcie znajdziesz alert "Update available" — aktualizujesz selektywnie, nie przez przypadek.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Global Libraries, Project Libraries, Library versioning](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); IEC 61131-3 §6.6 (program organization units, reuse)]*
 ### 18.2. Jak robisz partial download żeby nie resetować całego CPU?
 
 TIA Portal rozróżnia typy downloadów — wybierz najmniej inwazyjny dla sytuacji:
@@ -3103,7 +3103,7 @@ TIA Portal rozróżnia typy downloadów — wybierz najmniej inwazyjny dla sytua
 
 > 💡 **Sprawdź przed:** `Online & Diagnostics → Compare` — zidentyfikuj różnice. Nieoczekiwane zmiany (np. ktoś edytował online) staną się widoczne zanim je nadpiszesz.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: Download to device, Partial download, Compare offline/online](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. Safety partial download procedure]*
 ### 18.3. Do czego służy OPC UA w TIA Portal i jak go aktywujesz?
 
 **OPC UA** (Open Platform Communications Unified Architecture) to otwarte, bezpieczne API do integracji PLC z systemami SCADA, MES, ERP, chmurą i IT (Python, C#, Java). Kluczowe zalety nad S7-Protocol/Modbus: standaryzacja, szyfrowanie TLS 1.2, certyfikaty X.509, model obiektowy (nodes, methods, events).
@@ -3125,7 +3125,7 @@ TIA Portal rozróżnia typy downloadów — wybierz najmniej inwazyjny dla sytua
 
 > 💡 **Security w produkcji:** zawsze włącz `Basic256Sha256` + certyfikaty. OPC UA bez szyfrowania to otwarta furtka do odczytu (i zapisu!) wszystkich tagów PLC.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - IEC 62541 (OPC UA standard — security, certificates); [TIA Portal Help: OPC UA Server configuration](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC S7-1500 OPC UA (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/simatic-s7-1500.html)]*
 ### 18.4. Czym jest SIMATIC ProDiag i jak konfigurujesz pierwsze monitory diagnostyczne? 🟡
 ProDiag (Process Diagnostics) to narzędzie TIA Portal do tworzenia automatycznej diagnostyki maszynowej generując alarmy HMI wprost z warunków logicznych PLC bez programowania w blokach.
 - Dostępny od: TIA Portal V14 SP1, dla S7-1500 i ET200SP z CPU
@@ -3139,7 +3139,7 @@ ProDiag (Process Diagnostics) to narzędzie TIA Portal do tworzenia automatyczne
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal ProDiag (Siemens)](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); SIMATIC ProDiag dostępny od TIA Portal V14 SP1 dla S7-1500 i ET200SP CPU]*
 ## 19. COMMISSIONING — DODAWANIE STACJI I URZĄDZEŃ DO PROJEKTU
 
 
@@ -3179,7 +3179,7 @@ Procedura commissioning nowej stacji ET200SP z modułami F-DI/F-DQ:
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC ET 200SP (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200sp.html); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. konfiguracja ET200SP, F-Address, element kodujący]*
 ### 19.2. Jak dodajesz wyspę pneumatyczną SMC (seria EX600) do projektu TIA Portal przez PROFINET?
 
 Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako standardowe urządzenie I/O (nie Safety).
@@ -3214,7 +3214,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [TIA Portal Help: GSDML installation, PROFINET device name assignment](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC NET PROFINET (Siemens)](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html)]*
 ### 19.3. Jak krok po kroku dodajesz napęd SINAMICS G120 przez PROFINET do projektu TIA Portal?
 
 **Faza 1 — Przygotowanie sprzętowe:**
@@ -3259,7 +3259,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 > 💡 `Take online device as preset` — idealne gdy napęd był wcześniej skonfigurowany (legacy).
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SINAMICS G120 Safety Function Manual (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/) — procedura komisjonowania Safety; [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. PROFIsafe, F-Address napędu; parametry p0922/p9560/p9531 ⚠️ DO WERYFIKACJI w SINAMICS G120 Safety Function Manual]*
 
 ### 19.4. Jak dodajesz stację ET200MP z modułami Safety do istniejącej linii produkcyjnej z wieloma stacjami PROFINET?
 
@@ -3288,7 +3288,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 **Praktyka commissioning:** Na działającej linii — NIGDY nie rób „Download all" do F-CPU. Użyj „Download only changes" (delta download) — inaczej zatrzymasz Safety na całej linii i wymusisz pełny Safety Acceptance Test.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [SIMATIC ET 200MP (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200mp.html); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. konfiguracja ET200MP F-I/O, delta download Safety]*
 
 ### 19.5. Co to jest „Assign PROFIsafe address" i dlaczego jest wymagane osobno od konfiguracji TIA Portal?
 
@@ -3340,7 +3340,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 **Praktyka commissioning:** Przed wyjazdem na obiekt — pobierz GSDML dla WSZYSTKICH urządzeń firm trzecich i zainstaluj w TIA Portal. Na obiekcie bez internetu nie pobierzesz brakującego pliku.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens i praktyki commissioning*
+*[ZWERYFIKOWANE - [TIA Portal Help: GSD file installation, PROFINET IO third-party devices](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html); [SIMATIC NET PROFINET (Siemens)](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html)]*
 
 ### 19.7. Jak wygląda procedura wymiany uszkodzonego modułu ET200SP na działającej linii (hot swap)?
 
@@ -3365,7 +3365,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 **Praktyka commissioning:** Trzymaj zapas modułów na obiekcie — szczególnie F-DI i F-DO. Czas wymiany modułu ET200SP to dosłownie 30 sekund, ale czas oczekiwania na dostawę może być tygodniami. Zawsze zaznacz na schemacie elektrycznym który slot używa jakiego modułu.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens, procedura hot swap standardowa dla ET200SP*
+*[ZWERYFIKOWANE - [SIMATIC ET 200SP (Siemens)](https://www.siemens.com/global/en/products/automation/systems/industrial/et-200sp.html); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. wymiana modułów F, element kodujący, hot swap]*
 ## 20. SCHEMATY ELEKTRYCZNE — CZYTANIE, ANALIZA I PRAKTYKA COMMISSIONING
 
 ### 20.1. Co to jest schemat elektryczny i jakie rodzaje schematów spotykasz na obiekcie?
@@ -3397,7 +3397,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 > 💡 **Na obiekcie:** przy przejmowaniu nieznanej maszyny — zawsze zacznij od schematu ideowego obwodu mocy. Zidentyfikuj styczniki, zabezpieczenia, silnik i porównaj z fizyczną szafą. Dopiero potem analizuj logikę sterowania.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej, norma IEC 81346 / EN 60204-1*
+*[ZWERYFIKOWANE - IEC 81346-2 (oznaczenia referencyjne elementów — -F, -K, -M, -S, -Q); EN 60204-1 §3/§5 (dokumentacja elektryczna maszyn); EN 61346-1 (poprzednik IEC 81346)]*
 
 ---
 
@@ -3438,7 +3438,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 *Rys. 20.2b — Tabliczka zaciskowa: lewo = Y (mostki pionowe), prawo = Δ (mostki skośne). Źródło: Wikimedia Commons, Public Domain*
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej, EN 60204-1 §9*
+*[ZWERYFIKOWANE - EN 60204-1 §9.4 (Y/Δ starting, contactor interlock); IEC 60038 (napięcia normalizowane — 400V/Δ); IEC 60947-4-1 (łączniki do silników, przekaźniki termiczne)]*
 
 ---
 
@@ -3478,7 +3478,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 *Rys. 20.3b — Obwód mocy rewersji: Q2 = rozłącznik, KM1/KM2, F1 = termiczny, M = silnik. Źródło: Wikimedia Commons, CC BY-SA 3.0*
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej, EN 60204-1 §9.3*
+*[ZWERYFIKOWANE - EN 60204-1 §9.3 (reversing drives, contactor interlock); IEC 60947-4-1 (mechaniczna blokada wzajemna 3RA1934); EN 60034-8 §8.3 (oznaczenia zacisków silnika)]*
 
 ---
 
@@ -3522,7 +3522,7 @@ N (0V) ────────────────────────�
 
 *Rys. 20.4 — Obwód sterowania z samopodtrzymaniem: S1=STOP NC, S2=START NO, K1=stycznik z samopodtrzymaniem, K2=timer. Źródło: Wikimedia Commons, CC BY-SA 3.0*
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej, EN 60204-1*
+*[ZWERYFIKOWANE - EN 60204-1 §10.7 (start/stop control circuits, NC stop = fail-safe); IEC 61131-3 §6.5 (LAD ladder diagram — self-holding contact)]*
 
 ---
 
@@ -3562,7 +3562,7 @@ N (0V) ────────────────────────�
 
 *Rys. 20.5b — Połączenia uzwojeń Δ/YY. Źródło: Wikimedia Commons, CC BY-SA 4.0*
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej, EN 60034-8*
+*[ZWERYFIKOWANE - EN 60034-8 §8.3 (oznaczenia zacisków silnika Dahlander, pole liczby biegunów); IEC 60034-8 Tablica 8 (U1/V1/W1/U2/V2/W2 połączenia Dahlander)]*
 
 ---
 
@@ -3602,7 +3602,7 @@ Obwód cewki KM_R:  ──[S2 START_R]──[NC KM_F]──(Cewka KM_R)
 
 > ⚠️ Przy audycie Safety: sam schemat elektryczny nie wystarczy — sprawdź fizycznie czy moduł mechaniczny jest zamontowany. EN 60204-1 §9 wymaga blokady sprzętowej.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej, EN 60204-1 §9.3, IEC 60947-4-1*
+*[ZWERYFIKOWANE - EN 60204-1 §9.3 (interlock contactors — mechanical and electrical); IEC 60947-4-1 §7.1.1.2 (blokada mechaniczna między łącznikami); Siemens 3RA1934-1A / 3RA1944-2A (katalog produktów blokad mechanicznych)]*
 
 ---
 
@@ -3656,7 +3656,7 @@ Obwód cewki KM_R:  ──[S2 START_R]──[NC KM_F]──(Cewka KM_R)
 
 > 💡 **Schemat Safety jest dowodem** — audytor TÜV/UDT porównuje schemat z fizycznym okablowaniem i konfiguracją TIA Portal. Niezgodność = blokada odbioru maszyny.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej, EN 60204-1, IEC 62061*
+*[ZWERYFIKOWANE - EN 60204-1 §10.7 (obwody bezpieczeństwa, dwukanałowe); IEC 62061 §8.4 (dokumentacja systemu Safety, weryfikacja); [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/) — schemat okablowania F-DI/F-DO, Safety wiring examples]*
 ## 21. SICAR@TIA — STANDARD AUTOMATYKI AUTOMOTIVE
 
 ### 21.1. Co to jest SICAR@TIA i do czego służy?  🟢

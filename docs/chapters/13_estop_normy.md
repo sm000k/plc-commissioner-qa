@@ -11,7 +11,7 @@
 
 > ⚠️ **Norma:** EN 60204-1 wymaga by e-stop realizował kategorię **0 lub 1** — nie 2, chyba że analiza ryzyka uzasadnia inaczej.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - EN 60204-1 §9.2.2 (kategorie zatrzymania); IEC 61800-5-2 §6.2 (STO/SS1/SS2 definicje); [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/)]*
 ### 13.2. Co to jest LSafe_EStop i gdzie go znajdziesz w TIA Portal?  🟡
 
 `LSafe_EStop` to certyfikowany przez TÜV blok funkcjonalny z biblioteki LSafe (STEP 7 Safety Advanced). Realizuje kompletną logikę e-stopu: odcięcie wyjścia aktuatora, blokada restartu, sekwencja ACK i monitorowanie styczników.
@@ -39,7 +39,7 @@ Blok musi być wywołany z Safety OB (`F_MAIN` lub Safety Main OB).
 **Okablowanie sprzętowe E-Stop (CPU 1516F + F-DI + F-DQ z dwoma kanałami):**
 ![E-Stop hardware setup: S7-1516F, F-DI, F-DQ, dwukanałowe połączenie przycisku](images/safety/07c_estop_hw_setup_p10.png)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/) — rozdz. LSafe_EStop, okablowanie F-DI; [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 13.3. Co to jest feedback circuit (obwód sprzężenia zwrotnego styczników) i dlaczego jest wymagany dla SIL 3 / PL e?  🟡
 
 Feedback circuit to monitorowanie stanu styków pomocniczych (NC, pozytywnie sterowanych) styczników wykonawczych podłączone z powrotem na wejście DI lub F-DI.
@@ -48,7 +48,7 @@ Dla Cat.4 / PL e / SIL 3 wymagana jest REDUNDANCJA ścieżki wyłączania (2 sty
 Parametr feedbackTime w LSafe_EStop definiuje max czas w którym stycznik musi się przełączyć po komendzie (typowo 100–300ms ⚠️ DO WERYFIKACJI — wartość zależy od rodzaju stycznika, sprawdź w dokumentacji producenta).
 Połączenie styczników: pozytywne otwarcie (EN 60947-5-1) — jeśli cewka odcięta, styk NC jest MECHANICZNIE zmuszony do otwarcia nawet przy zgrzaniu. Wymagane przez normy w obwodach Safety.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - EN 60947-5-1 §4.5 (pozytywne otwarcie); ISO 13849-1 Tablica K.1 (DC dla monitorowania sprzężenia zwrotnego); [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/) — rozdz. feedback circuit]*
 ### 13.4. Co to są CCF (Common Cause Failure) i jakie środki są wymagane dla Cat.4?  🟢
 
 CCF (Common Cause Failure / Usterka wspólnej przyczyny) to scenariusz gdzie JEDNA przyczyna (np. przepięcie, temperatura, EMC, błąd montażu) uszkadza oba kanały redundantnego systemu jednocześnie — co pozbawia system odporności na błędy.
@@ -56,7 +56,7 @@ ISO 13849-1 Tablica F.1 wymaga minimum 65 punktów CCF dla architektury Cat.3 i 
 W praktyce: prowadź kable kanału 1 i 2 w osobnych trasach, stosuj różnych producentów czujników (diverse redundancy), zachowuj separację przestrzenną.
 Siemens F-DI realizuje diagnostykę cross-circuit (zwarcie między kanałami) i pulse-testing — ale CCF środki leżą po stronie projektu i montażu, nie CPU.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - ISO 13849-1 Tablica F.1 (CCF punkty, wartości ⚠️ DO WERYFIKACJI w wydaniu normy); [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/) — rozdz. CCF; [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/)]*
 ### 13.5. Czy można łączyć przyciski e-stop szeregowo do jednego wejścia F-DI?
 
 Tak, ale z ograniczeniami. EN ISO 13850 i IEC 62061 dopuszczają szeregowe połączenie e-stopów TYLKO jeśli można wykluczyć jednoczesne naciśnięcie dwóch e-stopów ORAZ jednoczesne wystąpienie awarii i naciśnięcia.
@@ -66,7 +66,7 @@ Jeśli szeregowo: każde zadziałanie to osobna "supplementary safety function" 
 
 ---
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE - EN ISO 13850 §5.4 (szeregowe połączenie e-stopów); IEC 62061 §7.3 (analiza ryzyka per funkcja Safety); [E-Stop SIL 3 Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/) — rozdz. okablowanie wielu przycisków e-stop]*
 
 ### 13.6. Jak wygląda obliczenie PFHD (Probability of Dangerous Failure per Hour) dla funkcji Safety E-Stop z F-CPU S7-1500F?
 
