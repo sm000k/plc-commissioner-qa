@@ -8,7 +8,7 @@
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 14:51 | Pytania: 178
+### Wersja: v12.5 | Data: 2026-04-11 15:07 | Pytania: 178
 
 ---
 
@@ -54,7 +54,7 @@
 - [1.12. Czym jest enkoder i jaka jest różnica między inkrementalnym a absolutnym?](#112-czym-jest-enkoder-i-jaka-jest-różnica-między-inkrementalnym-a-absolutnym--)
 - [1.13. Co to jest IO-Link i jakie korzyści daje względem klasycznych wejść analogowych PLC?](#113-co-to-jest-io-link-i-jakie-korzyści-daje-względem-klasycznych-wejść-analogowych-plc--)
 - [1.14. Co to jest przerzutnik SR i RS w TIA Portal i jaka jest różnica w priorytecie?](#114-co-to-jest-przerzutnik-sr-i-rs-w-tia-portal-i-jaka-jest-różnica-w-priorytecie--)
-- [1.15. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?](#115-czym-różni-się-dominacja-set-od-dominacji-reset-w-układzie-samopodtrzymania-lad--)
+- [1.15. Jak zbudować układ samopodtrzymania w LAD i czym różni się Dominacja SET od Dominacji RESET?](#115-jak-zbudować-układ-samopodtrzymania-w-lad-i-czym-różni-się-dominacja-set-od-dominacji-reset--)
 - [1.16. Jaką typową pułapkę w obwodzie samopodtrzymania LAD pokazuje zadanie „Znajdź różnice"?](#116-jaką-typową-pułapkę-w-obwodzie-samopodtrzymania-lad-pokazuje-zadanie-znajdź-różnice--)
 
 **2. ARCHITEKTURA SIMATIC SAFETY INTEGRATED**
@@ -599,61 +599,83 @@ IF "StopBtn" THEN "MotorRunRS" := FALSE; END_IF;    // Reset na końcu = prioryt
 
 ---
 
-### 1.15. Czym różni się Dominacja SET od Dominacji RESET w układzie samopodtrzymania LAD?  🔴
+### 1.15. Jak zbudować układ samopodtrzymania w LAD i czym różni się Dominacja SET od Dominacji RESET?  🔴
 
-**Dominacja** określa, który sygnał wygrywa gdy jednocześnie wciśniemy START i STOP. Jest to praktyczny odpowiednik priorytetu przerzutnika SR/RS, widoczny bezpośrednio w schemacie drabinkowym.
+**Samopodtrzymanie** (seal-in) to obwód LAD, w którym cewka wyjściowa podtrzymuje się sama — styk NO tego samego bitu jest podłączony **równolegle do START**. Dzięki temu operator wciska START na chwilę, a cewka pracuje dalej. **Dominacja** określa, który sygnał wygrywa gdy START i STOP są aktywne jednocześnie — zależy od **struktury obwodu**, czyli gdzie w drabince siedzi styk STOP.
 
-**Dominacja SET (= odpowiednik SR) — priorytet ma START:**
-
-```
-  |                                                     |
-  |    START                                            |
-  +----] [-------------------+-------( Lampka )-------- +
-  |                          |                          |
-  |    Lampka     STOP(NC)   |                          |
-  +----] [--------]/[--------+                          |
-  |                                                     |
-```
-- `START` steruje cewką `( Lampka )` **bezpośrednio** (górna gałąź — omija STOP)
-- Dolna gałąź: samopodtrzymanie `Lampka` szeregowo ze `STOP(NC)` — STOP odcina tylko podtrzymanie
-- Gdy `START=1` i `STOP=1` → **Lampka = 1** (SET wygrywa — górna gałąź omija STOP)
-- 💡 „START bezpośrednio steruje Lampką, dlatego STOP nie ma tutaj nic do gadania"
-
-**Dominacja RESET (= odpowiednik RS) — priorytet ma STOP:**
+**Dominacja RESET — STOP wygrywa (bezpieczna):**
 
 ```
-  |                                                     |
-  |    START            STOP(NC)                        |
-  +----] [--------+-----]/[---------( Lampka )--------- +
-  |               |                                     |
-  |    Lampka     |                                     |
-  +----] [--------+                                     |
-  |                                                     |
+  |                                              |
+  |    START         STOP(NC)     ( Lampka )     |
+  +----] [-----+-----]/[---------(        )----- +
+  |            |                                  |
+  |   Lampka   |                                  |
+  +----] [-----+                                  |
+  |                                              |
 ```
-- `START` i `Lampka` (samopodtrzymanie) → gałęzie **równoległe** (OR), łączą się w węzeł `+`
-- `STOP(NC)` → **szeregowo za węzłem** — jedyna droga do cewki `( Lampka )` prowadzi przez STOP
-- Gdy `START=1` i `STOP=1` → **Lampka = 0** (RESET wygrywa — STOP odcina obie ścieżki)
-- 💡 „START zasila Lampkę poprzez STOP, dlatego przycisk wyłączenia jest ważniejszy"
+- Górna gałąź: `START` → do węzła `+`
+- Dolna gałąź: `Lampka` (samopodtrzymanie) → do tego samego węzła `+`
+- Za węzłem: `STOP(NC)` **szeregowo** → cewka `( Lampka )`
+- STOP odcina **jedyną drogę** do cewki — blokuje i START, i podtrzymanie
+- `START=1, STOP=1` → **Lampka = 0** (RESET wygrywa)
+- 💡 „Obie ścieżki prowadzą przez STOP — przycisk wyłączenia jest ważniejszy"
 
-**Tabela prawdy — porównanie obu dominacji:**
+**Dominacja SET — START wygrywa (niebezpieczna):**
 
-| Stan | START | STOP | Lampka (Dom. SET) | Lampka (Dom. RESET) |
-|:-----|:-----:|:----:|:-----------------:|:-------------------:|
-| Oba wciśnięte | **1** | **1** | **1 ← SET wygrywa** | **0 ← RESET wygrywa** |
+```
+  |                                              |
+  |    START                      ( Lampka )     |
+  +----] [-------------------+---(        )----- +
+  |                          |                    |
+  |   Lampka    STOP(NC)     |                    |
+  +----] [------]/[----------+                    |
+  |                                              |
+```
+- Górna gałąź: `START` → **bezpośrednio** do cewki (omija STOP!)
+- Dolna gałąź: `Lampka` (samopodtrzymanie) → `STOP(NC)` → do cewki
+- STOP odcina **tylko podtrzymanie** — START dalej zasila cewkę górą
+- `START=1, STOP=1` → **Lampka = 1** (SET wygrywa)
+- 💡 „START omija STOP górną gałęzią — przycisk wyłączenia nie działa gdy START wciśnięty"
+
+**Kluczowa różnica — pozycja STOP w obwodzie:**
+
+| Cecha | Dominacja RESET | Dominacja SET |
+|-------|:-:|:-:|
+| STOP odcina | **obie** ścieżki (START + seal-in) | **tylko** seal-in |
+| START=1, STOP=1 | **Lampka = 0** | **Lampka = 1** |
+| Bezpieczeństwo | ✅ bezpieczna | ⚠️ niebezpieczna |
+
+**Dlaczego układ trzyma stan gdy START=0, STOP=0?**
+STOP jest stykiem NC `]/[` — gdy nikt go nie wciska (`STOP=0`), styk NC jest **zamknięty** (przepuszcza). Prąd płynie przez seal-in `Lampka` → przez zamknięty STOP(NC) → do cewki. Układ **trzyma stan poprzedni** — identycznie jak SR/RS z S=0, R=0.
+
+**Tabela prawdy:**
+
+| Stan | START | STOP | Dom. RESET | Dom. SET |
+|:-----|:-----:|:----:|:----------:|:--------:|
+| Oba wciśnięte | **1** | **1** | **0 ← STOP** | **1 ← START** |
 | Tylko START | 1 | 0 | 1 | 1 |
 | Tylko STOP | 0 | 1 | 0 | 0 |
-| Żaden | 0 | 0 | * (stan poprzedni) | * (stan poprzedni) |
+| Żaden | 0 | 0 | * (trzyma) | * (trzyma) |
 
-> Gwiazdka `*` = stan zapamiętany — bez akcji na wejściach układ nie zmienia stanu (samopodtrzymanie działa). Jedyna różnica → wiersz `START=1, STOP=1`.
+> `*` = stan podtrzymany przez seal-in (styk NC STOP jest zamknięty → cewka trzyma). Jedyna różnica → wiersz `START=1, STOP=1`.
 
-**Związek z przerzutnikami bistabilnymi w TIA Portal:**
+**Powiązanie z blokami SR/RS i cewkami (S)/(R):**
 
-| Schemat LAD (styki + cewki) | Odpowiednik bloku TIA Portal |
-|-----------------------------|------------------------------|
-| Dominacja SET               | Blok **SR** — Set-Dominant (S wygrywa) |
-| Dominacja RESET             | Blok **RS** — Reset-Dominant (R wygrywa) |
+Układ seal-in z normalną cewką `( )`, bloki SR/RS i cewki `(S)`/`(R)` to **ta sama logika bistabilna** — trzy różne notacje, identyczna tabela prawdy.
 
-**Zasada projektowania bezpiecznych maszyn:** Zawsze stosuj **Dominację RESET** dla obwodów STOP i E-Stop. Operator musi mieć gwarancję, że wciśnięcie przycisku wyłączenia zatrzyma maszynę niezależnie od innych sygnałów (EN 60204-1 §9.2.2).
+| Implementacja | Podtrzymanie | Dominację decyduje |
+|---|---|---|
+| Seal-in + cewka `( )` | Styk NO wyjścia równolegle do START (budujesz sam) | **Pozycja STOP** w obwodzie |
+| Cewki `(S)` / `(R)` | Wbudowane w cewkę (nie trzeba styku) | **Kolejność skanowania** (ostatni network wygrywa) |
+| Blok SR / RS | Wbudowane w blok | **Typ bloku** (SR → S wygrywa, RS → R wygrywa) |
+
+| Obwód seal-in | Cewki LAD | Blok TIA Portal |
+|---|---|---|
+| Dominacja RESET | `(S)` → potem `(R)` (R ostatni) | **RS** — Reset-Dominant |
+| Dominacja SET | `(R)` → potem `(S)` (S ostatni) | **SR** — Set-Dominant |
+
+**Zasada bezpieczeństwa:** Zawsze stosuj **Dominację RESET** dla obwodów STOP i E-Stop. Operator musi mieć gwarancję, że STOP zatrzyma maszynę niezależnie od innych sygnałów (EN 60204-1 §9.2.2).
 
 *Źródło: Kurs ControlByte — Układy samopodtrzymania, Dominacja SET/RESET; EN 60204-1 §9.2.2*
 
