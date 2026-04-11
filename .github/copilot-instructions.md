@@ -158,13 +158,19 @@ Treść odpowiedzi — definicja + szczegóły.
 21. SICAR@TIA — standard automatyki automotive
 
 **Tematy priorytetowe do rozszerzenia w kolejnych wersjach:**
-- TIA Portal V19 — nowe funkcje
-- SINAMICS S210 / V90 z PROFINET
+- §12 Napędy SINAMICS — rozbudowa parametryzacji G120/S120, faultcodes (+8 pytań)
+- §7 PROFIsafe — telegramy Safety 30/54/900 w napędach (+4 pytania)
+- §13 E-Stop — obliczenia PFH/DC z Application Example (+3 pytania)
+- §19 Commissioning stacje — dodawanie ET200/napędów do istniejącej linii (+4 pytania)
+- §21 SICAR — Safety w SICAR, sequencing, diagnostyka (+5 pytań)
 - ProDiag — diagnostyka online
-- S7-1500 R/H — redundancja CPU
-- IO-Link — czujniki inteligentne
-- OPC UA — integracja MES/SCADA
 - PROFINET TSN (Time Sensitive Networking)
+
+**Tematy WYKLUCZONE (poza zakresem kompendium):**
+- ~~HMI / WinCC~~ — poza zakresem stanowiska
+- ~~PID regulacja~~ — poza zakresem
+- ~~SCL wzorce praktyczne~~ — poza zakresem
+- ~~Backup/restore TIA Portal~~ — poza zakresem
 
 ## Terminologia Siemens (używaj ZAWSZE zamiast odpowiedników generycznych)
 
