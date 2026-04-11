@@ -4,7 +4,7 @@ Baza wiedzy Q&A dla inżyniera PLC/Commissioner przygotowującego się do rozmow
 
 **Zakres:** Siemens TIA Portal (V16–V19), SIMATIC Safety Integrated, ET200 SP/MP, SINAMICS G120/S120/V90, Robot ABB IRC5, SICAR@GST, PROFINET
 
-**Wersja:** v12.4 | **159 pytań** | **21 sekcji** | [Otwórz online](https://sm000k.github.io/plc-commissioner-qa/)
+**Wersja:** v12.5 | **178 pytań** | **21 sekcji** | [Otwórz online](https://sm000k.github.io/plc-commissioner-qa/)
 
 ---
 

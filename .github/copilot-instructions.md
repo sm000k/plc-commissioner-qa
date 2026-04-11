@@ -56,7 +56,7 @@ Strona: https://sm000k.github.io/plc-commissioner-qa/
 
 ```
 docs/                                ← Aktywne dokumenty
-  LATEST.md                          ← GŁÓWNY DOKUMENT Q&A (v12.4, 159 pytań, 21 sekcji) ✅
+  LATEST.md                          ← GŁÓWNY DOKUMENT Q&A (v12.5, 178 pytań, 21 sekcji) ✅
   sections_manifest.json             ← Indeks sekcji: zakresy linii, liczba pytań → CZYTAJ ZAMIAST LATEST.md
   qa_draft_v12.md                    ← Aktualny draft (= LATEST.md)
   chapters/                          ← Rozdziały Q&A (po 1 pliku na sekcję)
@@ -96,7 +96,7 @@ Pre-wyekstrahowany tekst wszystkich PDF-ów: `sources/pdfs/extracted/*.txt` — 
 Indeks PDF-ów z keywords i mapą sekcji: `sources/pdfs/pdf_manifest.json`.
 
 ## Aktywny dokument Q&A
-- **Bieżący**: `docs/LATEST.md` = `docs/qa_draft_v12.md` — **159 pytań, 21 sekcji** (2026-04-11)
+- **Bieżący**: `docs/LATEST.md` = `docs/qa_draft_v12.md` — **178 pytań, 21 sekcji** (2026-04-11)
   - Zawiera PLAN NAUKI z tagami 🔴🟡🟢
   - Rozdziały jako osobne pliki: `docs/chapters/00_header.md` … `21_sicar.md`
   - Bazy wiedzy: `docs/knowledge_base_controlbyte.md`, `docs/knowledge_base_delta_v11.md`
