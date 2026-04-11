@@ -914,142 +914,143 @@ Redundancja CPU (H-system) nie oznacza automatycznie redundancji **sieci PROFINE
 
 **Schematy wszystkich topologii:**
 
-> W każdym schemacie Sync Link (X3↔X3, X4↔X4) jest identyczny — łączy CPU PRIMARY z BACKUP. Różnice dotyczą wyłącznie połączeń PROFINET (porty X1).
+> W każdym schemacie Sync Link (X3↔X3, X4↔X4) jest identyczny — łączy CPU PRIMARY z BACKUP. Różnice dotyczą wyłącznie połączeń PROFINET (porty X1). Każdy kabel = osobna linia, porty oznaczone na obu końcach.
 
 **① Daisy chain** — najprostsza, bez redundancji kabla:
 ```
-    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
-    │ CPU PRIMARY │                 │ CPU BACKUP  │
-    └──────┬──────┘                 └──────┬──────┘
-       X1 P1                           X1 P1
-           │                               │
-           ▼                               ▼
-       [ET200SP_1]──[ET200SP_2]──[ET200SP_3]
-        IM155-HF     IM155-HF     IM155-HF
+  CPU PRIMARY [X1:P1]                    CPU BACKUP [X1:P1]
+       │                                      │
+       │ kabel 1                               │ kabel 4
+       ▼                                      ▼
+  ET200SP_1 [P1]                          ET200SP_4 [P1]
+  IM155-6 PN HF                           IM155-6 PN HF
+  [P2]                                    [P2]
+       │                                      │
+       │ kabel 2                               │ kabel 5
+       ▼                                      ▼
+  ET200SP_2 [P1]                          ET200SP_5 [P1]
+  IM155-6 PN HF                           IM155-6 PN HF
+  [P2]                                    [P2] ← wolny (koniec łańcucha)
+       │
+       │ kabel 3
+       ▼
+  ET200SP_3 [P1]
+  IM155-6 PN HF
+  [P2] ← wolny (koniec łańcucha)
 
-    Awaria kabla: ──✕──
-       [ET200SP_1]  ✕  [ET200SP_2]──[ET200SP_3]
-        ✅ działa       ❌ utracone  ❌ utracone
+  Porty na urządzenie: CPU = 1 port (X1:P1), ET200SP = 2 porty (P1+P2)
+  Awaria kabla 2 → ET200SP_2 i _3 utracone ❌
 ```
-> Każdy CPU prowadzi osobny łańcuch do stacji. Przerwa kabla = utrata wszystkich stacji za punktem awarii.
+> Każdy CPU prowadzi osobny łańcuch. IM 155-6 PN HF ma 2 porty (P1 wejście, P2 wyjście do następnej stacji). Przerwa kabla = utrata wszystkich stacji ZA punktem awarii.
 
 ---
 
 **② Gwiazda z niezarządzalnym switchem** (SCALANCE XB208):
 ```
-    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
-    │ CPU PRIMARY │                 │ CPU BACKUP  │
-    └──────┬──────┘                 └──────┬──────┘
-       X1 P1                           X1 P1
-           │                               │
-           └───────────┬───────────────────┘
-                       │
-                ┌──────┴──────┐
-                │ SCALANCE    │  ← SPOF (Single Point of Failure)
-                │ XB208       │
-                │ (niezarz.)  │
-                └──┬───┬───┬──┘
-                   │   │   │
-              [ET200] [ET200] [ET200]
-              SP_1    SP_2    SP_3
+  CPU PRIMARY [X1:P1] ──kabel 1──▶ SCALANCE XB208 [P1]
+  CPU BACKUP  [X1:P1] ──kabel 2──▶ SCALANCE XB208 [P2]
+
+  SCALANCE XB208 (8 portów, niezarządzalny):
+       [P3] ──kabel 3──▶ ET200SP_1 [P1]  (IM155-6 PN HF, P2 wolny)
+       [P4] ──kabel 4──▶ ET200SP_2 [P1]  (IM155-6 PN HF, P2 wolny)
+       [P5] ──kabel 5──▶ ET200SP_3 [P1]  (IM155-6 PN HF, P2 wolny)
+       [P6-P8] ← wolne
+
+  Porty na urządzenie: CPU = 1 port, Switch = 8 portów, ET200SP = 1 port użyty (z 2)
+  Awaria XB208 → CAŁA sieć I/O utracona ❌ (SPOF)
 ```
-> Najtańszy switch. Brak diagnostyki, brak MRP. Awaria XB208 = utrata CAŁEJ sieci I/O.
+> Najtańszy switch. Każda stacja używa tylko P1 (gwiazda, nie łańcuch). Brak diagnostyki, brak MRP. Switch = Single Point of Failure.
 
 ---
 
-**③ Gwiazda z zarządzalnym switchem** (SCALANCE XC/XP):
+**③ Gwiazda z zarządzalnym switchem** (SCALANCE XC208):
 ```
-    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
-    │ CPU PRIMARY │                 │ CPU BACKUP  │
-    └──────┬──────┘                 └──────┬──────┘
-       X1 P1                           X1 P1
-           │                               │
-           └───────────┬───────────────────┘
-                       │
-                ┌──────┴──────┐
-                │ SCALANCE    │  ← SPOF, ale z diagnostyką
-                │ XC208       │
-                │ (zarządz.)  │
-                │ SNMP/LLDP   │
-                └──┬───┬───┬──┘
-                   │   │   │
-              [ET200] [ET200] [ET200]
-              SP_1    SP_2    SP_3
+  CPU PRIMARY [X1:P1] ──kabel 1──▶ SCALANCE XC208 [P1]
+  CPU BACKUP  [X1:P1] ──kabel 2──▶ SCALANCE XC208 [P2]
+
+  SCALANCE XC208 (8 portów, zarządzalny, SNMP/LLDP):
+       [P3] ──kabel 3──▶ ET200SP_1 [P1]  (IM155-6 PN HF, P2 wolny)
+       [P4] ──kabel 4──▶ ET200SP_2 [P1]  (IM155-6 PN HF, P2 wolny)
+       [P5] ──kabel 5──▶ ET200SP_3 [P1]  (IM155-6 PN HF, P2 wolny)
+       [P6-P8] ← wolne
+
+  Porty na urządzenie: CPU = 1 port, Switch = 8 portów, ET200SP = 1 port użyty (z 2)
+  Awaria XC208 → CAŁA sieć I/O utracona ❌ (SPOF, ale z diagnostyką)
 ```
-> Jak ②, ale switch ma diagnostykę SNMP, LLDP, port mirroring. Wciąż SPOF — awaria switcha = utrata sieci. Bez MRP (gwiazda nie tworzy pierścienia).
+> Jak ②, ale switch ma diagnostykę SNMP, LLDP, port mirroring. Wciąż SPOF — gwiazda nie tworzy pierścienia.
 
 ---
 
-**④ Ring bez switcha — porty CPU tworzą pierścień** (MRP, optymalne):
+**④ Ring bez switcha** — porty CPU tworzą pierścień (MRP, optymalne):
 ```
-    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
-    │ CPU PRIMARY │                 │ CPU BACKUP  │
-    │ (MRM)       │                 │ (MRM)       │
-    └──┬───────┬──┘                 └──┬───────┬──┘
-   X1 P1    X1 P2                 X1 P1    X1 P2
-       │       │                     │       │
-       │       └─────────────────────┘       │
-       │           (górna gałąź)             │
-       │                                     │
-       │   [ET200SP_1]───[ET200SP_2]         │
-       │    IM155-HF      IM155-HF           │
-       │    (MRC)         (MRC)              │
-       │                                     │
-       └───[ET200SP_3]───[ET200SP_4]─────────┘
-            IM155-HF      IM155-HF
-            (MRC)         (MRC)
-       ◄──────── pierścień MRP ────────────►
+  CPU PRIMARY [X1:P1] ──kabel 1──▶ ET200SP_1 [P1]  (IM155-6 PN HF, MRC)
+                                   ET200SP_1 [P2] ──kabel 2──▶ ET200SP_2 [P1]
+                                                               ET200SP_2 [P2]
+                                                                    │
+                                                               kabel 3
+                                                                    ▼
+  CPU PRIMARY [X1:P2] ◀──kabel 6── ET200SP_4 [P2]  (IM155-6 PN HF, MRC)
+                                   ET200SP_4 [P1] ◀──kabel 5── ET200SP_3 [P2]
+                                                               ET200SP_3 [P1]
+                                                                    ▲
+                                                               kabel 4 (od ET200SP_2 [P2])
+
+  Pierścień: CPU:P1 → _1 → _2 → _3 → _4 → CPU:P2 (zamknięty ring)
+
+  CPU BACKUP [X1:P1] i [X1:P2] — analogicznie w tym samym ringu (System Redundancy R1)
+
+  Porty na urządzenie: CPU = 2 porty (P1+P2, MRM), ET200SP = 2 porty (P1+P2, MRC)
+  Awaria dowolnego kabla → MRP przełącza w ≤ 200 ms ✅
 ```
-> **Optymalne dla S7-1500H.** CPU = MRM (Media Redundancy Manager), stacje = MRC (Client). Awaria dowolnego kabla → MRP przełącza w ≤ 200 ms. Zero dodatkowych switchy = zero kosztów.
+> **Optymalne dla S7-1500H.** CPU = MRM (Media Redundancy Manager), stacje = MRC (Client). Oba porty CPU i oba porty każdej stacji WYKORZYSTANE — tworzą zamknięty pierścień. Zero dodatkowych switchy.
 
 ---
 
-**⑤ Ring z zarządzalnym switchem** (MRPD, dla IRT/S120):
+**⑤ Ring z zarządzalnymi switchami** (MRPD, dla IRT/S120):
 ```
-    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
-    │ CPU PRIMARY │                 │ CPU BACKUP  │
-    └──────┬──────┘                 └──────┬──────┘
-       X1 P1                           X1 P1
-           │                               │
-    ┌──────┴──────┐                 ┌──────┴──────┐
-    │ SCALANCE    │                 │ SCALANCE    │
-    │ XC216      ◄──── ring MRP ────►  XC216      │
-    │ (zarządz.)  │                 │ (zarządz.)  │
-    └──┬───┬───┬──┘                 └──┬───┬───┬──┘
-       │   │   │                       │   │   │
-    [ET200] [ET200] [ET200]       [ET200] [ET200] [ET200]
-    SP_1    SP_2    SP_3          SP_4    SP_5    SP_6
+  CPU PRIMARY [X1:P1] ──kabel 1──▶ SCALANCE XC216-A [P1]
+  CPU BACKUP  [X1:P1] ──kabel 2──▶ SCALANCE XC216-B [P1]
+
+  Ring MRP między switchami:
+  SCALANCE XC216-A [P2] ══kabel ring══▶ SCALANCE XC216-B [P2]
+
+  Gałąź A — stacje pod SCALANCE XC216-A:
+       [P3] ──kabel 3──▶ ET200SP_1 [P1]  (P2 wolny lub daisy chain dalej)
+       [P4] ──kabel 4──▶ ET200SP_2 [P1]
+       [P5] ──kabel 5──▶ ET200SP_3 [P1]
+
+  Gałąź B — stacje pod SCALANCE XC216-B:
+       [P3] ──kabel 6──▶ ET200SP_4 [P1]
+       [P4] ──kabel 7──▶ ET200SP_5 [P1]
+       [P5] ──kabel 8──▶ ET200SP_6 [P1]
+
+  Porty: CPU = 1 port, Switch = 16 portów, ET200SP = 1 port użyty (z 2)
+  Awaria kabla ring → MRPD przełącza w ≈ 0 ms ✅
 ```
-> Switche w pierścieniu MRP/MRPD. MRPD = ≈ 0 ms przełączenia (potrzebny dla IRT, np. napędy S120). Droższe, ale wymagane gdy stacje potrzebują synchronizacji zegarowej (isochronous mode).
+> Switche w pierścieniu MRP/MRPD. MRPD = ≈ 0 ms przełączenia (potrzebny dla IRT, np. napędy S120). Droższe, ale wymagane dla synchronizacji zegarowej (isochronous mode).
 
 ---
 
 **⑥ Dual-homed — dwa niezależne trakty** (systemy krytyczne):
 ```
-    ┌─────────────┐  ══Sync Link══  ┌─────────────┐
-    │ CPU PRIMARY │                 │ CPU BACKUP  │
-    └──────┬──────┘                 └──────┬──────┘
-       X1 P1                           X1 P1
-           │                               │
-    ┌──────┴──────┐                 ┌──────┴──────┐
-    │ SCALANCE XC │                 │ SCALANCE XC │
-    │ Trakt A     │                 │ Trakt B     │
-    └──────┬──────┘                 └──────┬──────┘
-           │                               │
-           │    ┌───────────────┐          │
-           │    │   ET200SP     │          │
-           ├────┤   IM 155-6    ├──────────┤
-           │    │   MF HF       │          │
-           │    │  (port A + B) │          │
-           │    └───────────────┘          │
-           │    ┌───────────────┐          │
-           │    │   ET200SP     │          │
-           └────┤   IM 155-6    ├──────────┘
-                │   MF HF       │
-                │  (port A + B) │
-                └───────────────┘
+  CPU PRIMARY [X1:P1] ──kabel 1──▶ SCALANCE XC-A [P1]   (Trakt A)
+  CPU BACKUP  [X1:P1] ──kabel 2──▶ SCALANCE XC-B [P1]   (Trakt B)
+
+  ET200SP_1 (IM 155-6 MF HF — 2 NIEZALEŻNE interfejsy PROFINET):
+       [IF1] ──kabel 3──▶ SCALANCE XC-A [P3]   (Trakt A)
+       [IF2] ──kabel 4──▶ SCALANCE XC-B [P3]   (Trakt B)
+
+  ET200SP_2 (IM 155-6 MF HF):
+       [IF1] ──kabel 5──▶ SCALANCE XC-A [P4]   (Trakt A)
+       [IF2] ──kabel 6──▶ SCALANCE XC-B [P4]   (Trakt B)
+
+  Porty: CPU = 1 port, Switch = wiele, ET200SP MF HF = 2 interfejsy (IF1+IF2)
+  ⚠️ IM 155-6 MF HF (Multi-Fieldbus) ≠ IM 155-6 PN HF!
+     MF HF: 2 niezależne interfejsy PROFINET (osobne MAC, osobne IP)
+     PN HF: 2 porty jednego interfejsu (wewnętrzny switch)
+  Awaria całego traktu A → Trakt B przejmuje natychmiast (~0 ms) ✅
 ```
-> Każda stacja ma 2 niezależne interfejsy PN (Multi-Fieldbus). Awaria całego traktu A (switch + kable) → Trakt B przejmuje natychmiast (~0 ms). Wymaga droższego IM 155-6 **MF** HF (nie zwykły PN HF).
+> Każda stacja podłączona do OBU traktów osobnym kablem. Wymaga droższego IM 155-6 **MF** HF (Multi-Fieldbus, nie zwykły PN HF).
 
 ---
 
