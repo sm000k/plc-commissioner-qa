@@ -243,7 +243,22 @@ Rodzina S7-1200 to kompaktowe sterowniki montowane na szynie DIN, programowane w
 | Wymiana czujnika | Ręczna rekalibracja | Auto re-parametryzacja z DB (Data Storage mode) |
 | Koszt na przekrój | Niższy | Wyższy dla mastera, niższy per czujnik |
 
-**Tryб Data Storage (automatyczna reparametryzacja):**
+**Co oznacza każda żyła w kablu M12:**
+
+**Kabel 3-żyłowy (IO-Link / czujniki cyfrowe):**
+- **Pin 1 (BN — brązowy):** L+ zasilanie (24 VDC)
+- **Pin 3 (BU — niebieski):** M masa (0 V)
+- **Pin 4 (BK — czarny):** C/Q — dane IO-Link (komunikacja) lub wyjście przełączające (SIO mode)
+
+**Kabel 4-żyłowy (czujniki analogowe 4–20 mA / 0–10 V):**
+- **Pin 1 (BN — brązowy):** L+ zasilanie (24 VDC)
+- **Pin 2 (WH — biały):** Sygnał analogowy (wyjście czujnika → AI modułu)
+- **Pin 3 (BU — niebieski):** M masa (0 V)
+- **Pin 4 (BK — czarny):** Drugi kanał wyjścia lub ekran/rezerwa
+
+> Złącze M12 to standard przemysłowy — kolory żył wg EN 60947-5-2. IO-Link celowo używa tego samego kabla co czujniki binarne (3-wire) — wymiana czujnika zwykłego na IO-Link nie wymaga przeokablowania.
+
+**Tryb Data Storage (automatyczna reparametryzacja):**
 Po wymianie uszkodzonego czujnika IO-Link Master automatycznie wgrywa zapisane parametry do nowego urządzenia — bez interwencji serwisanta. TIA Portal → właściwości portu IO-Link → `Data Storage: On`.
 
 **Typowe zastosowania w automotive:**
