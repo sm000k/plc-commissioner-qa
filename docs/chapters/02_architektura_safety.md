@@ -213,6 +213,24 @@ Redundancja CPU (H-system) nie oznacza automatycznie redundancji **sieci PROFINE
 
 ---
 
+**Schemat — Daisy chain (najprostsza, bez redundancji kabla):**
+```
+┌──────────────┐        Sync Link ×2        ┌──────────────┐
+│  CPU 1517H   │  X3 ══════════════ X3      │  CPU 1517H   │
+│  PRIMARY     │  X4 ══════════════ X4      │  BACKUP      │
+└──────┬───────┘                            └──────┬───────┘
+       │ X1 (PROFINET)                             │ X1 (PROFINET)
+       │                                           │
+       ├── ET200SP_1 ── ET200SP_2 ── ET200SP_3     │
+       │   IM155-6HF    IM155-6HF    IM155-6HF    │
+       │                                           │
+       └── ET200SP_4 ── ET200SP_5 ─────────────────┘
+           IM155-6HF    IM155-6HF
+```
+> ⚠️ Przerwa kabla między ET200SP_1 a _2 → utrata _2 i _3. Brak redundancji kabla — każdy CPU prowadzi osobny łańcuch.
+
+---
+
 **Schemat — Ring bez zewnętrznego switcha (optymalne dla S7-1500H):**
 ```
 ┌──────────────┐        Sync Link ×2        ┌──────────────┐
