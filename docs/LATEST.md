@@ -710,7 +710,7 @@ Układ seal-in z normalną cewką `( )`, bloki SR/RS i cewki `(S)`/`(R)` to **ta
 **SIMATIC Safety Integrated — jeden PLC, jeden inżyniering, jedna komunikacja:**
 ![SIMATIC Safety Integrated: TIA Portal, F-CPU, ET200 F-I/O, SINAMICS](images/safety/01b_simatic_safety_overview_p2.png)
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE] — [SIMATIC Safety Integrated — przegląd systemu](https://www.siemens.com/global/en/products/automation/systems/industrial/safety-integrated.html); [SIMATIC Safety — Konfiguracja i programowanie (A5E02714440-AK)](https://support.industry.siemens.com/cs/document/104547937/)*
 ### 2.2. Co to jest F-CPU i jak działa dual-channel processing?  🔴
 
 **Dual-channel processing** to architektura, w której ten sam fragment kodu Safety jest wykonywany przez **dwa niezależne kanały obliczeniowe wewnątrz jednego CPU**. W S7-1500F realizowane programowo (diversified redundant processing w jednym fizycznym procesorze — ten sam program Safety wykonywany dwukrotnie z dywersyfikowanym przetwarzaniem, wyniki porównywane). W starszych generacjach (S7-300F/400F) — sprzętowo (dwa oddzielne procesory). Oba kanały przetwarzają identyczne dane wejściowe i produkują wyniki. Na końcu każdego cyklu Safety specjalny komparator porównuje wyniki obu kanałów:
@@ -728,7 +728,7 @@ Układ seal-in z normalną cewką `( )`, bloki SR/RS i cewki `(S)`/`(R)` to **ta
 
 *Certyfikacja (informacyjnie):* F-CPU jest certyfikowany dla SIL 3 / PL e — ta informacja pochodzi z karty katalogowej napędu lub CPU; nie musisz jej znać na pamięć, ale warto wiedzieć że to TÜV zatwierdza architekturę, nie sam Siemens.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE] — [SIMATIC Safety — Konfiguracja i programowanie (A5E02714440-AK)](https://support.industry.siemens.com/cs/document/104547937/), rozdział „Dual-channel processing / diversified redundant processing"; [SIMATIC Safety Getting Started (A5E02714463)](https://support.industry.siemens.com/cs/document/109751404/)*
 ### 2.3. Jakie sterowniki Siemens obsługują funkcje Safety?
 
 S7-1500F: CPU 1511F, 1513F, 1515F, 1516F, 1517F, 1518F — Advanced controllers z wbudowanym Safety.
@@ -737,27 +737,34 @@ ET 200SP CPU F: CPU 1510SP F, 1512SP F — zdalny sterownik z Safety, montaż pr
 ET 200pro CPU F: CPU 1516pro F — IP67, bezpośrednio na maszynie.
 Wszystkie programowane w TIA Portal z STEP 7 Safety Advanced lub Safety Basic.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE] — [SIMATIC S7-1500F — strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html); [SIMATIC S7-1200F — strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1200.html)*
 ### 2.4. Co to jest F-DB i dlaczego nie można go edytować ręcznie?
 
 F-DB (Fail-safe Data Block) generowany jest automatycznie przez TIA Portal dla każdego bloku Safety. Zawiera: CRC (checksum logiki), F-signature (podpis programu Safety), parametry czasowe.
 Ręczna edycja zniszczyłaby spójność podpisu → F-CPU odmówiłoby uruchomienia Safety. To celowe zabezpieczenie przed nieautoryzowaną modyfikacją.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+*[ZWERYFIKOWANE] — [SIMATIC Safety — Konfiguracja i programowanie (A5E02714440-AK)](https://support.industry.siemens.com/cs/document/104547937/), rozdział Safety Administration Editor*
 ### 2.5. Co to jest F-signature i collective signature?  🟡
 
 F-signature to unikalny podpis (suma kontrolna CRC) jednego bloku Safety — zmienia się przy każdej modyfikacji kodu.
 Collective signature (podpis zbiorczy) to podpis CAŁEGO programu Safety złożony ze wszystkich bloków. Widoczny na wyświetlaczu CPU lub w TIA Portal jako ciąg znaków (np. '5CBE6409').
 Przy wgraniu CPU porównuje collective signature — niezgodność → Safety nie uruchamia się.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+W TIA Portal w Safety Administration Editor widoczne są:
+- **Zbiorczy podpis bezpieczeństwa** (collective F-signature) — zmienia się przy każdej zmianie danych projektu fail-safe
+- **Podpis zbiorczy F-SW** — zmienia się przy zmianie programu Safety
+- **Podpis zbiorczy F-HW** — zmienia się przy zmianie konfiguracji sprzętowej fail-safe
+
+*[ZWERYFIKOWANE] — [SIMATIC Safety — Konfiguracja i programowanie (A5E02714440-AK)](https://support.industry.siemens.com/cs/document/104547937/), str. 83–84 „F-signatures"; [SIMATIC Safety Getting Started (A5E02714463)](https://support.industry.siemens.com/cs/document/109751404/), str. 32, 43*
 ### 2.6. Jakie są tryby pracy Safety CPU i jak się przełącza?
 
 **Safety mode activated** — normalny tryb produktywny, program Safety działa, wyjścia sterowane przez logikę F.
 **Safety mode deactivated** — tryb commissioning/testowy, wejścia/wyjścia F modułów mogą być nadpisywane ręcznie bez ochrony Safety (używany np. podczas uruchamiania do testów okablowania).
-Przełączenie przez TIA Portal (Safety Administration) lub dedykowany sygnał w logice. Po przełączeniu wymagane potwierdzenie (hasło Safety lub ACK). Zmiana trybu jest logowana z datą i użytkownikiem. Uwaga: dezaktywacja trybu Safety jest widoczna w diagnostyce i na wyświetlaczu CPU — nie można jej ukryć.
+Przełączenie przez TIA Portal (Safety Administration Editor → „Disable safety mode") lub dedykowany sygnał w logice. Po przełączeniu wymagane potwierdzenie (hasło Safety). Zmiana trybu jest logowana z datą i użytkownikiem. Uwaga: dezaktywacja trybu Safety jest widoczna w diagnostyce i na wyświetlaczu CPU — nie można jej ukryć.
 
-*[PRAWDOPODOBNE] — na podstawie wiedzy domenowej Siemens*
+> ⚠️ **WARNING z dokumentacji Siemens:** „Deactivation of safety mode is intended for test purposes, commissioning, etc. Whenever safety mode is deactivated, the safety of the system must be ensured by other organizational measures, such as monitored operation, manual safety shutdown, and access restrictions to certain areas."
+
+*[ZWERYFIKOWANE] — [SIMATIC Safety Getting Started (A5E02714463)](https://support.industry.siemens.com/cs/document/109751404/), str. 42–43; [SIMATIC Safety — Konfiguracja i programowanie (A5E02714440-AK)](https://support.industry.siemens.com/cs/document/104547937/), Safety Administration Editor*
 ### 2.7. Jakie są podstawowe komponenty i zasady programowania sterowników bezpieczeństwa Pilz PNOZmulti?
 
 Pilz PNOZmulti to programowalny sterownik bezpieczeństwa, który umożliwia łatwe i intuicyjne tworzenie logiki bezpieczeństwa dla maszyn, wykorzystując dedykowane bloki funkcyjne i graficzne środowisko programowania.
@@ -883,7 +890,7 @@ Minimalna sieć Hot Standby wymaga **6 komponentów** — dwa CPU, dwa połącze
 ```
 
 ⚠️ **DO WERYFIKACJI** — numery zamówieniowe CPU orientacyjne, mogą się różnić w zależności od wersji firmware.
-*[PRAWDOPODOBNE] — na podstawie Siemens S7-1500H System Manual*
+*[ZWERYFIKOWANE] — [Siemens SIMATIC S7-1500H System Manual (6ES7518-4FX00-1AC2)](https://support.industry.siemens.com/cs/document/109779336/); [S7-1500R/H — strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500/s7-1500r-h.html)*
 
 ---
 
