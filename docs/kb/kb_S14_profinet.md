@@ -52,3 +52,9 @@ Odpowiedź — ISO on TCP to protokół komunikacyjny, który umożliwia niskopo
     - Umożliwia szybką i efektywną wymianę danych między panelem a sterownikiem, np. do sterowania przyciskami, wyświetlania statusów LED, czy wartości prędkości.
 *Praktyk: [W panelu IDEC HG2J, protokół ISO on TCP jest wykorzystywany do połączenia ze sterownikami Siemens S7-1200/1500, co pozwala na łatwe mapowanie zmiennych z pamięci sterownika do obiektów wizualizacji na panelu.] [HMI] [PROFINET]*
 
+
+---
+### 🔗 Dokumentacja Siemens online
+- [PROFINET — przegląd technologii](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html)
+- [SCALANCE — switche przemysłowe](https://www.siemens.com/global/en/products/automation/industrial-communication/industrial-ethernet/scalance.html)
+- [PROFINET diagnostyka — Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)

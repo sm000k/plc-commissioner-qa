@@ -36,3 +36,9 @@ Parametr "Reintegration after discrepancy error" w konfiguracji modułu safety o
 - Reset reintegracji kanałów safety w sterowniku PLC jest odrębny od resetu funkcji bezpieczeństwa, który wymaga innej logiki programowania.
 *Źródło: transkrypcje ControlByte*
 
+
+---
+### 🔗 Dokumentacja Siemens online
+- [SIMATIC Safety — programowanie i obsługa (Entry ID: 104547937)](https://support.industry.siemens.com/cs/document/104547937/)
+- [E-Stop SIL3 z S7-1500F — Application Example (Entry ID: 21064024)](https://support.industry.siemens.com/cs/document/21064024/)
+- [Wiring Examples F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/)

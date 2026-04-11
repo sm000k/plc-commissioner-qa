@@ -21,3 +21,9 @@ Odpowiedź — Pilz PNOZmulti to programowalny sterownik bezpieczeństwa, który
     - Tryb "online Dynamic Program Display" podświetla aktywne sygnały na zielono, co ułatwia diagnostykę.
 *Praktyk: [Programowanie PNOZmulti jest bardzo przyjazne użytkownikowi dzięki dedykowanym blokom. Diagnostyka w trybie online jest prosta, ponieważ aktywne sygnały są wizualnie wyróżnione.] [Safety]*
 
+
+---
+### 🔗 Dokumentacja Siemens online
+- [SIMATIC Safety Integrated — przegląd systemu](https://www.siemens.com/global/en/products/automation/systems/industrial/safety-integrated.html)
+- [SIMATIC Safety — konfiguracja i programowanie (Entry ID: 104547937)](https://support.industry.siemens.com/cs/document/104547937/)
+- [Pilz PNOZmulti Configurator — strona produktowa](https://www.pilz.com/en-INT/products/controllers/small-controllers/pnozmulti-2)

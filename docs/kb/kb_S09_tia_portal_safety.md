@@ -42,3 +42,9 @@ Odpowiedź — Rygle bezpieczeństwa Pilz PSENmlock to zaawansowane urządzenia 
         9. Maszyna jest w 100% zabezpieczona.
 *Praktyk: [Elektrorygiel PSENmlock z klamką jest idealny do systemów, gdzie operator może zostać zatrzaśnięty w strefie niebezpiecznej. Impulsowe ryglowanie/odryglowywanie to zaleta w kontekście zużycia energii i temperatury pracy.] [Safety]*
 
+
+---
+### 🔗 Dokumentacja Siemens online
+- [SIMATIC Safety — Getting Started (Entry ID: 104547937)](https://support.industry.siemens.com/cs/document/104547937/)
+- [TIA Portal — Safety Administration](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)
+- [Pilz PSENmlock — strona produktowa](https://www.pilz.com/en-INT/products/sensors/safety-locking-devices/psenmlock)

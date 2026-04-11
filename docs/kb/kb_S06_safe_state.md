@@ -14,3 +14,9 @@ Odpowiedź — STO (Safe Torque Off) to funkcja bezpieczeństwa, która zapewnia
     - W docelowej aplikacji sygnały STO należy podłączyć dwukanałowo do układu bezpieczeństwa (przekaźnika bezpieczeństwa lub programowalnego sterownika bezpieczeństwa), który będzie realizował bezpieczne zatrzymanie napędu.
 *Praktyk: [Podłączenie STO do układu bezpieczeństwa jest kluczowe dla zapewnienia zgodności z normami. Brak prawidłowego podłączenia STO oznacza, że napęd nie jest bezpiecznie wyłączany w przypadku zagrożenia.] [Safety] [Sinamics]*
 
+
+---
+### 🔗 Dokumentacja Siemens online
+- [SINAMICS V90 — Safe Torque Off (STO)](https://support.industry.siemens.com/cs/document/109781612/)
+- [SINAMICS Safety Integrated — funkcje bezpieczeństwa napędów](https://www.siemens.com/global/en/products/drives/sinamics/safety-integrated.html)
+- [IEC 61800-5-2 — Safety functions for drives (informacyjnie)](https://www.siemens.com/global/en/products/drives/sinamics/safety-integrated.html)

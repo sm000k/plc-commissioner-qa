@@ -88,3 +88,10 @@ Odpowiedź — Sterowniki S7-1200 charakteryzują się modułową konstrukcją, 
     - **LINK, RX/TX:** Po lewej stronie, sygnalizują stan połączenia sieciowego.
 *Praktyk: [Przy każdym przyłączu na sterowniku S7-1200 znajduje się opis (np. 3L+, 3M, .0, .1), co ułatwia identyfikację zacisków. Sterownik 1211C nie może być rozbudowany o dodatkowe moduły wejść/wyjść bezpośrednio, ale może łączyć się z modułami zewnętrznymi po sieci.] [PLC]*
 
+
+---
+### 🔗 Dokumentacja Siemens online
+- [SIMATIC S7-1200 — strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1200.html)
+- [SIMATIC S7-1500 — strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html)
+- [IEC 61131-3 — języki programowania PLC (strona PLCopen)](https://plcopen.org/iec-61131-3)
+- [TIA Portal — informacje ogólne](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)

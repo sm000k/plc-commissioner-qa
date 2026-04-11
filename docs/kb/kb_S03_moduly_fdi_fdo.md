@@ -32,3 +32,9 @@ Odpowiedź — Prawidłowa konfiguracja parametrów wejść dwukanałowych jest 
     - **Znaczenie praktyczne:** Ten parametr wpływa na sposób obsługi stanowiska przez operatora. Urządzenia z kilkuletnim stażem mogą generować błędy rozbieżności, a ta opcja wymusza fizyczne potwierdzenie stanu bezpiecznego.
 *Praktyk: [W przypadku błędu rozbieżności, jeśli "Test zero signal necessary" jest aktywne, diody zgłaszają błąd i brak możliwości reintegracji, dopóki nie zostanie wymuszony stan niski na obu kanałach, a dopiero potem można nacisnąć przycisk reset.] [Safety]*
 
+
+---
+### 🔗 Dokumentacja Siemens online
+- [Wiring Examples F-DI/F-DO (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/)
+- [ET 200SP F-DI — strona produktowa](https://mall.industry.siemens.com/mall/en/WW/Catalog/Products/10325230)
+- [SIMATIC Safety — konfiguracja modułów F-I/O (Entry ID: 104547937)](https://support.industry.siemens.com/cs/document/104547937/)

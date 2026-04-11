@@ -86,3 +86,9 @@ Odpowiedź — Język Python, w połączeniu z protokołem OPC UA, umożliwia au
     - **Generowanie raportu:** Komenda `pytest --html=report.html` tworzy plik HTML z wynikami testów.
 *Praktyk: [Można testować oprogramowanie PLC na wirtualnym sterowniku (SoftPLC) uruchomionym na komputerze PC, bez potrzeby posiadania fizycznego sprzętu. W przypadku błędu w programie PLC, testy automatyczne szybko go wykrywają, co jest informacją dla programisty o konieczności naprawy.] [Python] [TIA Portal] [Codesys]*
 
+
+---
+### 🔗 Dokumentacja Siemens online
+- [TIA Portal — Getting Started (Entry ID: 109761372)](https://support.industry.siemens.com/cs/document/109761372/)
+- [SINAMICS V-Assistant — narzędzie commissioning](https://support.industry.siemens.com/cs/document/109781612/)
+- [S7-1200 Web Server — diagnostyka online (Entry ID: 68011496)](https://support.industry.siemens.com/cs/document/68011496/)

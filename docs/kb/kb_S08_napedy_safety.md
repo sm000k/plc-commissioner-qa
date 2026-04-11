@@ -9,3 +9,9 @@ Serwowzmacniacz Sinamics V90 jest wyposażony w funkcję bezpieczeństwa STO (Sa
 - W docelowej aplikacji sygnały STO należy podłączyć dwukanałowo do układu bezpieczeństwa, takiego jak przekaźnik bezpieczeństwa lub programowalny sterownik bezpieczeństwa (PLC Safety), aby zapewnić bezpieczne zatrzymanie napędu.
 *Źródło: transkrypcje ControlByte*
 
+
+---
+### 🔗 Dokumentacja Siemens online
+- [SINAMICS V90 — Getting Started](https://support.industry.siemens.com/cs/document/109781612/)
+- [SINAMICS Safety Integrated — przegląd funkcji STO/SS1/SS2/SLS](https://www.siemens.com/global/en/products/drives/sinamics/safety-integrated.html)
+- [SINAMICS G120 — Safety Integrated (Entry ID: 109751595)](https://support.industry.siemens.com/cs/document/109751595/)

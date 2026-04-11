@@ -27,3 +27,9 @@ Proces dekodowania telegramu XML z robota ABB w sterowniku PLC Siemens obejmuje 
 - Do symulacji i testowania komunikacji można wykorzystać narzędzia takie jak PLCSIM Advanced i Node-RED, który generuje przykładowe telegramy XML.
 *Źródło: transkrypcje ControlByte*
 
+
+---
+### 🔗 Dokumentacja online
+- [ABB IRC5 — strona produktowa](https://new.abb.com/products/robotics/controllers/irc5)
+- [ABB RobotStudio — narzędzie offline](https://new.abb.com/products/robotics/robotstudio)
+- [Siemens PLCSIM Advanced — symulacja komunikacji](https://support.industry.siemens.com/cs/document/109795016/)

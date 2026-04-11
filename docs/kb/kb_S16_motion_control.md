@@ -63,3 +63,9 @@ Blok MC_MoveJog charakteryzuje się specyficznymi zachowaniami i wyjściami stat
 - Podczas trwania ruchu możliwe jest dynamiczne zmienianie parametrów `Velocity`, `Acceleration`, `Deceleration` i `Jerk` "w locie", co jest przydatne w aplikacjach wymagających adaptacji prędkości.
 - Podanie wartości 0 dla `Velocity` podczas aktywnego bloku spowoduje zahamowanie osi i utrzymanie prędkości zerowej.
 *Źródło: transkrypcje ControlByte*
+---
+### 🔗 Dokumentacja Siemens online
+- [SINAMICS V90 — strona produktowa](https://www.siemens.com/global/en/products/drives/sinamics/low-voltage-converters/sinamics-v90.html)
+- [SINAMICS V90 — V-Assistant commissioning (Entry ID: 109781612)](https://support.industry.siemens.com/cs/document/109781612/)
+- [TIA Portal Motion Control — Getting Started (Entry ID: 109766459)](https://support.industry.siemens.com/cs/document/109766459/)
+- [MC_MoveJog, MC_MoveAbsolute — dokumentacja bloków Motion](https://support.industry.siemens.com/cs/document/109766459/)
