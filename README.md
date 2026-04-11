@@ -4,100 +4,88 @@ Baza wiedzy Q&A dla inżyniera PLC/Commissioner przygotowującego się do rozmow
 
 **Zakres:** Siemens TIA Portal (V16–V19), SIMATIC Safety Integrated, ET200 SP/MP, SINAMICS G120/S120/V90, Robot ABB IRC5, SICAR@GST, PROFINET
 
+**Wersja:** v12.4 | **159 pytań** | **21 sekcji** | [Otwórz online](https://sm000k.github.io/plc-commissioner-qa/)
+
 ---
 
 ## Struktura projektu
 
 ```
 docs/
-  qa_draft_v9.md              ← GŁÓWNY DOKUMENT Q&A (115 pytań, 19 sekcji) ✅ AKTYWNY
-  qa_draft_v8.md              ← Poprzednia wersja (110 pytań) — backup
+  LATEST.md                   ← GŁÓWNY DOKUMENT Q&A (v12.4, 159 pytań) ✅ AKTYWNY
+  qa_draft_v12.md             ← Aktualny draft (= LATEST.md, scalany z chapters)
+  chapters/                   ← Rozdziały źródłowe (21 plików, edytujesz TU)
+    00_header.md … 21_sicar.md
+  kb/                         ← Baza wiedzy per sekcja (14 plików)
   images/safety/              ← 45 diagramów PNG z dokumentacji Siemens
-  knowledge_base_controlbyte.md ← Baza wiedzy z transkrypcji YouTube
+  images/electrical/          ← 9 schematów elektrycznych
+  sections_manifest.json      ← Indeks sekcji (auto-generowany)
   QA_LOG.md                   ← Historia zmian i wersji
-  slownik_v7.md               ← Słownik pojęć PLC/Safety/Napędy
+  REFERENCE.md                ← Mapa źródeł PDF i braków
+  knowledge_base_controlbyte.md ← Baza wiedzy z transkrypcji YouTube
+  _config.yml                 ← Konfiguracja Jekyll (GitHub Pages)
 
 scripts/
-  Get-YouTubeTranscripts.py   ← Pobieranie transkrypcji z YouTube (Gemini API)
-  Build-KnowledgeBase.py      ← Ekstrakcja Q&A z transkrypcji (Gemini)
-  Merge-KnowledgeBase.py      ← Scalanie nowej wiedzy do dokumentu Q&A
-  New-QADocument.ps1          ← Generowanie .docx z pliku Markdown
-  Read-DocxText.ps1           ← Ekstrakcja tekstu z .docx do analizy
-  _build_selection.py         ← Filtr filmów YouTube do pobrania
+  publish.ps1                 ← Pipeline: TOC → merge → manifest → git push
+  merge_chapters.py           ← Scala chapters → qa_draft_v12.md
+  build_toc.py                ← Generuje spis treści w 00_header.md
+  build_manifest.py           ← Generuje sections_manifest.json
+  egzaminator.py              ← Bot przepytujący (Anthropic API)
+  validate_qa.py              ← Walidacja jakości Q&A
+  split_chapters.py           ← Rozdziela draft → chapters
+  extract_pdfs.py             ← Ekstrakcja tekstu z PDF
+  split_knowledge_base.py     ← Podział KB na sekcje
+  archive/                    ← Stare/jednorazowe skrypty
 
 sources/
   pdfs/                       ← Dokumentacja Siemens (PDFy źródłowe)
-  books/                      ← Materiały edukacyjne S7-1200
+    extracted/                ← Pre-wyekstrahowany tekst (grep_search)
+  books/                      ← Materiały edukacyjne
+  sicar/                      ← Dokumentacja SICAR@TIA
 
-archive/
-  docx/                       ← Stare wersje dokumentu Q&A (v3–v7)
-  old-docs/                   ← Stare pliki robocze
+archive/                      ← Stare wersje (v7–v11, docx v3–v7)
 
 transcripts/
-  controlbyte/                ← Transkrypcje z kanału @controlbytepl (52 filmy)
+  controlbyte/                ← Transkrypcje @controlbytepl (52 filmy)
 
 .github/
   copilot-instructions.md     ← Instrukcje dla GitHub Copilot
-  prompts/                    ← Prompty workflow (zbierz→formułuj→generuj)
+  prompts/                    ← Prompty workflow
 ```
 
 ---
 
-## Źródła wiedzy (PDFy)
+## Publikacja (GitHub Pages)
 
-| Plik | Zawartość |
-|------|-----------|
-| `21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en.pdf` | E-Stop SIL3, klasy zatrzymania, PFH, ISO 13849-1 |
-| `39198632_Wiring_Example_en.pdf` | Okablowanie F-DI/F-DO, PM/PP-switching |
-| `safety_getting_started_en-US.pdf` | SIMATIC Safety — podstawy, architektura |
-| `SIMATIC Safety - Konfiguracja i programowanie (2).pdf` | Zaawansowana konfiguracja Safety, F-bloki |
-| `SIMATIC Safety Integrated – wszystko w jednym sterowniku PLC.pdf` | Koncepcja Safety Integrated, F-CPU, PROFIsafe |
-| `btc.pl-SCL-S7-1200.pdf` | Programowanie S7-1200 w SCL |
-| `siemens SCL.PDF` | SCL S7-300/400, historyczne tło |
-| `Sterowniki_PLC.pdf` | Podręcznik akademicki (⚠️ błędna klasyfikacja sprzętu) |
-
----
-
-## Workflow generowania
-
-### Aktualizacja Q&A z nowych transkrypcji:
 ```powershell
-# 1. Pobierz transkrypcje (wymaga GEMINI_API_KEY)
-$env:GEMINI_API_KEY="..."
-python scripts/Get-YouTubeTranscripts.py --selection
-
-# 2. Wyciągnij wiedzę z transkrypcji
-python scripts/Build-KnowledgeBase.py
-
-# 3. Scal z dokumentem Q&A
-python scripts/Merge-KnowledgeBase.py
+.\scripts\publish.ps1 -Message "Opis zmiany"
 ```
+Pipeline automatycznie: generuje TOC → scala chapters → kopiuje LATEST.md → buduje manifest → kopiuje index.md → git push.
 
-### Generowanie .docx z Markdown:
-```powershell
-.\scripts\New-QADocument.ps1 docs/qa_draft_v9.md
-```
+Strona: https://sm000k.github.io/plc-commissioner-qa/
 
 ---
 
-## Sekcje Q&A (19 sekcji, 110 pytań)
+## Sekcje Q&A (21 sekcji, 159 pytań)
 
-1. Podstawy PLC i automatyki (14 pyt.)
-2. Architektura SIMATIC Safety Integrated (8 pyt.)
-3. Moduły F-DI / F-DO (10 pyt.)
-4. Struktury głosowania 1oo1/1oo2/2oo3 (3 pyt.)
-5. Passivation, Reintegration, ACK (4 pyt.)
-6. Safe State (3 pyt.)
-7. PROFIsafe (4 pyt.)
-8. Napędy Safety — SINAMICS (6 pyt.)
-9. TIA Portal — Safety praktyka (6 pyt.)
-10. Robot ABB IRC5 (5 pyt.)
-11. Commissioning i diagnostyka (9 pyt.)
-12. SICAR i Napędy SINAMICS (4 pyt.)
-13. E-Stop — normy i obliczenia (6 pyt.)
-14. PROFINET — topologia i diagnostyka (7 pyt.)
-15. Kurtyny bezpieczeństwa i Muting (4 pyt.)
-16. Motion Control i SINAMICS (5 pyt.)
-17. Realne scenariusze commissioning (5 pyt.)
-18. TIA Portal — zaawansowane funkcje (4 pyt.)
-19. Słownik pojęć (2 pyt.)
+1. Podstawy PLC i automatyki (16)
+2. Architektura SIMATIC Safety Integrated (9)
+3. Moduły F-DI / F-DO — okablowanie i parametry (10)
+4. Struktury głosowania 1oo1/1oo2/2oo2/2oo3 (8)
+5. Passivation, Reintegration, ACK (4)
+6. Safe State — bezpieczny stan (5)
+7. PROFIsafe — komunikacja Safety (4)
+8. Napędy Safety — SINAMICS z wbudowanym Safety (8)
+9. TIA Portal — Safety praktyka (8)
+10. Robot ABB IRC5 — integracja z PLC (8)
+11. Commissioning i diagnostyka (10)
+12. Napędy SINAMICS (2)
+13. E-Stop — normy, implementacja i obliczenia (5)
+14. PROFINET — topologia, diagnostyka (8)
+15. Kurtyny bezpieczeństwa i Muting (6)
+16. Motion Control i SINAMICS — praktyka commissioning (15)
+17. Realne scenariusze commissioning (9)
+18. TIA Portal — zaawansowane funkcje (4)
+19. Commissioning — dodawanie stacji (3)
+20. Schematy elektryczne (7)
+21. SICAR@TIA — standard automatyki automotive (10)

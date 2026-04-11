@@ -34,131 +34,74 @@ Przy KAŻDEJ edycji dokumentu Q&A → zaktualizuj nagłówek w `docs/chapters/00
 - Tytuł: `# KOMPENDIUM Q&A — v{WERSJA}`
 - Linia wersji: `### Wersja: v{WERSJA} | Data: {RRRR-MM-DD HH:MM} | Pytania: {LICZBA}`
 - Data+godzina = moment ostatniej edycji (pobierz przez `[DateTime]::Now.ToString("yyyy-MM-dd HH:mm")`), wersja = bieżąca wersja z QA_LOG.md
+- **NIE edytuj ręcznie spisu treści** — `build_toc.py` generuje go automatycznie w pipeline
+
+### Zasada: ZAWSZE publikuj na GitHub Pages po edycji Q&A
+Po KAŻDEJ zmianie w dokumencie Q&A (dodanie/edycja pytań, merge chapters) → uruchom:
+```powershell
+.\scripts\publish.ps1 -Message "Opis zmiany"
+```
+Skrypt wykonuje **cały pipeline automatycznie**:
+1. `build_toc.py` — generuje TOC z chapter files → aktualizuje `00_header.md`
+2. `merge_chapters.py` — scala chapters → `qa_draft_v12.md`
+3. Kopiuje draft → `LATEST.md`
+4. `build_manifest.py` — aktualizuje `sections_manifest.json`
+5. Kopiuje `LATEST.md` → `index.md` (GitHub Pages)
+6. `git add + commit + push`
+
+**NIE trzeba** odpalać osobno `merge_chapters.py`, `build_toc.py`, `build_manifest.py` — `publish.ps1` robi wszystko.
+Strona: https://sm000k.github.io/plc-commissioner-qa/
 
 ## Struktura projektu
 
 ```
 docs/                                ← Aktywne dokumenty
-  LATEST.md                          ← GŁÓWNY DOKUMENT Q&A (v12, 155 pytań, 20 sekcji) ✅
-  qa_draft_v12.md                    ← Aktualny draft
-  qa_draft_v11.md                    ← Poprzednia wersja
+  LATEST.md                          ← GŁÓWNY DOKUMENT Q&A (v12.4, 159 pytań, 21 sekcji) ✅
+  sections_manifest.json             ← Indeks sekcji: zakresy linii, liczba pytań → CZYTAJ ZAMIAST LATEST.md
+  qa_draft_v12.md                    ← Aktualny draft (= LATEST.md)
   chapters/                          ← Rozdziały Q&A (po 1 pliku na sekcję)
-    00_header.md … 20_schematy_elektryczne.md
-  knowledge_base_controlbyte.md      ← Baza wiedzy: transkrypcje ControlByte (52 filmy)
-  knowledge_base_delta_v11.md        ← Delta wiedzy: patch v11
+    00_header.md … 21_sicar.md
+  kb/                                ← ⚡ Knowledge base podzielona per sekcja (14 plików, avg 40 linii)
+    kb_S01_podstawy_plc.md … kb_S16_motion_control.md
+  knowledge_base_controlbyte.md      ← MONOLIT — nie czytaj w całości → używaj docs/kb/
+  knowledge_base_delta_v11.md        ← MONOLIT — nie czytaj w całości → używaj docs/kb/
   images/safety/                     ← 45 PNG z dokumentacji Siemens
+  images/electrical/                 ← 9 schematów elektrycznych
+  REFERENCE.md                       ← Mapa źródeł PDF i braków
   QA_LOG.md                          ← Log zmian
-  slownik_v7.md
-scripts/                             ← Skrypty produkcyjne
-  egzaminator.py                     ← Bot przepytujący (Anthropic API)
+scripts/
+  publish.ps1                        ← ⚡ Pipeline: TOC → merge → manifest → index.md → git push
+  build_toc.py                       ← Generuje spis treści z chapters
   merge_chapters.py / split_chapters.py
-  Get-YouTubeTranscripts.py
-  Build-KnowledgeBase.py
-  Merge-KnowledgeBase.py
-  New-QADocument.ps1
-  Read-DocxText.ps1
-  _build_selection.py
-sources/pdfs/                        ← Dokumentacja Siemens (PDFy)
-sources/books/                       ← Materiały edukacyjne
-archive/docx/                        ← Stare wersje .docx (v3–v7)
-archive/old-docs/                    ← Stare pliki robocze
-transcripts/controlbyte/             ← Transkrypcje YouTube (52 filmy)
+  build_manifest.py                  ← Update sections_manifest.json
+  egzaminator.py                     ← Bot przepytujący (Anthropic API)
+  validate_qa.py                     ← Walidacja jakości Q&A
+  extract_pdfs.py                    ← Ekstrakcja tekstu z PDF-ów (jednorazowo)
+  split_knowledge_base.py            ← Podział KB per sekcja
+  archive/                           ← Stare/jednorazowe skrypty
+sources/pdfs/
+  extracted/                         ← ⚡ Pre-wyekstrahowane teksty PDF (grep_search!)
+  pdf_manifest.json                  ← Indeks PDF-ów: keywords, mapa sekcji
+sources/sicar/                       ← Dokumentacja SICAR@TIA (72 PDF + extracted)
+transcripts/controlbyte/             ← 52 transkrypcje YouTube
+archive/                             ← Stare drafty v8–v11, slownik_v7
 ```
 
 ## Źródła wiedzy (PDFy w sources/pdfs/)
 
-### Obecne źródła
+> Pełna lista źródeł, mapa pokrycia sekcji i lista brakujących PDF-ów do pobrania:
+> **`docs/REFERENCE.md`** — otwórz gdy potrzebujesz dodać/znaleźć źródło.
 
-| Plik | Zawartość | Pokrywa sekcje |
-|------|-----------|----------------|
-| `21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en.pdf` | Application Example: E-Stop SIL3, klasy zatrzymania, PFH, obliczenia ISO 13849-1 | §13 |
-| `39198632_Wiring_Example_en.pdf` | Przykłady okablowania F-DI/F-DO, PM-switching, PP-switching, relay | §3 |
-| `safety_getting_started_en-US.pdf` | Podstawy SIMATIC Safety — pierwsze kroki, architektura | §2, §6 |
-| `SIMATIC Safety - Konfiguracja i programowanie (2).pdf` | Zaawansowana konfiguracja Safety, programowanie F-bloków | §2, §4, §5, §7, §9 |
-| `SIMATIC Safety Integrated – wszystko w jednym sterowniku PLC.pdf` | Koncepcja Safety Integrated, F-CPU, PROFIsafe | §2, §7 |
-| `btc.pl-SCL-S7-1200.pdf` | Programowanie S7-1200 w SCL (TIA Portal V13+) | §1 |
-| `Sterowniki_PLC.pdf` | Ogólne informacje o sterownikach PLC | §1 |
-| `siemens SCL.PDF` | Programowanie w SCL — uzupełnienie | §1 |
-
-### Mapa pokrycia sekcji — co jest, czego brakuje
-
-| § | Sekcja | Ma źródło? | Brak |
-|---|--------|------------|------|
-| 1 | Podstawy PLC | ✅ PDF + books | — |
-| 2 | Architektura Safety | ✅ 3 PDFy | — |
-| 3 | Moduły F-DI/F-DO | ✅ Wiring Example | — |
-| 4 | Struktury głosowania | ✅ Safety Konfig. | — |
-| 5 | Passivation/Reintegration | ✅ Safety Konfig. | — |
-| 6 | Safe State | ✅ Safety Getting Started | — |
-| 7 | PROFIsafe | ✅ Safety Konfig./Integrated | — |
-| 8 | Napędy Safety | ❌ | SINAMICS Safety Integrated FM |
-| 9 | TIA Portal Safety | ✅ Safety Konfig. | — |
-| 10 | Robot ABB IRC5 | ❌ | ABB IRC5 Application Manual |
-| 11 | Commissioning i diagnostyka | ⚠️ knowledge base only | S7-1500 Diagnostics Manual |
-| 12 | SICAR i Napędy SINAMICS | ❌ | SINAMICS G120 Commissioning, SICAR Conventions |
-| 13 | E-Stop | ✅ Application Example | — |
-| 14 | PROFINET | ❌ | PROFINET System Description |
-| 15 | Kurtyny/Muting | ❌ | Light Curtains App. Example |
-| 16 | Motion Control | ❌ | SINAMICS S120/V90 Manual |
-| 17 | Scenariusze commissioning | ⚠️ knowledge base only | — (pokryją inne PDFy) |
-| 18 | TIA Portal zaawansowane | ❌ | TIA Portal V19 What's New |
-| 19 | Commissioning stacje | ❌ | ET200SP/MP System Manual |
-| 20 | Schematy elektryczne | ❌ | EN 60204-1, schematy katalogowe |
-
-### 🔴 Brakujące źródła — do pobrania z Siemens SIOS (support.industry.siemens.com)
-
-> Szukaj po tytule lub numerze dokumentu. Wszystkie są darmowe (PDF download).
-
-**Priorytet 1 — krytyczne luki (sekcje bez żadnego źródła):**
-
-| Dokument do pobrania | Szukaj na SIOS | Dla sekcji |
-|----------------------|----------------|------------|
-| **SINAMICS G120 — Getting Started** | "SINAMICS G120 getting started" lub numer produktu 6SL3210 | §12, §16 |
-| **SINAMICS G120 — List Manual (parametry)** | "SINAMICS G120 list manual" | §8, §12, §16 |
-| **SINAMICS S120 — Safety Integrated Function Manual** | "SINAMICS S120 safety integrated function manual" | §8 |
-| **PROFINET System Description** | "PROFINET system description" | §14 |
-| **S7-1500 / ET200SP System Manual** | "ET200SP system manual" lub "S7-1500 system manual" | §11, §19 |
-| **S7-1500 Diagnostics Manual** | "S7-1500 diagnostics" | §11 |
-| **Light Curtains with SIMATIC Safety — Application Example** | "safety light curtain muting application example" | §15 |
-
-**Priorytet 2 — wzmocnienie istniejących sekcji:**
-
-| Dokument do pobrania | Szukaj na SIOS | Dla sekcji |
-|----------------------|----------------|------------|
-| **SINAMICS V90 — Getting Started** | "SINAMICS V90 getting started PROFINET" | §16 |
-| **TIA Portal V19 — What's New** | "TIA Portal V19 innovations" | §18 |
-| **PROFIsafe — System Description** | "PROFIsafe system description" (PI International) | §7 |
-| **SIMATIC Safety — Application Examples Collection** | "SIMATIC safety application examples" | §4, §5, §6 |
-| **IEC 61800-5-2 — Safety functions for drives** | Norma płatna, ale Siemens ma darmowe Application Notes opisujące STO/SS1/SS2 | §8 |
-
-**Priorytet 3 — źródła zewnętrzne (nie-Siemens):**
-
-| Dokument | Źródło | Dla sekcji |
-|----------|--------|------------|
-| **ABB IRC5 — Application Manual PROFINET** | ABB Library (library.abb.com), szukaj "IRC5 PROFINET" | §10 |
-| **ABB IRC5 — Technical Reference Manual** | ABB Library | §10 |
-| **SICAR@GST Conventions** | Wewnętrzny dokument Siemens (jeśli masz dostęp) | §12 |
-| **EN 60204-1 — Bezpieczeństwo maszyn, wyposażenie elektryczne** | Norma płatna (PKN), ale streszczenia dostępne w app. notes Siemens | §20 |
-
-### Konwencja nazw plików źródłowych
-
-Pobrane PDFy zapisuj w `sources/pdfs/` z nazwą: `{temat_krótki}_{lang}.pdf`
-Przykłady:
-- `sinamics_g120_getting_started_en.pdf`
-- `profinet_system_description_en.pdf`
-- `et200sp_system_manual_en.pdf`
-- `abb_irc5_profinet_en.pdf`
-
-Po dodaniu nowego PDF-a → zaktualizuj tabelę "Obecne źródła" powyżej.
+Pre-wyekstrahowany tekst wszystkich PDF-ów: `sources/pdfs/extracted/*.txt` — szukaj przez `grep_search`.
+Indeks PDF-ów z keywords i mapą sekcji: `sources/pdfs/pdf_manifest.json`.
 
 ## Aktywny dokument Q&A
-- **Bieżący**: `docs/LATEST.md` = `docs/qa_draft_v12.md` — **155 pytań, 20 sekcji** (2026-04-01)
+- **Bieżący**: `docs/LATEST.md` = `docs/qa_draft_v12.md` — **159 pytań, 21 sekcji** (2026-04-11)
   - Zawiera PLAN NAUKI z tagami 🔴🟡🟢
-  - Rozdziały jako osobne pliki: `docs/chapters/00_header.md` … `20_schematy_elektryczne.md`
+  - Rozdziały jako osobne pliki: `docs/chapters/00_header.md` … `21_sicar.md`
   - Bazy wiedzy: `docs/knowledge_base_controlbyte.md`, `docs/knowledge_base_delta_v11.md`
-  - Embedded: obrazy z `docs/images/safety/` (45 PNG łącznie)
-- **Poprzedni**: `docs/qa_draft_v11.md` — backup
-- **Historia**: `archive/docx/` — wersje v3–v7 .docx
+  - Embedded: obrazy z `docs/images/safety/` (45 PNG), `docs/images/electrical/` (9 PNG)
+- **Archiwum**: `archive/` — stare drafty v8–v11, slownik_v7
 
 Następna wersja: `docs/qa_draft_v13.md`
 
@@ -203,7 +146,7 @@ Treść odpowiedzi — definicja + szczegóły.
 9. TIA Portal — Safety praktyka
 10. Robot ABB IRC5 — integracja z PLC
 11. Commissioning i diagnostyka
-12. SICAR i Napędy SINAMICS
+12. Napędy SINAMICS
 13. E-Stop — normy, implementacja i obliczenia bezpieczeństwa
 14. PROFINET — topologia, diagnostyka i zaawansowane funkcje
 15. Kurtyny bezpieczeństwa i Muting
@@ -212,6 +155,7 @@ Treść odpowiedzi — definicja + szczegóły.
 18. TIA Portal — zaawansowane funkcje
 19. Commissioning — dodawanie stacji i urządzeń do projektu
 20. Schematy elektryczne — silniki i aparatura łączeniowa
+21. SICAR@TIA — standard automatyki automotive
 
 **Tematy priorytetowe do rozszerzenia w kolejnych wersjach:**
 - TIA Portal V19 — nowe funkcje
@@ -269,11 +213,12 @@ Treść odpowiedzi — definicja + szczegóły.
 
 > Przed wygenerowaniem lub zmodyfikowaniem JAKIEJKOLWIEK odpowiedzi Q&A, ZAWSZE wykonaj:
 
-1. **Odczytaj rozdział** — `docs/chapters/XX_*.md` odpowiadający sekcji pytania
-2. **Sprawdź bazy wiedzy** — `docs/knowledge_base_controlbyte.md` i `docs/knowledge_base_delta_v11.md` (szukaj słów kluczowych z pytania)
-3. **Jeśli brakuje informacji** — dopiero wtedy sięgnij do `sources/pdfs/` (ekstrakcja tekstu z PDF)
-4. **Generuj odpowiedź** — dopiero po zebraniu materiału źródłowego
-5. **Self-check** — sprawdź odpowiedź wg Quality Checklist poniżej
+1. **Sprawdź manifest** — `docs/sections_manifest.json` → znajdź zakres linii sekcji (start/end)
+2. **Odczytaj rozdział** — `docs/chapters/XX_*.md` odpowiadający sekcji pytania
+3. **Sprawdź knowledge base per sekcja** — `docs/kb/kb_SXX_*.md` (tylko plik dla TEJ sekcji, nie monolity!)
+4. **Jeśli brakuje informacji** — `grep_search` po `sources/pdfs/extracted/*.txt` (pre-wyekstrahowany tekst)
+5. **Generuj odpowiedź** — dopiero po zebraniu materiału źródłowego
+6. **Self-check** — sprawdź odpowiedź wg Quality Checklist poniżej
 
 ## Quality Checklist — każda odpowiedź musi przejść
 

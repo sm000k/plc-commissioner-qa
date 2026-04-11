@@ -1,3 +1,7 @@
+# Windows system files
+desktop.ini
+Thumbs.db
+
 # Python
 __pycache__/
 *.py[cod]
