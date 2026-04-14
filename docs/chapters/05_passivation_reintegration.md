@@ -53,21 +53,48 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 *[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. QBAD/value status](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 5.4. Co to jest ACK_REQ, ACK_NEC i ACK_REI w praktyce?  🔴
 
-| Zmienna | Kierunek | Kontekst | Opis |
-|---------|----------|----------|------|
-| `ACK_REQ` | Wyjście bloku F | F-FB / F-I/O | Auto `TRUE` gdy moduł/blok wymaga resetu — widoczny w Watch Table |
-| `ACK_NEC` | Wejście bloku F | Safety-FB (ESTOP1, Two-hand, GuardMonitoring) | Impuls *(zbocze narastające)* potwierdzający usunięcie błędu w logice Safety |
-| `ACK_REI` | Wejście F-I/O DB | Reintegracja modułów F-I/O po passivation | Impuls reintegracji konkretnego modułu F-I/O |
+W systemie Safety Siemens istnieją **dwa niezależne mechanizmy resetu**, które łatwo pomylić. Każdy ma swoją zmienną i swój kontekst. Najprościej zrozumieć je na konkretnym scenariuszu.
 
-**Schemat logiki Reset Safety (LAD):**
+---
+
+**Scenariusz: operator zrywa kabel E-STOP → naprawa → powrót do pracy**
+
+**Krok 1 — Awaria:** Kabel do kanału E-STOP się zrywa. Moduł F-DI wykrywa wire break → **passivation** modułu → wyjścia F-DO = 0 → maszyna stoi.
+
+**Krok 2 — Moduł mówi „potrzebuję resetu":** W F-I/O DB modułu pojawia się `ACK_REQ = TRUE`. To **wyjście informacyjne** (read-only) — moduł sam je ustawia, programista go nie steruje. Widoczne w Watch Table TIA Portal. Oznacza: „błąd usunięty, ale czekam na potwierdzenie operatora".
+
+**Krok 3 — Reintegracja modułu F-I/O (ACK_REI):** Operator naciska przycisk „Reset" na kasecie → program Safety generuje **impuls** (zbocze narastające, 1 cykl PLC) na zmiennej `ACK_REI` w F-I/O DB tego modułu → moduł F-DI reintegruje się → `PASS_OUT = FALSE` → moduł znów przekazuje dane procesowe zamiast substitute values.
+
+**Krok 4 — Reset funkcji Safety (ACK_NEC):** Moduł już działa, ale **blok ESTOP1** w programie Safety nadal blokuje wyjścia (bo E-STOP był aktywny). Blok ESTOP1 ma wejście `ACK_NEC` — operator musi nacisnąć przycisk „Reset Safety" → program generuje **impuls** na `ACK_NEC` → blok ESTOP1 zwalnia wyjście `Q` → maszyna może ruszyć.
+
+---
+
+**Podsumowanie — 3 zmienne, 3 różne role:**
+
+| Zmienna | Co robi | Kto ją ustawia | Gdzie żyje | Kiedy potrzebna |
+|---------|---------|----------------|------------|-----------------|
+| `ACK_REQ` | **Informuje:** „moduł/blok czeka na reset" | Moduł F-I/O lub blok F automatycznie | F-I/O DB / wyjście bloku F | Zawsze po passivation — sprawdzaj w Watch Table |
+| `ACK_REI` | **Reintegruje moduł F-I/O** po passivation | Programista (impuls z przycisku Reset) | F-I/O DB modułu (np. `"F-DI_1".ACK_REI`) | Po każdym błędzie sprzętowym (wire break, zwarcie, utrata PROFIsafe) |
+| `ACK_NEC` | **Resetuje funkcję Safety** w bloku F | Programista (impuls z przycisku Reset Safety) | Wejście bloku ESTOP1 / SF_GuardMonitoring / SF_TwoHandControl | Po zadziałaniu funkcji Safety (E-STOP, osłona, kurtyna) |
+
+**Kluczowa różnica:**
+- `ACK_REI` = „naprawiłem kabel, moduł może wrócić do pracy" (**warstwa sprzętowa**)
+- `ACK_NEC` = „sytuacja jest bezpieczna, maszyna może ruszyć" (**warstwa logiki Safety**)
+- W praktyce operator naciska **jeden przycisk „Reset"**, a program Safety generuje oba impulsy we właściwej kolejności: najpierw `ACK_REI` (reintegracja modułu), potem `ACK_NEC` (reset funkcji)
+
+**Zbiorcza reintegracja — ACK_GL:**
+Zamiast ustawiać `ACK_REI` osobno dla każdego modułu F-I/O, możesz użyć bloku `ACK_GL` — generuje zbiorczy impuls reintegracji dla **wszystkich** modułów F-I/O w grupie F-runtime jednocześnie. Stosuj po awarii sieci PROFINET lub wymianie modułu, gdy wiele F-I/O wymaga reintegracji naraz.
+
 ```
-Reset_HMI: --|P|-- [ACK_NEC]   ← impuls z przycisku, tylko 1 cykl PLC
+// LAD — typowa logika resetu:
+"Reset_Button": --|P|-- "ACK_GL_DB".ACK_GLOB    ← reintegracja WSZYSTKICH F-I/O
+"Reset_Button": --|P|-- "ESTOP1_DB".ACK_NEC      ← reset funkcji E-STOP
 ```
 
-> ⚠️ `ACK_NEC` **nie może być** sygnałem stałym `TRUE` — tylko impuls zboczowy!
+> ⚠️ **KRYTYCZNE:** Zarówno `ACK_REI` jak i `ACK_NEC` muszą być **impulsami** (zbocze narastające, 1 cykl PLC). Sygnał stały `TRUE` = błąd programu Safety → F-CPU może odrzucić kompilację lub zgłosić Runtime Error.
 
-> 💡 **Zbiorcza reintegracja całej stacji:** blok `ACK_GL` *(STEP 7 Safety Advanced)*
-> generuje zbiorczy impuls do **wszystkich** F-I/O w grupie runtime jednocześnie.
-> Stosuj po wymianie modułu lub awarii sieci PROFINET całej stacji.
-
-*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. ACK_NEC, ACK_REI, ACK_GL — impuls reintegracji](https://support.industry.siemens.com/cs/document/109751404/)]*
+📚 **Źródła:**
+- [`sources/pdfs/extracted/safety_getting_started_en-US_extracted.txt`](sources/pdfs/extracted/safety_getting_started_en-US_extracted.txt) (str. 30–31) — Step 11: Programming ACK_GL for reintegration, parametr ACK_GLOB
+- [`sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt`](sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt) (str. 8) — ACK_GL instruction, events causing passivation
+- [`sources/pdfs/extracted/safety_getting_started_en-US_extracted.txt`](sources/pdfs/extracted/safety_getting_started_en-US_extracted.txt) (str. 25) — SF_GuardMonitoring: ACK_NEC, ACK_REQ, ACK input
+- Norma: EN ISO 13849-1 §6.3.5 (wymaganie ręcznego resetu po zadziałaniu funkcji Safety)

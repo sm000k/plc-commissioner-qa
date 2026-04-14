@@ -4,13 +4,13 @@
 
 ### Siemens TIA Portal · Safety PLC · ET200 · Napędy SINAMICS · Robot ABB · SICAR
 
-### Wersja: v12.5 | Data: 2026-04-11 16:01 | Pytania: 178
+### Wersja: v12.5 | Data: 2026-04-14 17:10 | Pytania: 175
 
 ### Pytania + odpowiedzi zweryfikowane pod kątem rozmów kwalifikacyjnych.
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 15:39 | Pytania: 178
+### Wersja: v12.5 | Data: 2026-04-13 20:51 | Pytania: 175
 
 ---
 
@@ -86,11 +86,8 @@
 - [4.1. Wyjaśnij notację XooY i podaj przykład każdej architektury.](#41-wyjaśnij-notację-xooy-i-podaj-przykład-każdej-architektury--)
 - [4.2. Kiedy wybierasz 1oo2 a kiedy 2oo2?](#42-kiedy-wybierasz-1oo2-a-kiedy-2oo2--)
 - [4.3. Jak 1oo2 jest realizowane w module F-DI Siemens?](#43-jak-1oo2-jest-realizowane-w-module-f-di-siemens)
-- [4.4. Jak F-CPU reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?](#44-jak-f-cpu-reaguje-na-błąd-rozbieżności-sygnału-discrepancy-failure-w-konfiguracji-1oo2)
-- [4.5. Jakie są scenariusze awaryjne wykrywane przez moduł F-DI w układzie dwukanałowym 1oo2?](#45-jakie-są-scenariusze-awaryjne-wykrywane-przez-moduł-f-di-w-układzie-dwukanałowym-1oo2)
-- [4.6. Jak parametr "Reintegration after discrepancy error" wpływa na obsługę błędu rozbieżności sygnału?](#46-jak-parametr-reintegration-after-discrepancy-error-wpływa-na-obsługę-błędu-rozbieżności-sygnału)
-- [4.7. Co to jest discrepancy time (czas rozbieżności) w F-DI 1oo2 i co się dzieje gdy zostanie przekroczony?](#47-co-to-jest-discrepancy-time-czas-rozbieżności-w-f-di-1oo2-i-co-się-dzieje-gdy-zostanie-przekroczony-)
-- [4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2?](#48-jak-moduł-f-di-et200sp-wykrywa-zwarcie-między-kanałami-cross-circuit-detection-w-obwodzie-1oo2-)
+- [4.4. Jak monitorowana jest rozbieżność sygnałów w strukturze 1oo2 i jakie awarie wykrywa moduł F-DI?](#44-jak-monitorowana-jest-rozbieżność-sygnałów-w-strukturze-1oo2-i-jakie-awarie-wykrywa-moduł-f-di-)
+- [4.5. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2?](#45-jak-moduł-f-di-et200sp-wykrywa-zwarcie-między-kanałami-cross-circuit-detection-w-obwodzie-1oo2-)
 
 **5. PASSIVATION, REINTEGRATION, ACK**
 - [5.1. Co to jest passivation i co się dzieje z wyjściami/wejściami?](#51-co-to-jest-passivation-i-co-się-dzieje-z-wyjściamiwejściami--)
@@ -265,7 +262,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **178 pytań / 21 sekcji.**
+> **175 pytań / 21 sekcji.**
 
 
 ---

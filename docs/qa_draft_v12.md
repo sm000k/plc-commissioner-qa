@@ -4,13 +4,13 @@
 
 ### Siemens TIA Portal · Safety PLC · ET200 · Napędy SINAMICS · Robot ABB · SICAR
 
-### Wersja: v12.5 | Data: 2026-04-11 16:01 | Pytania: 178
+### Wersja: v12.5 | Data: 2026-04-14 17:10 | Pytania: 175
 
 ### Pytania + odpowiedzi zweryfikowane pod kątem rozmów kwalifikacyjnych.
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
 
-### Wersja: v12.5 | Data: 2026-04-11 15:39 | Pytania: 178
+### Wersja: v12.5 | Data: 2026-04-13 20:51 | Pytania: 175
 
 ---
 
@@ -86,11 +86,8 @@
 - [4.1. Wyjaśnij notację XooY i podaj przykład każdej architektury.](#41-wyjaśnij-notację-xooy-i-podaj-przykład-każdej-architektury--)
 - [4.2. Kiedy wybierasz 1oo2 a kiedy 2oo2?](#42-kiedy-wybierasz-1oo2-a-kiedy-2oo2--)
 - [4.3. Jak 1oo2 jest realizowane w module F-DI Siemens?](#43-jak-1oo2-jest-realizowane-w-module-f-di-siemens)
-- [4.4. Jak F-CPU reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?](#44-jak-f-cpu-reaguje-na-błąd-rozbieżności-sygnału-discrepancy-failure-w-konfiguracji-1oo2)
-- [4.5. Jakie są scenariusze awaryjne wykrywane przez moduł F-DI w układzie dwukanałowym 1oo2?](#45-jakie-są-scenariusze-awaryjne-wykrywane-przez-moduł-f-di-w-układzie-dwukanałowym-1oo2)
-- [4.6. Jak parametr "Reintegration after discrepancy error" wpływa na obsługę błędu rozbieżności sygnału?](#46-jak-parametr-reintegration-after-discrepancy-error-wpływa-na-obsługę-błędu-rozbieżności-sygnału)
-- [4.7. Co to jest discrepancy time (czas rozbieżności) w F-DI 1oo2 i co się dzieje gdy zostanie przekroczony?](#47-co-to-jest-discrepancy-time-czas-rozbieżności-w-f-di-1oo2-i-co-się-dzieje-gdy-zostanie-przekroczony-)
-- [4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2?](#48-jak-moduł-f-di-et200sp-wykrywa-zwarcie-między-kanałami-cross-circuit-detection-w-obwodzie-1oo2-)
+- [4.4. Jak monitorowana jest rozbieżność sygnałów w strukturze 1oo2 i jakie awarie wykrywa moduł F-DI?](#44-jak-monitorowana-jest-rozbieżność-sygnałów-w-strukturze-1oo2-i-jakie-awarie-wykrywa-moduł-f-di-)
+- [4.5. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2?](#45-jak-moduł-f-di-et200sp-wykrywa-zwarcie-między-kanałami-cross-circuit-detection-w-obwodzie-1oo2-)
 
 **5. PASSIVATION, REINTEGRATION, ACK**
 - [5.1. Co to jest passivation i co się dzieje z wyjściami/wejściami?](#51-co-to-jest-passivation-i-co-się-dzieje-z-wyjściamiwejściami--)
@@ -265,7 +262,7 @@
 
 ## PLAN NAUKI — JAK UŻYWAĆ TEGO DOKUMENTU
 
-> **178 pytań / 21 sekcji.**
+> **175 pytań / 21 sekcji.**
 
 
 ---
@@ -914,156 +911,216 @@ Redundancja CPU (H-system) nie oznacza automatycznie redundancji **sieci PROFINE
 
 **Schematy wszystkich topologii:**
 
-> Sync Link (X3↔X3, X4↔X4) jest we wszystkich wariantach identyczny. Poniżej opisane są tylko połączenia PROFINET. Każda topologia ma: tabelę urządzeń z liczbą portów + listę kabli.
+> Sync Link (X3-X3, X4-X4) identyczny we wszystkich wariantach — pominięty na schematach.
+> Legenda: `*` = port użyty, `o` = port wolny. Każde urządzenie pokazuje WSZYSTKIE porty.
 
 ---
 
 **① Daisy chain** — najprostsza, bez redundancji kabla:
-
-| Urządzenie | Moduł interfejsu | Porty PN (fizyczne) | Porty użyte | Rola |
-|---|---|:---:|:---:|---|
-| CPU PRIMARY | wbudowany X1 | **1** (P1) | 1 | IO-Controller |
-| CPU BACKUP | wbudowany X1 | **1** (P1) | 1 | IO-Controller (standby) |
-| ET200SP_1 | IM 155-6 PN HF | **2** (P1, P2) | 2 | IO-Device, łańcuch |
-| ET200SP_2 | IM 155-6 PN HF | **2** (P1, P2) | 2 | IO-Device, łańcuch |
-| ET200SP_3 | IM 155-6 PN HF | **2** (P1, P2) | 1 | IO-Device, koniec łańcucha |
-
-Kable:
-
-| Kabel | Od | Port | → Do | Port |
-|:---:|---|:---:|---|:---:|
-| 1 | CPU PRIMARY | X1:P1 | ET200SP_1 | P1 |
-| 2 | ET200SP_1 | P2 | ET200SP_2 | P1 |
-| 3 | ET200SP_2 | P2 | ET200SP_3 | P1 |
-| — | ET200SP_3 | P2 | *(wolny — koniec łańcucha)* | — |
-
-> ⚠️ Awaria kabla 2 → ET200SP_2 i _3 utracone. Brak redundancji — stacje za przerwą nie mają alternatywnej trasy.
+```
+    +-------------------+
+    | CPU PRIMARY       |
+    +--------+----------+
+        [P1] |
+             | kabel 1
+        [P1] |
+    +--------+----------+
+    | ET200SP_1         |
+    | IM155-6 HF       |
+    +--------+----------+
+        [P2] |
+             | kabel 2
+        [P1] |
+    +--------+----------+
+    | ET200SP_2         |
+    | IM155-6 HF       |
+    +--------+----------+
+        [P2] |
+             | kabel 3
+        [P1] |
+    +--------+----------+
+    | ET200SP_3         |
+    | IM155-6 HF       |
+    +--------+----------+
+        [P2] |
+             | kabel 4
+        [P1] |
+    +--------+----------+
+    | CPU BACKUP        |
+    +-------------------+
+```
+> ⚠️ Awaria kabla 2 → ET200SP_2, _3 i CPU BACKUP utracone. Kabel wchodzi do P1, wychodzi z P2. Oba CPU na koncach lancucha — brak redundancji kabla.
 
 ---
 
 **② Gwiazda z niezarządzalnym switchem** (SCALANCE XB208):
-
-| Urządzenie | Moduł interfejsu | Porty PN (fizyczne) | Porty użyte | Rola |
-|---|---|:---:|:---:|---|
-| CPU PRIMARY | wbudowany X1 | **1** (P1) | 1 | IO-Controller |
-| CPU BACKUP | wbudowany X1 | **1** (P1) | 1 | IO-Controller (standby) |
-| SCALANCE XB208 | — | **8** (P1–P8) | 5 | Switch niezarządzalny |
-| ET200SP_1 | IM 155-6 PN HF | **2** (P1, P2) | 1 | IO-Device |
-| ET200SP_2 | IM 155-6 PN HF | **2** (P1, P2) | 1 | IO-Device |
-| ET200SP_3 | IM 155-6 PN HF | **2** (P1, P2) | 1 | IO-Device |
-
-Kable:
-
-| Kabel | Od | Port | → Do | Port |
-|:---:|---|:---:|---|:---:|
-| 1 | CPU PRIMARY | X1:P1 | SCALANCE XB208 | P1 |
-| 2 | CPU BACKUP | X1:P1 | SCALANCE XB208 | P2 |
-| 3 | SCALANCE XB208 | P3 | ET200SP_1 | P1 |
-| 4 | SCALANCE XB208 | P4 | ET200SP_2 | P1 |
-| 5 | SCALANCE XB208 | P5 | ET200SP_3 | P1 |
-
-> ⚠️ Switch = SPOF (Single Point of Failure). Awaria XB208 → cała sieć I/O utracona. Brak diagnostyki, brak MRP.
+```
+    +-----------+                +-----------+
+    | CPU PRI   |                | CPU BAK   |
+    +-----+-----+                +-----+-----+
+     [P1] |                       [P1] |
+          | k1                         | k2
+     [P1] |                       [P2] |
+    +-----+----------------------------+-----+
+    |            SCALANCE XB208              |
+    |      (niezarzadzalny, 8 portow)        |
+    |              oP6  oP7  oP8             |
+    +-----+------------+------------+--------+
+     [P3] |       [P4] |       [P5] |
+          | k3         | k4         | k5
+     [P1] |       [P1] |       [P1] |
+    +-----+----+ +-----+----+ +----+-----+
+    | ET200SP_1| | ET200SP_2| | ET200SP_3|
+    | IM155 HF | | IM155 HF | | IM155 HF |
+    | oP2      | | oP2      | | oP2      |
+    +----------+ +----------+ +----------+
+```
+> ⚠️ Switch = SPOF. Kable z CPU wchodza do P1/P2 switcha, ze switcha P3-P5 do P1 stacji. P2 stacji wolne. Awaria XB208 = utrata CALEJ sieci I/O.
 
 ---
 
 **③ Gwiazda z zarządzalnym switchem** (SCALANCE XC208):
-
-| Urządzenie | Moduł interfejsu | Porty PN (fizyczne) | Porty użyte | Rola |
-|---|---|:---:|:---:|---|
-| CPU PRIMARY | wbudowany X1 | **1** (P1) | 1 | IO-Controller |
-| CPU BACKUP | wbudowany X1 | **1** (P1) | 1 | IO-Controller (standby) |
-| SCALANCE XC208 | — | **8** (P1–P8) | 5 | Switch zarządzalny (SNMP, LLDP) |
-| ET200SP_1 | IM 155-6 PN HF | **2** (P1, P2) | 1 | IO-Device |
-| ET200SP_2 | IM 155-6 PN HF | **2** (P1, P2) | 1 | IO-Device |
-| ET200SP_3 | IM 155-6 PN HF | **2** (P1, P2) | 1 | IO-Device |
-
-Kable: identyczne jak ②.
-
-> ⚠️ Wciąż SPOF — gwiazda nie tworzy pierścienia. Przewaga nad ②: diagnostyka SNMP, LLDP, port mirroring.
+```
+    +-----------+                +-----------+
+    | CPU PRI   |                | CPU BAK   |
+    +-----+-----+                +-----+-----+
+     [P1] |                       [P1] |
+          | k1                         | k2
+     [P1] |                       [P2] |
+    +-----+----------------------------+-----+
+    |            SCALANCE XC208              |
+    |   (zarzadzalny, SNMP/LLDP, 8 portow)  |
+    |              oP6  oP7  oP8             |
+    +-----+------------+------------+--------+
+     [P3] |       [P4] |       [P5] |
+          | k3         | k4         | k5
+     [P1] |       [P1] |       [P1] |
+    +-----+----+ +-----+----+ +----+-----+
+    | ET200SP_1| | ET200SP_2| | ET200SP_3|
+    | IM155 HF | | IM155 HF | | IM155 HF |
+    | oP2      | | oP2      | | oP2      |
+    +----------+ +----------+ +----------+
+```
+> ⚠️ Wciąż SPOF jak ②, ale switch ma diagnostykę SNMP, LLDP, port mirroring. P2 stacji wolne.
 
 ---
 
 **④ Ring bez switcha — porty CPU tworzą pierścień** (MRP, optymalne):
+```
+        +--------- k6 (zamyka pierscien) ---------+
+        |                                         |
+   [P2] |                                    [P2] |
+    +---+-------------------+                     |
+    | CPU PRIMARY (MRM)     |                     |
+    +---+-------------------+                     |
+   [P1] |                                         |
+        | k1                                      |
+   [P1] |                                         |
+    +---+-------------------+                     |
+    | ET200SP_1             |                     |
+    | IM155-6 HF (MRC)    |                     |
+    +---+-------------------+                     |
+   [P2] |                                         |
+        | k2                                      |
+   [P1] |                                         |
+    +---+-------------------+                     |
+    | ET200SP_2             |                     |
+    | IM155-6 HF (MRC)    |                     |
+    +---+-------------------+                     |
+   [P2] |                                         |
+        | k3                                      |
+   [P1] |                                         |
+    +---+-------------------+                     |
+    | ET200SP_3             |                     |
+    | IM155-6 HF (MRC)    |                     |
+    +---+-------------------+                     |
+   [P2] |                                         |
+        | k4                                      |
+   [P1] |                                         |
+    +---+-------------------+                     |
+    | ET200SP_4             |                     |
+    | IM155-6 HF (MRC)    |                     |
+    +---+-------------------+                     |
+   [P2] |                                         |
+        | k5                                      |
+   [P1] |                                    [P2] |
+    +---+-------------------+-----------------+---+
+    | CPU BACKUP (MRM standby)                    |
+    +---------------------------------------------+
 
-| Urządzenie | Moduł interfejsu | Porty PN (fizyczne) | Porty użyte | Rola MRP |
-|---|---|:---:|:---:|---|
-| CPU PRIMARY | wbudowany X1 | **2** (P1, P2) | 2 | **MRM** (Manager) |
-| CPU BACKUP | wbudowany X1 | **2** (P1, P2) | 2 | **MRM** (Manager) |
-| ET200SP_1 | IM 155-6 PN HF | **2** (P1, P2) | 2 | MRC (Client) |
-| ET200SP_2 | IM 155-6 PN HF | **2** (P1, P2) | 2 | MRC (Client) |
-| ET200SP_3 | IM 155-6 PN HF | **2** (P1, P2) | 2 | MRC (Client) |
-| ET200SP_4 | IM 155-6 PN HF | **2** (P1, P2) | 2 | MRC (Client) |
-
-Kable (zamknięty pierścień):
-
-| Kabel | Od | Port | → Do | Port |
-|:---:|---|:---:|---|:---:|
-| 1 | CPU PRIMARY | X1:P1 | ET200SP_1 | P1 |
-| 2 | ET200SP_1 | P2 | ET200SP_2 | P1 |
-| 3 | ET200SP_2 | P2 | ET200SP_3 | P1 |
-| 4 | ET200SP_3 | P2 | ET200SP_4 | P1 |
-| 5 | ET200SP_4 | P2 | CPU PRIMARY | X1:P2 |
-
-> Trasa pierścienia: **CPU:P1 → _1 → _2 → _3 → _4 → CPU:P2** (zamknięty ring). CPU BACKUP podłączony do tego samego ringu (System Redundancy R1). WSZYSTKIE porty na WSZYSTKICH urządzeniach wykorzystane. Awaria dowolnego kabla → MRP przełącza w ≤ 200 ms. ✅ **Zero dodatkowych switchy = zero kosztów.**
+    Pierscien: PRI:P1 -> _1 -> _2 -> _3 -> _4 -> BAK:P1
+    Zamkniecie: BAK:P2 -(k6)-> PRI:P2
+    WSZYSTKIE porty uzyte na WSZYSTKICH urzadzeniach.
+```
+> ✅ **Optymalne.** CPU PRIMARY = MRM, CPU BACKUP = MRM standby. Oba CPU w pierścieniu — P1 i P2 użyte na każdym urządzeniu. Awaria kabla → MRP ≤ 200 ms. Zero switchy.
 
 ---
 
 **⑤ Ring z zarządzalnymi switchami** (MRPD, dla IRT/S120):
-
-| Urządzenie | Moduł interfejsu | Porty PN (fizyczne) | Porty użyte | Rola |
-|---|---|:---:|:---:|---|
-| CPU PRIMARY | wbudowany X1 | **1** (P1) | 1 | IO-Controller |
-| CPU BACKUP | wbudowany X1 | **1** (P1) | 1 | IO-Controller (standby) |
-| SCALANCE XC216-A | — | **16** (P1–P16) | 5 | Switch zarządzalny, ring MRP |
-| SCALANCE XC216-B | — | **16** (P1–P16) | 5 | Switch zarządzalny, ring MRP |
-| ET200SP_1–_3 | IM 155-6 PN HF | **2** (P1, P2) | 1 każdy | IO-Device pod switch A |
-| ET200SP_4–_6 | IM 155-6 PN HF | **2** (P1, P2) | 1 każdy | IO-Device pod switch B |
-
-Kable:
-
-| Kabel | Od | Port | → Do | Port |
-|:---:|---|:---:|---|:---:|
-| 1 | CPU PRIMARY | X1:P1 | SCALANCE XC216-A | P1 |
-| 2 | CPU BACKUP | X1:P1 | SCALANCE XC216-B | P1 |
-| ring | SCALANCE XC216-A | P2 | SCALANCE XC216-B | P2 |
-| 3 | SCALANCE XC216-A | P3 | ET200SP_1 | P1 |
-| 4 | SCALANCE XC216-A | P4 | ET200SP_2 | P1 |
-| 5 | SCALANCE XC216-A | P5 | ET200SP_3 | P1 |
-| 6 | SCALANCE XC216-B | P3 | ET200SP_4 | P1 |
-| 7 | SCALANCE XC216-B | P4 | ET200SP_5 | P1 |
-| 8 | SCALANCE XC216-B | P5 | ET200SP_6 | P1 |
-
-> Switche połączone w ring MRP/MRPD. MRPD = ≈ 0 ms przełączenia. Wymagane dla IRT (np. napędy S120, isochronous mode). ✅
+```
+    +-----------+                      +-----------+
+    | CPU PRI   |                      | CPU BAK   |
+    | oP2       |                      | oP2       |
+    +-----+-----+                      +-----+-----+
+     [P1] |                             [P1] |
+          | k1                               | k2
+     [P1] |                             [P1] |
+    +-----+-----------+  kabel ring  +-------+---------+
+    | SCALANCE        |              | SCALANCE        |
+    | XC216-A         |              | XC216-B         |
+    |  oP6..oP16      |              |  oP6..oP16      |
+    +--+------+---+---+              +--+------+---+---+
+  [P3] | [P4] |[P5]|              [P3] | [P4] |[P5]|
+       |      |    |                    |      |    |
+   k3  |  k4  | k5 |                k6  |  k7  | k8 |
+       |      |    |                    |      |    |
+  [P1] | [P1] |[P1]|              [P1] | [P1] |[P1]|
+    +--+--+ +-+-+ +--+-+          +--+--+ +-+-+ +--+-+
+    | _1  | | _2| | _3 |          | _4  | | _5| | _6 |
+    | oP2 | |oP2| | oP2|          | oP2 | |oP2| | oP2|
+    +-----+ +---+ +----+          +-----+ +---+ +----+
+     ET200SP (IM155 HF)             ET200SP (IM155 HF)
+```
+> ✅ Switche w pierścieniu MRP/MRPD. MRPD = ≈ 0 ms. Kable ze switch P3-P5 do stacji P1. P2 na CPU i stacjach wolne — redundancję zapewnia ring switchów. Wymagane dla IRT/S120.
 
 ---
 
 **⑥ Dual-homed — dwa niezależne trakty** (systemy krytyczne):
+```
+    TRAKT A                           TRAKT B
 
-| Urządzenie | Moduł interfejsu | Porty / interfejsy PN | Porty użyte | Rola |
-|---|---|:---:|:---:|---|
-| CPU PRIMARY | wbudowany X1 | **1** (P1) | 1 | IO-Controller |
-| CPU BACKUP | wbudowany X1 | **1** (P1) | 1 | IO-Controller (standby) |
-| SCALANCE XC-A | — | wiele | 3 | Switch Trakt A |
-| SCALANCE XC-B | — | wiele | 3 | Switch Trakt B |
-| ET200SP_1 | IM 155-6 **MF** HF | **2 interfejsy** (IF1, IF2) | 2 | IO-Device, oba trakty |
-| ET200SP_2 | IM 155-6 **MF** HF | **2 interfejsy** (IF1, IF2) | 2 | IO-Device, oba trakty |
+    +-----------+                     +-----------+
+    | CPU PRI   |                     | CPU BAK   |
+    | oP2       |                     | oP2       |
+    +-----+-----+                     +-----+-----+
+     [P1] |                            [P1] |
+          | k1                              | k2
+     [P1] |                            [P1] |
+    +-----+-------+                   +-----+-------+
+    | SCALANCE    |                   | SCALANCE    |
+    | XC-A        |                   | XC-B        |
+    | oP2 oP5-P16 |                   | oP2 oP5-P16 |
+    +--+------+---+                   +--+------+---+
+  [P3] |  [P4]|                     [P3] |  [P4]|
+       |      |                          |      |
+   k3  |  k5  |                      k4  |  k6  |
+       |      |                          |      |
+  [IF1]|  [IF1]|                    [IF2]|  [IF2]|
+    +--+------+-------+           +--+------+-------+
+    | ET200SP_1       |           | (te same stacje)|
+    | IM 155-6 MF HF   |           |                 |
+    +-----+-----------+           +-----------+-----+
+    +--+------+-------+
+    | ET200SP_2       |  k3: XC-A:P3 <-- IF1
+    | IM 155-6 MF HF   |  k4: XC-B:P3 <-- IF2
+    +-----------------+  k5: XC-A:P4 <-- IF1
+                         k6: XC-B:P4 <-- IF2
 
-> ⚠️ **IM 155-6 MF HF ≠ IM 155-6 PN HF!**
-> - **PN HF**: 2 porty, ale **1 interfejs** (wewnętrzny switch, ten sam MAC/IP)
-> - **MF HF**: **2 niezależne interfejsy** PROFINET (osobne MAC, osobne IP → dual-homed)
-
-Kable:
-
-| Kabel | Od | Port | → Do | Port | Trakt |
-|:---:|---|:---:|---|:---:|:---:|
-| 1 | CPU PRIMARY | X1:P1 | SCALANCE XC-A | P1 | A |
-| 2 | CPU BACKUP | X1:P1 | SCALANCE XC-B | P1 | B |
-| 3 | ET200SP_1 | IF1 | SCALANCE XC-A | P3 | A |
-| 4 | ET200SP_1 | IF2 | SCALANCE XC-B | P3 | B |
-| 5 | ET200SP_2 | IF1 | SCALANCE XC-A | P4 | A |
-| 6 | ET200SP_2 | IF2 | SCALANCE XC-B | P4 | B |
-
-> Każda stacja podłączona do OBU traktów osobnym kablem (IF1→Trakt A, IF2→Trakt B). Awaria całego traktu A (switch + kable) → Trakt B przejmuje natychmiast (~0 ms). ✅
+    UWAGA: IM 155-6 MF HF =/= PN HF!
+      MF HF: 2 NIEZALEZNE interfejsy (osobne MAC, osobne IP)
+      PN HF: 2 porty, ale 1 interfejs (wewnetrzny switch)
+```
+> ✅ Kable z IF1 do Trakt A (XC-A), z IF2 do Trakt B (XC-B). Awaria traktu A → Trakt B przejmuje ~0 ms. Wymaga IM 155-6 **MF** HF (Multi-Fieldbus).
 
 ---
 
@@ -1075,6 +1132,27 @@ Kable:
 | Standard automotive / H-system | ④ Ring bez switcha (MRP) | Redundancja CPU + kabel PN, zero kosztów dodatkowych |
 | Systemy krytyczne / napędy S120 | ⑤ Ring MRPD z SCALANCE XC/XP lub ⑥ Dual-homed | Minimalny przestój, IRT, pełna redundancja traktów |
 
+**Kluczowe różnice między topologiami:**
+
+| Cecha | ① Daisy | ②③ Gwiazda | ④ Ring MRP | ⑤ Ring MRPD | ⑥ Dual-homed |
+|---|:---:|:---:|:---:|:---:|:---:|
+| Redundancja kabla PN | NIE | NIE | TAK | TAK | TAK |
+| Czas przełączenia | — | — | ≤ 200 ms | ≈ 0 ms | ≈ 0 ms |
+| Dodatkowy sprzęt | brak | switch | brak | 2x switch | 2x switch + MF HF |
+| SPOF (single point of failure) | kabel | switch | brak | brak | brak |
+| Obsługa IRT (isochronous) | NIE | NIE | NIE | TAK | TAK |
+| Porty CPU użyte | P1 | P1 | P1 + P2 | P1 | P1 |
+| Moduł IM stacji | PN HF | PN HF | PN HF | PN HF | **MF HF** |
+| Protokół redundancji | — | — | MRP | MRP/MRPD | System R1 |
+| Koszt względny | najniższy | niski | niski | średni | wysoki |
+
+**Najważniejsze zasady praktyczne:**
+- **IM 155-6 PN HF** (2 porty, 1 interfejs) — dla topologii ①–⑤
+- **IM 155-6 MF HF** (2 niezależne interfejsy, osobne MAC/IP) — wyłącznie dla ⑥ dual-homed
+- W ringu MRP: CPU = **MRM** (Manager), stacje = **MRC** (Client)
+- Sync Link (X3↔X3, X4↔X4) to **osobne połączenie peer-to-peer** między CPU — NIE jest częścią pierścienia PROFINET
+- W topologii ④ ring zamyka się przez oba porty obu CPU — zero dodatkowego sprzętu
+
 *[ZWERYFIKOWANE] — [SIMATIC S7-1500H System Manual](https://support.industry.siemens.com/cs/document/109779336/); [S7-1500R/H strona produktowa](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500/s7-1500r-h.html); IEC 61158-6-10 (PROFINET MRP); [PROFINET diagnostics Application Example (Entry ID: 109484728)](https://support.industry.siemens.com/cs/document/109484728/)]*
 
 ---
@@ -1083,21 +1161,46 @@ Kable:
 
 ### 3.1. Co to jest F-DI i jak różni się od standardowego DI?  🔴
 
-F-DI (Fail-safe Digital Input) to moduł wejść bezpieczeństwa. Różnice od standardowego:
-- **VS* (pulse testing)** — impulsowe zasilanie czujnika do diagnostyki okablowania. Wykrywa 3 typy usterek:
-  - **Zwarcie do L+ (24 V)** — przewód sygnałowy dotknął zasilania → moduł widzi stały sygnał wysoki bez pulsacji VS*
-  - **Zwarcie do M (0 V / masa)** — przewód sygnałowy dotknął masy → moduł widzi stały sygnał niski, brak impulsów zwrotnych
-  - **Przerwa przewodu (wire break)** — brak jakiegokolwiek sygnału zwrotnego
-- **Cross-circuit detection** — wykrywanie **zwarcia między dwoma kanałami** czujnika 1oo2 (np. przygnieciony kabel wielożyłowy → izolacja przebita, kanał A i B połączone elektrycznie). Bez tej detekcji zwarcie międzykanałowe zamaskuje awarię jednego styku E-Stop → obwód 2-kanałowy zdegradowany do 1-kanałowego, a system tego nie zauważy. [ZWERYFIKOWANE — Siemens 21064024: „short-circuits or cross-circuits are detected between the two input channels"]
-- Obsługa dwukanałowych czujników Safety (1oo2) z discrepancy time
-- Komunikacja przez PROFIsafe z CRC do F-CPU
-- Self-test kanałów w tle (ciągły autotest hardware bez przerywania cyklu)
+F-DI (Fail-safe Digital Input) to moduł wejść bezpieczeństwa certyfikowany do SIL 3 / PL e. W porównaniu ze standardowym DI posiada trzy dodatkowe mechanizmy diagnostyczne, które standardowy DI nie ma:
+
+**1. VS\* pulse testing — ciągły autotest okablowania (= „self-test kanałów w tle")**
+
+VS\* (Versorgung Sensor) to zasilanie czujnika z modułu F-DI, które zamiast stałego 24 V wysyła **krótkie impulsy testowe**. Moduł analizuje wzorzec impulsów powracających na wejście i wykrywa usterki:
+- **Przerwa przewodu (wire break)** — brak jakiegokolwiek sygnału zwrotnego (obwód otwarty)
+- **Zwarcie do L+ (24 V)** — stały sygnał wysoki bez pulsacji (przewód podciągnięty do zasilania)
+- **Zwarcie do M (0 V / masa)** — stały sygnał niski (przewód ściągnięty do masy)
+
+Testowanie odbywa się **w tle, cyklicznie, bez przerywania procesu** — impulsy są tak krótkie, że czujnik (np. styk NC E-Stop) działa normalnie. To właśnie jest „self-test kanałów" — nie jest to osobna funkcja, lecz bezpośredni efekt działania VS\* pulse testing.
+
+**2. Cross-circuit detection — wykrywanie zwarcia MIĘDZY kanałami 1oo2**
+
+Cross-circuit to zwarcie przewodu kanału A do przewodu kanału B tego samego czujnika dwukanałowego (1oo2). Przyczyna: kabel wielożyłowy przygnieciony lub przetarty → izolacja przebita → kanały A i B połączone elektrycznie.
+
+**Dlaczego to groźne:** Zwarcie międzykanałowe sprawia, że oba kanały zawsze pokazują identyczną wartość — nawet jeśli jeden styk E-Stop jest uszkodzony (np. spawany). System „myśli", że ma dwa niezależne kanały, a w rzeczywistości obwód jest zdegradowany do jednokanałowego (1oo1). Drugi błąd (uszkodzenie drugiego styku) nie zostanie wykryty → E-Stop nie zadziała. [ZWERYFIKOWANE — Siemens 21064024: „Without cross-circuit detection this would lead to, for example, a 2-channel emergency stop circuit not to trigger a shut-down even if only one normally-closed contact is faulty (second error)"]
+
+**Jak moduł F-DI to wykrywa:** Dwa wyjścia sensor supply (VS0 i VS2) generują impulsy testowe **z różnym przesunięciem czasowym** (nie jednocześnie). Kanał A jest zasilany z VS0, kanał B z VS2:
+- **Kanały niezależne** → odpowiedzi wracają z różnymi fazami (VS0 w swoim oknie, VS2 w swoim) → OK
+- **Kanały spięte** → impuls z VS0 pojawia się na wejściu kanału B w oknie czasowym przypisanym do VS0 (a nie VS2) → moduł wykrywa cross-circuit → passivation
+
+**Konfiguracja w TIA Portal:** Właściwości modułu F-DI → „Short-circuit test" → Activate (osobno per sensor supply 0 i sensor supply 2). **Domyślnie wyłączone** — trzeba aktywować, aby uzyskać DC ≥ 99% wymagane dla Cat.4 / PL e / SIL 3. [ZWERYFIKOWANE — Siemens 21064024, str. 12: „The short circuit tests for the channels 0 and 8 are activated."]
+
+**3. Obsługa 1oo2 z discrepancy time + komunikacja PROFIsafe**
+
+- Ewaluacja dwukanałowa 1oo2 z konfigurowalnym discrepancy time (monitorowanie rozbieżności między kanałami)
+- Komunikacja z F-CPU przez PROFIsafe z CRC — integralność danych gwarantowana na poziomie protokołu
+- Ewaluację 1oo2 wykonuje **sam moduł** F-DI (nie obciąża F-CPU) [ZWERYFIKOWANE — Siemens Safety Integrated broszura: „Ewaluację 1oo2 wejść failsafe wykonują moduły wejściowe"]
+
+**Podsumowanie:** VS\* pulse testing, cross-circuit detection i self-test to **ten sam mechanizm sprzętowy** widziany z różnych perspektyw — VS\* to sposób działania (impulsy), cross-circuit to jedna z wykrywanych usterek, a self-test to fakt że dzieje się to ciągle w tle. Aktywacja parametru „Short-circuit test" w TIA Portal włącza zarówno cross-circuit detection jak i detekcję zwarć do L+/M.
+
 Moduły: ET 200SP F-DI, ET 200MP F-DI, S7-1200 SM 1226 F-DI.
 
-*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404)](https://support.industry.siemens.com/cs/document/109751404/); [ET200SP F-DI product page](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html)]*
+📚 **Źródła:**
+- [`sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt`](sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt) (str. 12, 17) — konfiguracja short-circuit test, definicja cross-circuit
+- [`sources/pdfs/extracted/SIMATIC Safety Integrated – wszystko w jednym sterowniku PLC_extracted.txt`](sources/pdfs/extracted/SIMATIC%20Safety%20Integrated%20–%20wszystko%20w%20jednym%20sterowniku%20PLC_extracted.txt) — broszura: testy failsafe zwarć, przerw, cross-circuit
+- Normy: EN ISO 13849-1 (Cat.4 / PL e), IEC 62061 (SIL 3), IEC 61508
 ### 3.2. Co to jest VS* (pulse testing) i jak wykrywa usterki?  🔴
 
-VS* (Versorgung Sensor / Sensor Supply) to wyjście zasilające na module F-DI, które wysyła **krótkie impulsy testowe** zamiast stałego 24 V. Czujnik zasilany jest tymi impulsami, a sygnał wraca na wejście z tą samą charakterystyką pulsacji.
+VS\* (Versorgung Sensor / Sensor Supply) to wyjście zasilające na module F-DI, które wysyła **krótkie impulsy testowe** zamiast stałego 24 V. Czujnik zasilany jest tymi impulsami, a sygnał wraca na wejście z tą samą charakterystyką pulsacji. To jest ten sam mechanizm, który stoi za „self-testem kanałów" i „cross-circuit detection" opisanymi w pytaniu 3.1.
 
 **Moduł analizuje wzorzec impulsów i rozróżnia 4 stany usterek:**
 
@@ -1106,13 +1209,19 @@ VS* (Versorgung Sensor / Sensor Supply) to wyjście zasilające na module F-DI, 
 | **Przerwa przewodu (wire break)** | Brak jakiegokolwiek sygnału zwrotnego | Obwód otwarty → impulsy nie wracają |
 | **Zwarcie do M (0 V / masa)** | Stały sygnał niski (0 V) | Przewód ściągnięty do masy → impulsy zanikają |
 | **Zwarcie do L+ (24 V)** | Stały sygnał wysoki bez pulsacji | Przewód podciągnięty do zasilania → brak przerw między impulsami |
-| **Cross-circuit (zwarcie międzykanałowe)** | Oba kanały mają identyczny wzorzec mimo różnych faz VS* | Kanał A i B spięte elektrycznie → utrata niezależności kanałów 1oo2 |
+| **Cross-circuit (zwarcie międzykanałowe)** | Impuls z VS0 pojawia się na wejściu kanału B w złym oknie czasowym | Kanał A i B spięte elektrycznie → utrata niezależności kanałów 1oo2 |
 
-**Jak działa cross-circuit detection:** Moduł F-DI zasila kanał A i kanał B czujnika 1oo2 impulsami VS* **z przesunięciem fazowym** (nie jednocześnie). Jeśli kanały są niezależne — odpowiedzi wracają z różnymi fazami. Jeśli przewody A i B są spięte (np. kabel przygnieciony → izolacja przebita) — obie odpowiedzi będą identyczne → moduł wykrywa cross-circuit. [ZWERYFIKOWANE — Siemens 21064024: „short-circuits or cross-circuits are detected between the two input channels (sensor circuits)"]
+**Mechanizm cross-circuit detection w szczegółach:**
+Moduł F-DI ma dwa niezależne wyjścia sensor supply: **VS0** (dla kanałów 0–3) i **VS2** (dla kanałów 4–7 / 8–11 zależnie od modelu). VS0 i VS2 generują impulsy w **różnych oknach czasowych** — nigdy jednocześnie:
+1. W oknie T1: VS0 wysyła impuls → kanał A (np. DI0.0) widzi impuls, kanał B (np. DI0.4) — cisza
+2. W oknie T2: VS2 wysyła impuls → kanał B widzi impuls, kanał A — cisza
+3. Jeśli kanały A i B są spięte (cross-circuit): w oknie T1 **oba** kanały widzą impuls VS0 → moduł wykrywa impuls na kanale B w złym oknie czasowym → błąd cross-circuit → passivation
 
-VS* z cross-circuit detection zapewnia DC ≥ 99% (Diagnostic Coverage) — warunek konieczny do Cat.4 / PL e (ISO 13849-1) lub SIL 3 (IEC 62061 / IEC 61508). [ZWERYFIKOWANE — Siemens 39198632, normy ISO 13849-1 i IEC 62061]
+**Kluczowe:** VS\* pulse testing zapewnia DC ≥ 99% (Diagnostic Coverage) — warunek konieczny do Cat.4 / PL e (ISO 13849-1) lub SIL 3 (IEC 62061 / IEC 61508). [ZWERYFIKOWANE — Siemens 39198632, normy ISO 13849-1 i IEC 62061]
 
-**Konfiguracja w TIA Portal:** Właściwości modułu F-DI → Short-circuit test → Activate (osobno per sensor supply 0 i 2). Domyślnie wyłączone — trzeba aktywować! [ZWERYFIKOWANE — Siemens 21064024, str. 12]
+**Konfiguracja w TIA Portal:** Właściwości modułu F-DI → „Short-circuit test" → Activate (osobno per sensor supply 0 i sensor supply 2). Domyślnie wyłączone — trzeba aktywować! [ZWERYFIKOWANE — Siemens 21064024, str. 12]
+
+> ⚠️ **Wyjątek — kurtyny (OSSD):** Kurtyny bezpieczeństwa mają **własne impulsy testowe** na wyjściach OSSD1/OSSD2. Nie podłączaj VS\* do OSSD — w TIA Portal ustaw „Sensor supply" kanału na „None/Disabled", inaczej impulsy F-DI zablokują sygnał z kurtyny.
 
 ![ET 200 F-DI: cross-circuit, wire break i short-circuit detection](images/safety/01d_safety_brochure_p4.png)
 
@@ -1139,9 +1248,34 @@ Decyduje inżynier projektu na podstawie analizy bezpieczeństwa — nie Siemens
 *[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DO substitute values](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 3.6. Co to jest pm switching i pp switching — różnica?  🟡
 
-pm switching (plus-minus): moduł F-PM-E przełącza **obie** linie obciążenia — P (+24V) **i** M (0V). Aktuator podłączony jest między wyjściem P a wyjściem M modułu. Wymaga wydzielonego zasilania obciążenia (Load supply) odizolowanego od zasilania elektroniki. [ZWERYFIKOWANE — Siemens 39198632 Fig. 2-1]
-pp switching (plus-plus): moduł F-PM-E przełącza **dwa kanały po stronie P** (+24V). Linia M (0V) jest wspólnym powrotem obciążenia (common M) — nie jest przełączana przez moduł. [ZWERYFIKOWANE — Siemens 39198632 Fig. 2-2]
-F-PM-E (Power Module) w ET 200SP/S może realizować oba tryby.
+Pm switching i pp switching to dwa sposoby okablowania bezpiecznego odcięcia zasilania grupy standardowych modułów wyjściowych (DQ/AQ) przez moduł F-PM-E w stacji ET 200SP. Różnica dotyczy tego, **które linie zasilania obciążenia (Load supply) są przełączane** przez F-PM-E.
+
+**Problem, który rozwiązują:** Na linii produkcyjnej masz dziesiątki standardowych modułów DQ sterujących zaworami, silnikami, lamp­kami. Przy E-Stop lub innej funkcji Safety musisz **bezpiecznie odciąć zasilanie** tym wyjściom. Wymiana wszystkich DQ na moduły F-DQ jest droga. Zamiast tego F-PM-E odcina **zasilanie obciążenia** (Load supply) całej grupy standardowych modułów — wszystkie wyjścia w grupie natychmiast tracą napięcie i przechodzą w stan bezpieczny (0 V).
+
+**pm switching (plus-minus) — odcięcie obu linii:**
+- F-PM-E przełącza **obie** linie zasilania obciążenia: **P (+24V)** i **M (0V)**
+- Aktuator podłączony jest między wyjściem P a wyjściem M modułu DQ — a obie te linie przechodzą przez F-PM-E
+- **Wymaga wydzielonego zasilania obciążenia (Load supply)** odizolowanego galwanicznie od zasilania elektroniki (Electronic supply) — widoczne na schemacie jako osobny zasilacz 24V DC
+- **Zaleta:** pełna izolacja galwaniczna → nawet jeśli przewód wyjścia DQ dotknie zewnętrznego potencjału (np. zwarcie do obcego L+), aktuator i tak nie dostanie napięcia, bo M jest również odcięte
+- **Zastosowanie:** gdy wymagana jest ochrona przed zwarciami do zewnętrznych potencjałów (np. linie z napięciem >24V w pobliżu, wymóg EN 60204-1)
+- **Osiągalny poziom:** do SIL 2 / Cat.3 / PL d (z dwoma F-PM-E) lub SIL 1 / Cat.2 / PL c (z jednym F-PM-E)
+
+**pp switching (plus-plus) — odcięcie dwóch kanałów P:**
+- F-PM-E przełącza **dwa niezależne kanały po stronie P (+24V)** — podaje dwa sygnały P1 i P2 do grupy modułów
+- Linia M (0V) jest **wspólnym powrotem** (common M) — NIE jest przełączana przez F-PM-E
+- **Nie wymaga** osobnej izolacji galwanicznej zasilania obciążenia od elektroniki (prostsze okablowanie)
+- **Wada:** linia M pozostaje aktywna po odcięciu → jeśli przewód wyjścia DQ ma zwarcie do aktywnego L+ za F-PM-E, aktuator może nadal dostać napięcie przez tę ścieżkę. Dlatego wymóg Siemens: **„measures must be taken to protect the wiring from the PP output via all standard modules in the switch-off group to the actuator against short circuits to wires still active after safe switch off"** (EN 60204-1) [ZWERYFIKOWANE — Siemens 39198632, str. 5]
+- **Zastosowanie:** gdy okablowanie jest krótkie/chronione i nie ma ryzyka zwarć do obcych potencjałów — prostsze, tańsze rozwiązanie
+- **Osiągalny poziom:** do SIL 2 / Cat.3 / PL d (z dwoma F-PM-E) lub SIL 1 / Cat.2 / PL c (z jednym F-PM-E)
+
+| Cecha | pm switching | pp switching |
+|-------|-------------|-------------|
+| Co przełącza F-PM-E | P **i** M (obie linie) | Dwa kanały P (tylko plus) |
+| Linia M | Odcięta przez F-PM-E | Wspólna, nie odcinana |
+| Izolacja galwaniczna Load/Electronic | **Wymagana** | Nie wymagana |
+| Ochrona przed zwarciami do obcych potencjałów | Wbudowana (M odcięte) | Wymaga dodatkowych środków (EN 60204-1) |
+| Złożoność okablowania | Wyższa (osobny zasilacz) | Niższa |
+| Typowe zastosowanie | Linie z wyższym napięciem w pobliżu | Proste aplikacje, krótkie trasy kablowe |
 
 **pm-switching — schemat ET 200SP:**
 ![pm-switching ET 200SP via F-PM-E](images/safety/06a_wiring_pm_switching_p6.png)
@@ -1149,14 +1283,39 @@ F-PM-E (Power Module) w ET 200SP/S może realizować oba tryby.
 **pp-switching — schemat ET 200SP:**
 ![pp-switching ET 200SP via F-PM-E](images/safety/06b_wiring_pp_switching_p7.png)
 
-*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632), Fig. 2-1, 2-2 — pm-switching i pp-switching](https://support.industry.siemens.com/cs/document/39198632/)]*
+📚 **Źródła:**
+- [`sources/pdfs/extracted/39198632_Wiring_Example_en_extracted.txt`](sources/pdfs/extracted/39198632_Wiring_Example_en_extracted.txt) (str. 5–7) — Fig. 2-1 pm switching, Fig. 2-2 pp switching, wymogi PP Switch Off
+- Norma: EN 60204-1 (środki ochrony okablowania przed zwarciami)
+
 ### 3.7. Co to jest F-PM-E i do czego służy?
 
-F-PM-E (Fail-safe Power Module E) to moduł zasilający Safety w systemie ET 200SP/S. Umożliwia bezpieczne odcięcie zasilania grupy standardowych modułów DO przez sygnał Safety — bez ich fizycznej wymiany na moduły F.
-Działanie: F-CPU nakazuje F-PM-E odciąć 24V dla grupy standardowych DQ → wszystkie wyjścia grupy idą na 0 (PM switching do SIL2/Cat.3/PLd).
-Tańsze rozwiązanie niż wymiana wszystkich DQ na F-DQ.
+F-PM-E (Fail-safe Power Module E) to moduł Safety w systemie ET 200SP, który umożliwia **bezpieczne odcięcie zasilania obciążenia (Load supply) grupy standardowych modułów wyjściowych** (DQ, AQ) — bez konieczności wymiany tych modułów na drogie moduły F-DQ.
 
-*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632), rozdz. F-PM-E](https://support.industry.siemens.com/cs/document/39198632/); [ET200SP F-PM-E product page](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html)]*
+**Problem, który rozwiązuje:**
+Standardowe moduły DQ nie mają certyfikatu Safety — nie mogą samodzielnie realizować funkcji bezpieczeństwa. Ale na jednej stacji ET 200SP możesz mieć 10–20 modułów DQ sterujących zaworami i napędami. Wymiana ich wszystkich na F-DQ to ogromny koszt. F-PM-E rozwiązuje to inaczej: **odcina zasilanie na poziomie grupy** — jeden moduł F-PM-E obsługuje wszystkie standardowe DQ w swoim segmencie napięciowym (voltage segment).
+
+**Jak to działa krok po kroku:**
+1. F-PM-E jest montowany w szynie ET 200SP **przed** grupą standardowych modułów DQ/AQ
+2. Zasilanie obciążenia (Load supply 24V DC) przechodzi **przez** F-PM-E do modułów w grupie
+3. W normalnej pracy F-PM-E przepuszcza zasilanie → DQ działają normalnie
+4. F-CPU (przez program Safety) nakazuje F-PM-E odciąć zasilanie → **wszystkie wyjścia** grupy tracą napięcie → aktuatory przechodzą w stan bezpieczny (0 V)
+5. F-PM-E realizuje to w konfiguracji **pm switching** (odcina P i M) lub **pp switching** (odcina dwa kanały P) — patrz pytanie 3.6
+
+**Osiągalny poziom bezpieczeństwa:**
+- **2× F-PM-E** (redundancja) → do **SIL 2 / Cat.3 / PL d**
+- **1× F-PM-E** → do **SIL 1 / Cat.2 / PL c**
+
+**Ograniczenia i wymagania:**
+- Standardowe DQ w grupie **nie wykonują** same funkcji Safety — bezpieczeństwo zapewnia wyłącznie F-PM-E odcinając zasilanie
+- Tylko moduły z listy dopuszczonej przez Siemens (FAQ 39198632) mogą być użyte w grupie Safety
+- Diagnostyka procesu (czy aktuator rzeczywiście się wyłączył) musi być realizowana pośrednio — przez monitorowanie procesu lub feedback z czujników do F-DI
+- Moduły standardowe DI **nie mogą** być używane do odczytu sygnałów Safety — wymagane F-DI
+
+**Praktyka commissioning:** W TIA Portal F-PM-E konfiguruje się w hardware config jako moduł Safety w stacji ET 200SP. Przypisujesz mu F-address, ustawiasz tryb (pm/pp), a w programie Safety F-CPU sterujesz wyjściem F-PM-E tak jak zwykłym F-DO (TRUE = zasilanie włączone, FALSE = odcięte).
+
+📚 **Źródła:**
+- [`sources/pdfs/extracted/39198632_Wiring_Example_en_extracted.txt`](sources/pdfs/extracted/39198632_Wiring_Example_en_extracted.txt) (str. 4–7) — wymagania, schematy pm/pp switching
+- [`docs/chapters/03_moduly_fdi_fdo.md`](docs/chapters/03_moduly_fdi_fdo.md) — pytanie 3.6 (pm vs pp switching), 3.8 (alternatywy: Safety Relay, F-DO+przekaźnik)
 ### 3.8. Jak bezpiecznie wyłączyć standardowe moduły wyjść przez Safety?
 
 Trzy główne metody (wg dokumentu Siemens 39198632):
@@ -1171,39 +1330,77 @@ Ważne: standardowe moduły DI nie mogą być używane do odczytu sygnałów Saf
 *[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632), Fig. 3-1 (Safety Relay PM-switching), Fig. 3-2 (F-PM-E), Fig. 3-3 (F-DO + przekaźnik)](https://support.industry.siemens.com/cs/document/39198632/)]*
 ### 3.9. Jak F-CPU reaguje na typowe awarie wejść dwukanałowych (1oo2)?
 
-Moduł F-DI, skonfigurowany do oceny dwukanałowej (1oo2), monitoruje sygnały z dwóch niezależnych kanałów i reaguje na różne typy awarii, aby zapewnić bezpieczny stan maszyny.
-- **Zwarcie do potencjału 0 V (M):**
-  - **Reakcja:** Kanał zostaje spaszywowany, styczniki rozłączone.
+Moduł F-DI, skonfigurowany do oceny dwukanałowej (1oo2), monitoruje sygnały z dwóch niezależnych kanałów i reaguje na różne typy awarii. **Wszystkie trzy poniższe awarie powodują passivation** — różnica polega na zakresie (kanał vs cały moduł), co zależy od parametru „Behavior after channel fault" w TIA Portal:
+- `Passivate channel` — passivation tylko dotkniętego kanału (pozostałe kanały działają dalej)
+- `Passivate the entire module` — passivation całego F-I/O (domyślne dla ET 200SP)
+
+**1. Zwarcie do potencjału 0 V (M):**
+  - **Passivation:** ✅ Tak — awaria kanału → passivation kanału lub modułu (wg parametru). Wyjścia Safety przyjmują substitute values (0).
   - **Błąd diagnostyczny:** "Overload or internal sensor supply short circuit to ground".
-  - **Reset:** Po usunięciu zwarcia, wymagany jest reset układu.
-- **Zwarcie międzykanałowe:**
-  - **Reakcja:** Cały moduł zapala się na czerwono, zgłaszając błąd.
+  - **LED:** Kanał świeci na czerwono.
+  - **Reset:** Po usunięciu zwarcia → reintegracja (ręczna lub automatyczna, wg parametru „Channel failure acknowledge").
+
+**2. Zwarcie międzykanałowe (cross-circuit):**
+  - **Passivation:** ✅ Tak — awaria **modułu** (nie kanału!) → passivation **całego modułu** niezależnie od parametru „Behavior after channel fault". Cross-circuit oznacza utratę niezależności kanałów → moduł nie może gwarantować poprawnej ewaluacji 1oo2.
   - **Błąd diagnostyczny:** "Internal sensor supply short circuit to P" lub "Short-circuit of two encoder supplies".
-  - **Reset:** Po usunięciu zwarcia, wymagany jest reset układu.
-- **Rozbieżność sygnału (Discrepancy failure):**
-  - **Reakcja:** Pojawia się błąd "Discrepancy failure", wskazany jest kanał, na którym wystąpiła awaria.
-  - **Przyczyna:** Utrata ciągłości obwodu w jednym z kanałów (np. uszkodzenie styku w E-STOP, kurtynie bezpieczeństwa, skanerze).
-  - **Funkcja diagnostyczna:** Sprawdzenie równoczesności zadziałania sygnałów jest podstawową funkcją diagnostyczną dla urządzeń elektromechanicznych.
-  - **Reset:** Po podłączeniu obwodu, diody migają naprzemiennie (czerwona i zielona), sygnalizując możliwość resetu/reintegracji.
-Praktyczne wskazówki:
-- W przypadku błędu rozbieżności, jeśli parametr "Reintegration after discrepancy error" jest ustawiony na "Test zero signal necessary", operator musi najpierw wymusić stan zerowy na czujniku (np. wcisnąć E-STOP), a dopiero potem może zresetować układ. Jest to ważne dla starszych urządzeń, które mogą generować fałszywe błędy rozbieżności.
-*Źródło: transkrypcje ControlByte*
+  - **LED:** Cały moduł świeci na czerwono (nie pojedynczy kanał).
+  - **Reset:** Po usunięciu zwarcia → wymagany ACK_GL lub reset ręczny.
+
+**3. Rozbieżność sygnału (Discrepancy failure):**
+  - **Passivation:** ✅ Tak — awaria kanału → passivation kanału lub modułu (wg parametru). Discrepancy = jeden kanał zmienił stan, a drugi nie w czasie discrepancy time.
+  - **Przyczyna:** Utrata ciągłości obwodu w jednym z kanałów (np. uszkodzenie styku w E-STOP, kurtynie bezpieczeństwa, skanerze) lub zespawany styk → kanały nie zmieniają się jednocześnie.
+  - **Błąd diagnostyczny:** "Discrepancy failure" — wskazany jest kanał, na którym wykryto rozbieżność.
+  - **LED:** Diody migają naprzemiennie (czerwona i zielona) po usunięciu przyczyny → gotowość do reintegracji.
+  - **Reset:** Zależy od parametru „Reintegration after discrepancy error":
+    - `Automatic` — reintegracja natychmiast po zgodności kanałów
+    - `Test zero signal necessary` — operator musi najpierw wymusić stan 0 na obu kanałach (np. wcisnąć E-STOP), dopiero potem reset
+
+| Awaria | Passivation? | Zakres | LED |
+|--------|-------------|--------|-----|
+| Zwarcie do M (0V) | ✅ Tak | Kanał lub moduł (parametr) | Kanał: czerwona |
+| Cross-circuit | ✅ Tak | **Zawsze cały moduł** | Moduł: czerwona |
+| Discrepancy | ✅ Tak | Kanał lub moduł (parametr) | Miganie czerwona/zielona (po usunięciu) |
+
+**Praktyczne wskazówki:**
+- W przypadku błędu rozbieżności z parametrem "Test zero signal necessary" — operator musi najpierw wymusić stan zerowy na czujniku (np. wcisnąć E-STOP), a dopiero potem może zresetować układ. Jest to ważne dla starszych urządzeń, które mogą generować fałszywe błędy rozbieżności.
+- Parametr „Behavior after channel fault" (`Passivate channel` vs `Passivate the entire module`) ma krytyczne znaczenie: passivation kanału pozwala utrzymać pozostałe kanały modułu aktywne, ale zwiększa czas pracy F-runtime group. [ZWERYFIKOWANE — SIMATIC Safety Konfiguracja, str. 54-55]
+
+📚 **Źródła:**
+- [`sources/pdfs/extracted/SIMATIC Safety - Konfiguracja i programowanie (2)_extracted.txt`](sources/pdfs/extracted/SIMATIC%20Safety%20-%20Konfiguracja%20i%20programowanie%20(2)_extracted.txt) (str. 54–55) — passivation kanału vs modułu, parametr „Behavior after channel fault"
+- [`sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt`](sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt) (str. 22) — examples of events that cause passivation, ACK_GL
+- `docs/kb/kb_S03_moduly_fdi_fdo.md` — knowledge base sekcji
+- Źródło: transkrypcje ControlByte
 
 ### 3.10. Jakie parametry są kluczowe przy konfiguracji wejść dwukanałowych w sterowniku bezpieczeństwa?
 
-Prawidłowa konfiguracja parametrów wejść dwukanałowych jest niezbędna do zapewnienia niezawodnego działania systemu bezpieczeństwa i uniknięcia niepotrzebnych błędów.
-- **Ocena (Evaluation):**
-  - Dla wejść dwukanałowych często stosuje się ocenę "one out of two" (1oo2).
-- **Discrepancy time (czas rozbieżności):**
-  - **Definicja:** Maksymalny dopuszczalny czas między zmianą stanu sygnałów na dwóch kanałach wejściowych.
-  - **Znaczenie:** Należy go dobrać precyzyjnie. Zbyt mały czas może generować niepotrzebne błędy i pasywację kanałów (np. przy E-STOP, wyłącznikach krańcowych). Zbyt długi czas zwiększa zwłokę w wykryciu sytuacji awaryjnej.
-  - **Dobór:** Najlepiej określić go na podstawie testów.
-- **Reintegracja po błędzie rozbieżności (Reintegration after discrepancy error):**
-  - **Opcja "Test zero signal necessary":** W przypadku błędu rozbieżności, aby zresetować kanały, należy najpierw doprowadzić do stanu zerowego sygnał z czujnika (np. wcisnąć E-STOP, a następnie go odciągnąć).
-  - **Znaczenie praktyczne:** Ten parametr wpływa na sposób obsługi stanowiska przez operatora. Urządzenia z kilkuletnim stażem mogą generować błędy rozbieżności, a ta opcja wymusza fizyczne potwierdzenie stanu bezpiecznego.
-Praktyczne wskazówki:
-- W przypadku błędu rozbieżności, jeśli "Test zero signal necessary" jest aktywne, diody zgłaszają błąd i brak możliwości reintegracji, dopóki nie zostanie wymuszony stan niski na obu kanałach, a dopiero potem można nacisnąć przycisk reset.
-*Źródło: transkrypcje ControlByte*
+Prawidłowa konfiguracja parametrów wejść dwukanałowych (1oo2) w module F-DI jest niezbędna do niezawodnego działania systemu Safety i uniknięcia fałszywych passivation. W TIA Portal kluczowe parametry ustawia się we właściwościach kanału F-DI (Hardware Configuration → moduł F-DI → Properties).
+
+**1. Evaluation mode (tryb oceny)**
+- Dla wejść dwukanałowych wybierasz ocenę **1oo2 (one out of two)** — moduł F-DI porównuje sygnały z dwóch niezależnych kanałów (np. DI0.0 i DI0.4) i traktuje je jako jeden sygnał logiczny.
+- Ewaluację 1oo2 wykonuje sam moduł F-DI (nie F-CPU) — wynik trafia do F-CPU przez PROFIsafe jako jeden bit z value status.
+
+**2. Discrepancy time (czas rozbieżności)**
+- **Definicja:** Maksymalny dopuszczalny czas, w którym dwa kanały mogą pokazywać różne wartości bez wygenerowania błędu.
+- **Dobór:** Zbyt krótki → fałszywe błędy i passivation kanałów (np. przy E-STOP, wyłącznikach krańcowych, których styki NC nie przełączają się idealnie jednocześnie). Zbyt długi → większa zwłoka w wykryciu rzeczywistej awarii (np. zespawanego styku).
+- **Praktyka:** Najlepiej określić na podstawie testów — wciśnij E-STOP kilkanaście razy i sprawdź, czy nie generuje discrepancy fault. Typowe wartości: 10–200 ms w zależności od typu czujnika.
+
+**3. Reintegration after discrepancy error (reintegracja po błędzie rozbieżności)**
+- **Automatic** — reintegracja następuje automatycznie, gdy oba kanały wrócą do zgodności.
+- **Test zero signal necessary** — po błędzie rozbieżności operator musi najpierw wymusić stan zerowy na obu kanałach (np. wcisnąć E-STOP, a następnie go odciągnąć), dopiero potem możliwy jest reset. Bez wymuszenia stanu niskiego diody zgłaszają błąd i reintegracja jest zablokowana.
+- **Znaczenie praktyczne:** Urządzenia z kilkuletnim stażem mogą generować sporadyczne błędy rozbieżności (zużyte styki). Opcja „Test zero signal necessary" wymusza fizyczne potwierdzenie stanu bezpiecznego przed powrotem do pracy — zwiększa bezpieczeństwo, ale wymaga interwencji operatora.
+
+**Procedura diagnostyczna przy discrepancy fault:**
+1. Diody na module F-DI świecą na czerwono → brak możliwości reintegracji
+2. Sprawdź bufor diagnostyczny — błąd „Discrepancy failure" wskazuje kanał z awarią
+3. Jeśli aktywna opcja „Test zero signal necessary" → wymuś stan 0 na czujniku (np. wciśnij E-STOP)
+4. Po wymuszeniu stanu 0 i zwolnieniu → diody migają naprzemiennie (czerwona/zielona) = gotowość do resetu
+5. Naciśnij przycisk reset → reintegracja kanałów → normal operation
+
+📚 **Źródła:**
+- [`sources/pdfs/extracted/SIMATIC Safety - Konfiguracja i programowanie (2)_extracted.txt`](sources/pdfs/extracted/SIMATIC%20Safety%20-%20Konfiguracja%20i%20programowanie%20(2)_extracted.txt) (str. 54–55) — parametry Discrepancy behavior, Reintegration after discrepancy error
+- [`sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt`](sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt) (str. 22) — discrepancy time, cross-circuit monitoring
+- [`transcripts/controlbyte/NA_Jak działa PLC Safety - Wykrywanie zwarć do 0V, rozbieżności w ocenie 1oo2.txt`](transcripts/controlbyte/NA_Jak%20działa%20PLC%20Safety%20-%20Wykrywanie%20zwarć%20do%200V,%20rozbieżności%20w%20ocenie%201oo2.txt) — demonstracja parametrów 1oo2, discrepancy time, test zero signal
+- Norma: EN ISO 13849-1 (wymagania dla ewaluacji dwukanałowej Cat.3/Cat.4)
 
 ---
 
@@ -1252,45 +1449,58 @@ Dwa sygnały z dwóch czujników podłączone na dwa kanały tego samego modułu
 ---
 
 *[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DI channel evaluation 1oo2](https://support.industry.siemens.com/cs/document/109751404/)]*
-### 4.4. Jak F-CPU reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?
-Moduł F-DI wykrywa błąd rozbieżności sygnału, gdy jeden z dwóch kanałów skonfigurowanych w ocenie 1oo2 straci ciągłość obwodu lub sygnały nie zadziałają równocześnie w określonym czasie. Jest to podstawowa funkcja diagnostyczna dla urządzeń elektromechanicznych i czujników z wyjściami tranzystorowymi.
-- Błąd "Discrepancy failure" jest zgłaszany w buforze diagnostycznym PLC, wskazując kanał awarii.
-- Po usunięciu przyczyny błędu (np. ponownym podłączeniu obwodu), diody modułu naprzemian migają na czerwono i zielono, sygnalizując możliwość resetu reintegracji.
-- Discrepancy time (np. 50 ms) musi być precyzyjnie dobrany, aby uniknąć fałszywych błędów lub zbyt długiej zwłoki w wykryciu awarii.
-*Źródło: transkrypcje ControlByte*
+### 4.4. Jak monitorowana jest rozbieżność sygnałów w strukturze 1oo2 i jakie awarie wykrywa moduł F-DI? 🔴
 
-### 4.5. Jakie są scenariusze awaryjne wykrywane przez moduł F-DI w układzie dwukanałowym 1oo2?
-Moduł F-DI w układzie dwukanałowym 1oo2 jest w stanie wykryć różne scenariusze awaryjne, które mogą prowadzić do niebezpiecznych sytuacji, zapewniając wysoką diagnostykę.
-- **Zwarcie do potencjału 0 V (zwarcie do masy):** Moduł zgłasza błąd "Overload or internal sensor supply short circuit to ground", pasywuje kanał i rozłącza styczniki.
-- **Zwarcie międzykanałowe (do P):** Moduł zgłasza błąd "Internal sensor supply short circuit to P" lub "Short-circuit of two encoder supplies", cały moduł zapala się na czerwono.
-- **Rozbieżność sygnału (Discrepancy failure):** Wykrywana, gdy jeden z kanałów straci ciągłość obwodu lub sygnały nie zadziałają równocześnie, co jest kluczowe dla urządzeń z mechanicznymi stykami (E-STOP, wyłączniki krańcowe) lub wyjściami tranzystorowymi.
-*Źródło: transkrypcje ControlByte*
+Monitoring rozbieżności (discrepancy monitoring) to kluczowy mechanizm diagnostyczny struktury głosowania 1oo2 — porównuje sygnały z dwóch niezależnych kanałów i wykrywa, gdy przestają się zgadzać. Jest to podstawa bezpieczeństwa dla urządzeń elektromechanicznych (E-STOP, wyłączniki krańcowe, osłony) i czujników tranzystorowych.
 
-### 4.6. Jak parametr "Reintegration after discrepancy error" wpływa na obsługę błędu rozbieżności sygnału?
-Parametr "Reintegration after discrepancy error" w konfiguracji modułu safety określa, czy po wystąpieniu błędu rozbieżności sygnału wymagane jest doprowadzenie sygnału do stanu zerowego przed wykonaniem resetu.
-- Jeśli wybrano opcję "Test zero signal necessary", operator musi wymusić stan zerowy na czujniku (np. wcisnąć i odciągnąć E-STOP) zanim możliwy będzie reset reintegracji.
-- Ten parametr jest istotny dla sposobu obsługi stanowiska przez operatora, szczególnie w przypadku starszych urządzeń, które mogą generować sporadyczne błędy rozbieżności.
-- Reset reintegracji kanałów safety w sterowniku PLC jest odrębny od resetu funkcji bezpieczeństwa, który wymaga innej logiki programowania.
-*Źródło: transkrypcje ControlByte*
+**Discrepancy time i mechanizm wykrywania:**
+- **Discrepancy time** = maksymalny czas, przez jaki kanały 1oo2 mogą mieć różne stany logiczne bez wygenerowania błędu. Konfiguracja: TIA Portal → właściwości F-DI → zakładka „Input" → „Discrepancy time [ms]".
+- Po przekroczeniu discrepancy time → moduł F-DI zgłasza **„Discrepancy failure"** w buforze diagnostycznym (wskazując kanał awarii) → **passivation** kanału lub całego modułu (zależnie od parametru „Behavior after channel fault") → wyjścia F-DO przyjmują substitute values (0).
+- **Dobór czasu:** Zbyt krótki → fałszywe passivation (np. styki E-STOP nie przełączają się idealnie jednocześnie). Zbyt długi → większa zwłoka w wykryciu awarii (np. zespawanego styku). Praktyka: przetestuj czujnik kilkanaście razy i dobierz na podstawie wyników. Typowe wartości: 10–200 ms.
 
-### 4.7. Co to jest discrepancy time (czas rozbieżności) w F-DI 1oo2 i co się dzieje gdy zostanie przekroczony? 🔴
-Discrepancy time (czas rozbieżności) to maksymalny czas, przez jaki oba kanały 1oo2 mogą mieć różne wartości logiczne bez wywołania błędu. Parametr konfigurowany w TIA Portal dla każdego F-DI z oceną 1oo2.
-- Domyślnie: 100 ms — oba sygnały muszą zmienić stan w tym oknie
-- Przekroczenie → F-DI przechodzi w stan pasywny (passivation), wyjście F-DO = substitute value
-- Typowa przyczyna: mechaniczne opóźnienie styku bezpieczeństwa lub błąd okablowania
-- Konfiguracja: właściwości modułu F-DI → zakładka „Input" → „Discrepancy time [ms]"
-- W diagnostyce: alarm rozbieżności widoczny w buforze diagnostycznym CPU (F_LADDR.DIAG) ⚠️ DO WERYFIKACJI: konkretny numer kodu alarmu — sprawdź w SIMATIC Safety System Manual lub buforze diagnostycznym TIA Portal online
+**Trzy scenariusze awarii wykrywane w 1oo2:**
 
-*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. discrepancy monitoring](https://support.industry.siemens.com/cs/document/109751404/)]*
-### 4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2? 🟡
-Detekcja cross-circuit (zwarcia między kanałami) to mechanizm pozwalający wykryć zwarcie przewodu kanału 1 do kanału 2 dzięki testowym impulsom wyjść testowych (T-signal).
-- T1 i T2 generują impulsy testowe z różną fazą (wzajemnie rozłączne)
-- Wejścia odczytują sygnał z powrotem przez czujnik
-- Zwarcie między kanałami = impuls T1 pojawia się na wejściu kanału 2 → błąd cross-circuit
-- Wymaga okablowania z wyjść testowych (T1, T2) przez czujnik do wejść (DI0.0, DI0.1)
-- Nie działa przy PM-switching bez wyjść testowych (wtedy detekcja cross-circuit jest ograniczona)
+| Awaria | Komunikat diagnostyczny | Zakres passivation | LED na module |
+|--------|------------------------|-------------------|---------------|
+| Zwarcie do M (0V) | „Overload or internal sensor supply short circuit to ground" | Kanał lub moduł (parametr) | Kanał: czerwona |
+| Zwarcie międzykanałowe (cross-circuit) | „Internal sensor supply short circuit to P" / „Short-circuit of two encoder supplies" | **Zawsze cały moduł** | Moduł: czerwona |
+| Rozbieżność sygnału (discrepancy) | „Discrepancy failure" | Kanał lub moduł (parametr) | Miganie czerwona/zielona (po usunięciu przyczyny) |
 
-*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/); [E-Stop SIL3 Application (Entry ID: 21064024, str. 10-12)](https://support.industry.siemens.com/cs/document/21064024/)]*
+**Reintegracja po discrepancy — parametr „Reintegration after discrepancy error":**
+- **Automatic** — reintegracja natychmiast po zgodności kanałów.
+- **Test zero signal necessary** — po błędzie operator musi najpierw wymusić stan 0 na obu kanałach (np. wcisnąć E-STOP, a potem odciągnąć), dopiero wtedy możliwy jest reset. Bez tego diody zgłaszają błąd i reintegracja jest zablokowana.
+- Opcja „Test zero signal necessary" jest szczególnie istotna przy starszych urządzeniach (styki zużyte po latach pracy → sporadyczne błędy rozbieżności) — wymusza fizyczne potwierdzenie stanu bezpiecznego.
+
+> ⚠️ **Uwaga:** Reset reintegracji kanałów F-DI (ACK_GL / operator acknowledge) to **nie to samo** co reset funkcji bezpieczeństwa (np. E-STOP reset w programie Safety). To dwa odrębne mechanizmy z różną logiką programowania.
+
+📚 **Źródła:**
+- [`sources/pdfs/extracted/SIMATIC Safety - Konfiguracja i programowanie (2)_extracted.txt`](sources/pdfs/extracted/SIMATIC%20Safety%20-%20Konfiguracja%20i%20programowanie%20(2)_extracted.txt) (str. 54–55) — parametry Discrepancy behavior, Reintegration after discrepancy error, Behavior after channel fault
+- [`sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt`](sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt) (str. 22) — discrepancy time, passivation events
+- [`transcripts/controlbyte/NA_Jak działa PLC Safety - Wykrywanie zwarć do 0V, rozbieżności w ocenie 1oo2.txt`](transcripts/controlbyte/NA_Jak%20działa%20PLC%20Safety%20-%20Wykrywanie%20zwarć%20do%200V,%20rozbieżności%20w%20ocenie%201oo2.txt) — demonstracja scenariuszy awarii 1oo2, konfiguracja discrepancy time i reintegracji
+- Norma: EN ISO 13849-1 §6.2.9 (monitoring rozbieżności w Cat.3/Cat.4)
+
+### 4.5. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2? 🟡
+
+Cross-circuit detection wykrywa zwarcie przewodu kanału A do kanału B w parze 1oo2 — awarię groźną, bo degrada dwukanałowy obwód do jednokanałowego (1oo1) bez widocznych objawów.
+
+**Mechanizm — impulsy VS\* z przesunięciem czasowym:**
+- Moduł F-DI ma dwa niezależne wyjścia sensor supply: **VS0** (zasilanie kanałów 0–3) i **VS2** (zasilanie kanałów 8–11). To są wyjścia zasilania czujnika generujące krótkie impulsy testowe (VS\* pulse testing).
+- VS0 i VS2 wysyłają impulsy w **różnych oknach czasowych** (nigdy jednocześnie):
+  - Okno T1: VS0 wysyła impuls → kanał A widzi impuls, kanał B — cisza
+  - Okno T2: VS2 wysyła impuls → kanał B widzi impuls, kanał A — cisza
+- **Kanały spięte (cross-circuit):** impuls VS0 pojawia się na wejściu kanału B w oknie T1 (zamiast T2) → moduł wykrywa impuls w złym oknie → błąd cross-circuit → **passivation całego modułu**
+
+**Konfiguracja w TIA Portal:**
+- Właściwości modułu F-DI → „Short-circuit test" → **Activate** (osobno per sensor supply 0 i sensor supply 2)
+- **Domyślnie wyłączone** — trzeba aktywować, aby osiągnąć DC ≥ 99% wymagane dla Cat.4 / PL e / SIL 3
+- Wymagane prawidłowe okablowanie: czujnik kanału A zasilany z VS0, czujnik kanału B z VS2 — nigdy oba z tego samego VS
+
+> 💡 Szczegółowy opis VS\* pulse testing, wykrywania zwarć do L+/M i schematy okablowania → patrz pytanie 3.1 i 3.2.
+
+📚 **Źródła:**
+- [`sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt`](sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt) (str. 11–12) — aktywacja short-circuit test dla sensor supply 0 i 2, konfiguracja kanałów E-STOP
+- [`sources/pdfs/extracted/39198632_Wiring_Example_en_extracted.txt`](sources/pdfs/extracted/39198632_Wiring_Example_en_extracted.txt) — schematy okablowania F-DI z VS0/VS2
+- Norma: EN ISO 13849-1 (DC ≥ 99% dla Cat.4)
 ## 5. PASSIVATION, REINTEGRATION, ACK
 
 ### 5.1. Co to jest passivation i co się dzieje z wyjściami/wejściami?  🔴
@@ -1346,24 +1556,51 @@ Operator musi potwierdzić że sytuacja jest bezpieczna zanim maszyna wznowi pra
 *[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. QBAD/value status](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 5.4. Co to jest ACK_REQ, ACK_NEC i ACK_REI w praktyce?  🔴
 
-| Zmienna | Kierunek | Kontekst | Opis |
-|---------|----------|----------|------|
-| `ACK_REQ` | Wyjście bloku F | F-FB / F-I/O | Auto `TRUE` gdy moduł/blok wymaga resetu — widoczny w Watch Table |
-| `ACK_NEC` | Wejście bloku F | Safety-FB (ESTOP1, Two-hand, GuardMonitoring) | Impuls *(zbocze narastające)* potwierdzający usunięcie błędu w logice Safety |
-| `ACK_REI` | Wejście F-I/O DB | Reintegracja modułów F-I/O po passivation | Impuls reintegracji konkretnego modułu F-I/O |
+W systemie Safety Siemens istnieją **dwa niezależne mechanizmy resetu**, które łatwo pomylić. Każdy ma swoją zmienną i swój kontekst. Najprościej zrozumieć je na konkretnym scenariuszu.
 
-**Schemat logiki Reset Safety (LAD):**
+---
+
+**Scenariusz: operator zrywa kabel E-STOP → naprawa → powrót do pracy**
+
+**Krok 1 — Awaria:** Kabel do kanału E-STOP się zrywa. Moduł F-DI wykrywa wire break → **passivation** modułu → wyjścia F-DO = 0 → maszyna stoi.
+
+**Krok 2 — Moduł mówi „potrzebuję resetu":** W F-I/O DB modułu pojawia się `ACK_REQ = TRUE`. To **wyjście informacyjne** (read-only) — moduł sam je ustawia, programista go nie steruje. Widoczne w Watch Table TIA Portal. Oznacza: „błąd usunięty, ale czekam na potwierdzenie operatora".
+
+**Krok 3 — Reintegracja modułu F-I/O (ACK_REI):** Operator naciska przycisk „Reset" na kasecie → program Safety generuje **impuls** (zbocze narastające, 1 cykl PLC) na zmiennej `ACK_REI` w F-I/O DB tego modułu → moduł F-DI reintegruje się → `PASS_OUT = FALSE` → moduł znów przekazuje dane procesowe zamiast substitute values.
+
+**Krok 4 — Reset funkcji Safety (ACK_NEC):** Moduł już działa, ale **blok ESTOP1** w programie Safety nadal blokuje wyjścia (bo E-STOP był aktywny). Blok ESTOP1 ma wejście `ACK_NEC` — operator musi nacisnąć przycisk „Reset Safety" → program generuje **impuls** na `ACK_NEC` → blok ESTOP1 zwalnia wyjście `Q` → maszyna może ruszyć.
+
+---
+
+**Podsumowanie — 3 zmienne, 3 różne role:**
+
+| Zmienna | Co robi | Kto ją ustawia | Gdzie żyje | Kiedy potrzebna |
+|---------|---------|----------------|------------|-----------------|
+| `ACK_REQ` | **Informuje:** „moduł/blok czeka na reset" | Moduł F-I/O lub blok F automatycznie | F-I/O DB / wyjście bloku F | Zawsze po passivation — sprawdzaj w Watch Table |
+| `ACK_REI` | **Reintegruje moduł F-I/O** po passivation | Programista (impuls z przycisku Reset) | F-I/O DB modułu (np. `"F-DI_1".ACK_REI`) | Po każdym błędzie sprzętowym (wire break, zwarcie, utrata PROFIsafe) |
+| `ACK_NEC` | **Resetuje funkcję Safety** w bloku F | Programista (impuls z przycisku Reset Safety) | Wejście bloku ESTOP1 / SF_GuardMonitoring / SF_TwoHandControl | Po zadziałaniu funkcji Safety (E-STOP, osłona, kurtyna) |
+
+**Kluczowa różnica:**
+- `ACK_REI` = „naprawiłem kabel, moduł może wrócić do pracy" (**warstwa sprzętowa**)
+- `ACK_NEC` = „sytuacja jest bezpieczna, maszyna może ruszyć" (**warstwa logiki Safety**)
+- W praktyce operator naciska **jeden przycisk „Reset"**, a program Safety generuje oba impulsy we właściwej kolejności: najpierw `ACK_REI` (reintegracja modułu), potem `ACK_NEC` (reset funkcji)
+
+**Zbiorcza reintegracja — ACK_GL:**
+Zamiast ustawiać `ACK_REI` osobno dla każdego modułu F-I/O, możesz użyć bloku `ACK_GL` — generuje zbiorczy impuls reintegracji dla **wszystkich** modułów F-I/O w grupie F-runtime jednocześnie. Stosuj po awarii sieci PROFINET lub wymianie modułu, gdy wiele F-I/O wymaga reintegracji naraz.
+
 ```
-Reset_HMI: --|P|-- [ACK_NEC]   ← impuls z przycisku, tylko 1 cykl PLC
+// LAD — typowa logika resetu:
+"Reset_Button": --|P|-- "ACK_GL_DB".ACK_GLOB    ← reintegracja WSZYSTKICH F-I/O
+"Reset_Button": --|P|-- "ESTOP1_DB".ACK_NEC      ← reset funkcji E-STOP
 ```
 
-> ⚠️ `ACK_NEC` **nie może być** sygnałem stałym `TRUE` — tylko impuls zboczowy!
+> ⚠️ **KRYTYCZNE:** Zarówno `ACK_REI` jak i `ACK_NEC` muszą być **impulsami** (zbocze narastające, 1 cykl PLC). Sygnał stały `TRUE` = błąd programu Safety → F-CPU może odrzucić kompilację lub zgłosić Runtime Error.
 
-> 💡 **Zbiorcza reintegracja całej stacji:** blok `ACK_GL` *(STEP 7 Safety Advanced)*
-> generuje zbiorczy impuls do **wszystkich** F-I/O w grupie runtime jednocześnie.
-> Stosuj po wymianie modułu lub awarii sieci PROFINET całej stacji.
-
-*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. ACK_NEC, ACK_REI, ACK_GL — impuls reintegracji](https://support.industry.siemens.com/cs/document/109751404/)]*
+📚 **Źródła:**
+- [`sources/pdfs/extracted/safety_getting_started_en-US_extracted.txt`](sources/pdfs/extracted/safety_getting_started_en-US_extracted.txt) (str. 30–31) — Step 11: Programming ACK_GL for reintegration, parametr ACK_GLOB
+- [`sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt`](sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt) (str. 8) — ACK_GL instruction, events causing passivation
+- [`sources/pdfs/extracted/safety_getting_started_en-US_extracted.txt`](sources/pdfs/extracted/safety_getting_started_en-US_extracted.txt) (str. 25) — SF_GuardMonitoring: ACK_NEC, ACK_REQ, ACK input
+- Norma: EN ISO 13849-1 §6.3.5 (wymaganie ręcznego resetu po zadziałaniu funkcji Safety)
 ## 6. SAFE STATE — BEZPIECZNY STAN
 
 ### 6.1. Co to jest Safe State i kto go definiuje?

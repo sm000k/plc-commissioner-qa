@@ -43,42 +43,55 @@ Dwa sygnały z dwóch czujników podłączone na dwa kanały tego samego modułu
 ---
 
 *[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DI channel evaluation 1oo2](https://support.industry.siemens.com/cs/document/109751404/)]*
-### 4.4. Jak F-CPU reaguje na błąd rozbieżności sygnału (Discrepancy Failure) w konfiguracji 1oo2?
-Moduł F-DI wykrywa błąd rozbieżności sygnału, gdy jeden z dwóch kanałów skonfigurowanych w ocenie 1oo2 straci ciągłość obwodu lub sygnały nie zadziałają równocześnie w określonym czasie. Jest to podstawowa funkcja diagnostyczna dla urządzeń elektromechanicznych i czujników z wyjściami tranzystorowymi.
-- Błąd "Discrepancy failure" jest zgłaszany w buforze diagnostycznym PLC, wskazując kanał awarii.
-- Po usunięciu przyczyny błędu (np. ponownym podłączeniu obwodu), diody modułu naprzemian migają na czerwono i zielono, sygnalizując możliwość resetu reintegracji.
-- Discrepancy time (np. 50 ms) musi być precyzyjnie dobrany, aby uniknąć fałszywych błędów lub zbyt długiej zwłoki w wykryciu awarii.
-*Źródło: transkrypcje ControlByte*
+### 4.4. Jak monitorowana jest rozbieżność sygnałów w strukturze 1oo2 i jakie awarie wykrywa moduł F-DI? 🔴
 
-### 4.5. Jakie są scenariusze awaryjne wykrywane przez moduł F-DI w układzie dwukanałowym 1oo2?
-Moduł F-DI w układzie dwukanałowym 1oo2 jest w stanie wykryć różne scenariusze awaryjne, które mogą prowadzić do niebezpiecznych sytuacji, zapewniając wysoką diagnostykę.
-- **Zwarcie do potencjału 0 V (zwarcie do masy):** Moduł zgłasza błąd "Overload or internal sensor supply short circuit to ground", pasywuje kanał i rozłącza styczniki.
-- **Zwarcie międzykanałowe (do P):** Moduł zgłasza błąd "Internal sensor supply short circuit to P" lub "Short-circuit of two encoder supplies", cały moduł zapala się na czerwono.
-- **Rozbieżność sygnału (Discrepancy failure):** Wykrywana, gdy jeden z kanałów straci ciągłość obwodu lub sygnały nie zadziałają równocześnie, co jest kluczowe dla urządzeń z mechanicznymi stykami (E-STOP, wyłączniki krańcowe) lub wyjściami tranzystorowymi.
-*Źródło: transkrypcje ControlByte*
+Monitoring rozbieżności (discrepancy monitoring) to kluczowy mechanizm diagnostyczny struktury głosowania 1oo2 — porównuje sygnały z dwóch niezależnych kanałów i wykrywa, gdy przestają się zgadzać. Jest to podstawa bezpieczeństwa dla urządzeń elektromechanicznych (E-STOP, wyłączniki krańcowe, osłony) i czujników tranzystorowych.
 
-### 4.6. Jak parametr "Reintegration after discrepancy error" wpływa na obsługę błędu rozbieżności sygnału?
-Parametr "Reintegration after discrepancy error" w konfiguracji modułu safety określa, czy po wystąpieniu błędu rozbieżności sygnału wymagane jest doprowadzenie sygnału do stanu zerowego przed wykonaniem resetu.
-- Jeśli wybrano opcję "Test zero signal necessary", operator musi wymusić stan zerowy na czujniku (np. wcisnąć i odciągnąć E-STOP) zanim możliwy będzie reset reintegracji.
-- Ten parametr jest istotny dla sposobu obsługi stanowiska przez operatora, szczególnie w przypadku starszych urządzeń, które mogą generować sporadyczne błędy rozbieżności.
-- Reset reintegracji kanałów safety w sterowniku PLC jest odrębny od resetu funkcji bezpieczeństwa, który wymaga innej logiki programowania.
-*Źródło: transkrypcje ControlByte*
+**Discrepancy time i mechanizm wykrywania:**
+- **Discrepancy time** = maksymalny czas, przez jaki kanały 1oo2 mogą mieć różne stany logiczne bez wygenerowania błędu. Konfiguracja: TIA Portal → właściwości F-DI → zakładka „Input" → „Discrepancy time [ms]".
+- Po przekroczeniu discrepancy time → moduł F-DI zgłasza **„Discrepancy failure"** w buforze diagnostycznym (wskazując kanał awarii) → **passivation** kanału lub całego modułu (zależnie od parametru „Behavior after channel fault") → wyjścia F-DO przyjmują substitute values (0).
+- **Dobór czasu:** Zbyt krótki → fałszywe passivation (np. styki E-STOP nie przełączają się idealnie jednocześnie). Zbyt długi → większa zwłoka w wykryciu awarii (np. zespawanego styku). Praktyka: przetestuj czujnik kilkanaście razy i dobierz na podstawie wyników. Typowe wartości: 10–200 ms.
 
-### 4.7. Co to jest discrepancy time (czas rozbieżności) w F-DI 1oo2 i co się dzieje gdy zostanie przekroczony? 🔴
-Discrepancy time (czas rozbieżności) to maksymalny czas, przez jaki oba kanały 1oo2 mogą mieć różne wartości logiczne bez wywołania błędu. Parametr konfigurowany w TIA Portal dla każdego F-DI z oceną 1oo2.
-- Domyślnie: 100 ms — oba sygnały muszą zmienić stan w tym oknie
-- Przekroczenie → F-DI przechodzi w stan pasywny (passivation), wyjście F-DO = substitute value
-- Typowa przyczyna: mechaniczne opóźnienie styku bezpieczeństwa lub błąd okablowania
-- Konfiguracja: właściwości modułu F-DI → zakładka „Input" → „Discrepancy time [ms]"
-- W diagnostyce: alarm rozbieżności widoczny w buforze diagnostycznym CPU (F_LADDR.DIAG) ⚠️ DO WERYFIKACJI: konkretny numer kodu alarmu — sprawdź w SIMATIC Safety System Manual lub buforze diagnostycznym TIA Portal online
+**Trzy scenariusze awarii wykrywane w 1oo2:**
 
-*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. discrepancy monitoring](https://support.industry.siemens.com/cs/document/109751404/)]*
-### 4.8. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2? 🟡
-Detekcja cross-circuit (zwarcia między kanałami) to mechanizm pozwalający wykryć zwarcie przewodu kanału 1 do kanału 2 dzięki testowym impulsom wyjść testowych (T-signal).
-- T1 i T2 generują impulsy testowe z różną fazą (wzajemnie rozłączne)
-- Wejścia odczytują sygnał z powrotem przez czujnik
-- Zwarcie między kanałami = impuls T1 pojawia się na wejściu kanału 2 → błąd cross-circuit
-- Wymaga okablowania z wyjść testowych (T1, T2) przez czujnik do wejść (DI0.0, DI0.1)
-- Nie działa przy PM-switching bez wyjść testowych (wtedy detekcja cross-circuit jest ograniczona)
+| Awaria | Komunikat diagnostyczny | Zakres passivation | LED na module |
+|--------|------------------------|-------------------|---------------|
+| Zwarcie do M (0V) | „Overload or internal sensor supply short circuit to ground" | Kanał lub moduł (parametr) | Kanał: czerwona |
+| Zwarcie międzykanałowe (cross-circuit) | „Internal sensor supply short circuit to P" / „Short-circuit of two encoder supplies" | **Zawsze cały moduł** | Moduł: czerwona |
+| Rozbieżność sygnału (discrepancy) | „Discrepancy failure" | Kanał lub moduł (parametr) | Miganie czerwona/zielona (po usunięciu przyczyny) |
 
-*[ZWERYFIKOWANE - [Siemens Wiring Examples for F-I/O (Entry ID: 39198632)](https://support.industry.siemens.com/cs/document/39198632/); [E-Stop SIL3 Application (Entry ID: 21064024, str. 10-12)](https://support.industry.siemens.com/cs/document/21064024/)]*
+**Reintegracja po discrepancy — parametr „Reintegration after discrepancy error":**
+- **Automatic** — reintegracja natychmiast po zgodności kanałów.
+- **Test zero signal necessary** — po błędzie operator musi najpierw wymusić stan 0 na obu kanałach (np. wcisnąć E-STOP, a potem odciągnąć), dopiero wtedy możliwy jest reset. Bez tego diody zgłaszają błąd i reintegracja jest zablokowana.
+- Opcja „Test zero signal necessary" jest szczególnie istotna przy starszych urządzeniach (styki zużyte po latach pracy → sporadyczne błędy rozbieżności) — wymusza fizyczne potwierdzenie stanu bezpiecznego.
+
+> ⚠️ **Uwaga:** Reset reintegracji kanałów F-DI (ACK_GL / operator acknowledge) to **nie to samo** co reset funkcji bezpieczeństwa (np. E-STOP reset w programie Safety). To dwa odrębne mechanizmy z różną logiką programowania.
+
+📚 **Źródła:**
+- [`sources/pdfs/extracted/SIMATIC Safety - Konfiguracja i programowanie (2)_extracted.txt`](sources/pdfs/extracted/SIMATIC%20Safety%20-%20Konfiguracja%20i%20programowanie%20(2)_extracted.txt) (str. 54–55) — parametry Discrepancy behavior, Reintegration after discrepancy error, Behavior after channel fault
+- [`sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt`](sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt) (str. 22) — discrepancy time, passivation events
+- [`transcripts/controlbyte/NA_Jak działa PLC Safety - Wykrywanie zwarć do 0V, rozbieżności w ocenie 1oo2.txt`](transcripts/controlbyte/NA_Jak%20działa%20PLC%20Safety%20-%20Wykrywanie%20zwarć%20do%200V,%20rozbieżności%20w%20ocenie%201oo2.txt) — demonstracja scenariuszy awarii 1oo2, konfiguracja discrepancy time i reintegracji
+- Norma: EN ISO 13849-1 §6.2.9 (monitoring rozbieżności w Cat.3/Cat.4)
+
+### 4.5. Jak moduł F-DI ET200SP wykrywa zwarcie między kanałami (cross-circuit detection) w obwodzie 1oo2? 🟡
+
+Cross-circuit detection wykrywa zwarcie przewodu kanału A do kanału B w parze 1oo2 — awarię groźną, bo degrada dwukanałowy obwód do jednokanałowego (1oo1) bez widocznych objawów.
+
+**Mechanizm — impulsy VS\* z przesunięciem czasowym:**
+- Moduł F-DI ma dwa niezależne wyjścia sensor supply: **VS0** (zasilanie kanałów 0–3) i **VS2** (zasilanie kanałów 8–11). To są wyjścia zasilania czujnika generujące krótkie impulsy testowe (VS\* pulse testing).
+- VS0 i VS2 wysyłają impulsy w **różnych oknach czasowych** (nigdy jednocześnie):
+  - Okno T1: VS0 wysyła impuls → kanał A widzi impuls, kanał B — cisza
+  - Okno T2: VS2 wysyła impuls → kanał B widzi impuls, kanał A — cisza
+- **Kanały spięte (cross-circuit):** impuls VS0 pojawia się na wejściu kanału B w oknie T1 (zamiast T2) → moduł wykrywa impuls w złym oknie → błąd cross-circuit → **passivation całego modułu**
+
+**Konfiguracja w TIA Portal:**
+- Właściwości modułu F-DI → „Short-circuit test" → **Activate** (osobno per sensor supply 0 i sensor supply 2)
+- **Domyślnie wyłączone** — trzeba aktywować, aby osiągnąć DC ≥ 99% wymagane dla Cat.4 / PL e / SIL 3
+- Wymagane prawidłowe okablowanie: czujnik kanału A zasilany z VS0, czujnik kanału B z VS2 — nigdy oba z tego samego VS
+
+> 💡 Szczegółowy opis VS\* pulse testing, wykrywania zwarć do L+/M i schematy okablowania → patrz pytanie 3.1 i 3.2.
+
+📚 **Źródła:**
+- [`sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt`](sources/pdfs/extracted/21064024_E-Stop_SIL3_1500F_DOC_V7_0_1_en_extracted.txt) (str. 11–12) — aktywacja short-circuit test dla sensor supply 0 i 2, konfiguracja kanałów E-STOP
+- [`sources/pdfs/extracted/39198632_Wiring_Example_en_extracted.txt`](sources/pdfs/extracted/39198632_Wiring_Example_en_extracted.txt) — schematy okablowania F-DI z VS0/VS2
+- Norma: EN ISO 13849-1 (DC ≥ 99% dla Cat.4)
