@@ -36,8 +36,18 @@ Przy KAŻDEJ edycji dokumentu Q&A → zaktualizuj nagłówek w `docs/chapters/00
 - Data+godzina = moment ostatniej edycji (pobierz przez `[DateTime]::Now.ToString("yyyy-MM-dd HH:mm")`), wersja = bieżąca wersja z QA_LOG.md
 - **NIE edytuj ręcznie spisu treści** — `build_toc.py` generuje go automatycznie w pipeline
 
-### Zasada: ZAWSZE publikuj na GitHub Pages po edycji Q&A
-Po KAŻDEJ zmianie w dokumencie Q&A (dodanie/edycja pytań, merge chapters) → uruchom:
+### Zasada: publikuj na GitHub Pages co ~20 minut (nie po każdej edycji)
+Przy wielu edycjach Q&A w jednej sesji — **NIE publikuj po każdej zmianie**. Zamiast tego:
+1. Edytuj chapter files normalnie
+2. Co ~20 minut (lub na żądanie użytkownika) → uruchom `publish.ps1`
+3. Użytkownik ogląda `docs/LATEST.md` **lokalnie** między publikacjami
+
+Aby zaktualizować LATEST.md lokalnie (bez git push), uruchom tylko:
+```powershell
+python scripts/build_toc.py; python scripts/merge_chapters.py; Copy-Item docs/qa_draft_v12.md docs/LATEST.md
+```
+
+Pełna publikacja na GitHub Pages (co ~20 min):
 ```powershell
 .\scripts\publish.ps1 -Message "Opis zmiany"
 ```
@@ -56,7 +66,7 @@ Strona: https://sm000k.github.io/plc-commissioner-qa/
 
 ```
 docs/                                ← Aktywne dokumenty
-  LATEST.md                          ← GŁÓWNY DOKUMENT Q&A (v12.5, 178 pytań, 21 sekcji) ✅
+  LATEST.md                          ← GŁÓWNY DOKUMENT Q&A (v12.5, 175 pytań, 21 sekcji) ✅
   sections_manifest.json             ← Indeks sekcji: zakresy linii, liczba pytań → CZYTAJ ZAMIAST LATEST.md
   qa_draft_v12.md                    ← Aktualny draft (= LATEST.md)
   chapters/                          ← Rozdziały Q&A (po 1 pliku na sekcję)
@@ -96,7 +106,7 @@ Pre-wyekstrahowany tekst wszystkich PDF-ów: `sources/pdfs/extracted/*.txt` — 
 Indeks PDF-ów z keywords i mapą sekcji: `sources/pdfs/pdf_manifest.json`.
 
 ## Aktywny dokument Q&A
-- **Bieżący**: `docs/LATEST.md` = `docs/qa_draft_v12.md` — **178 pytań, 21 sekcji** (2026-04-11)
+- **Bieżący**: `docs/LATEST.md` = `docs/qa_draft_v12.md` — **175 pytań, 21 sekcji** (2026-04-14)
   - Zawiera PLAN NAUKI z tagami 🔴🟡🟢
   - Rozdziały jako osobne pliki: `docs/chapters/00_header.md` … `21_sicar.md`
   - Bazy wiedzy: `docs/knowledge_base_controlbyte.md`, `docs/knowledge_base_delta_v11.md`
@@ -117,19 +127,25 @@ Następna wersja: `docs/qa_draft_v13.md`
 Treść odpowiedzi — definicja + szczegóły.
 - Punkt kluczowy 1
 - Punkt kluczowy 2
-Źródło/uwaga praktyczna.
+Praktyczna wskazówka / krok procedury.
+
+📚 **Źródła:**
+- `sources/pdfs/extracted/NazwaPDF.txt` (str. XX) — krótki opis co tam jest
+- `docs/kb/kb_SXX_nazwa_sekcji.md` — knowledge base sekcji
+- Norma: EN ISO 13849-1 / IEC 61508 (jeśli dotyczy)
 
 ### 2. Kolejne pytanie?
 ...
 ```
 
 **Reguły jakości odpowiedzi:**
-- **MAX 30 zdań na odpowiedź** — zwięzłe, konkretne, bez lania wody. Definicja (1-2 zd.) + bullet list (3-6 pkt) + praktyka (3-5 kroków)
+- **~30 zdań na odpowiedź (orientacyjnie)** — zwięzłe, konkretne, bez lania wody. Definicja (1-2 zd.) + bullet list (3-6 pkt) + praktyka (3-5 kroków). Jeśli temat wymaga dłuższej odpowiedzi (np. schematy, tabele porównawcze) — odpowiedź MOŻE być dłuższa. Jeśli odpowiedź naturalnie dzieli się na niezależne podtematy → **rozdziel na osobne pytania** zamiast robić jedno mega-pytanie
 - Podawaj numery parametrów Siemens (np. `p0840`, `r0945`) **tylko gdy znasz je ze źródeł**
 - Podawaj normy (EN ISO 13849-1, IEC 61508, IEC 62061, EN 60204-1)
 - **NIGDY** nie fabrykuj danych technicznych — źródłem są pliki w workspace (PDFs, chapters, knowledge base)
 - Używaj terminologii Siemens (nie generycznej) — patrz tabela terminologii poniżej
 - Każda odpowiedź MUSI zawierać min. 1 element praktyczny: procedura krok-po-kroku / scenariusz z obiektu / co sprawdzasz w TIA Portal / komenda diagnostyczna
+- **OBOWIĄZKOWO na końcu każdej odpowiedzi** — sekcja `📚 **Źródła:**` z linkami do konkretnych plików źródłowych w workspace (użyj ścieżek względnych jako linki Markdown) oraz nazwami norm. Jeśli brak źródła → `⚠️ DO WERYFIKACJI w dokumentacji Siemens`.
 - Język: **polski**
 - Poziom: szczegółowy, techniczny, gotowy do rozmowy kwalifikacyjnej
 
@@ -233,7 +249,7 @@ Treść odpowiedzi — definicja + szczegóły.
 - [ ] ✅ **Praktyka** — czy zawiera min. 1 element praktyczny (procedura / scenariusz / diagnostyka / konfiguracja TIA Portal)?
 - [ ] ✅ **Parametry** — czy numery parametrów Siemens (pXXXX) pochodzą ze źródeł, nie są wymyślone?
 - [ ] ✅ **Terminologia** — czy używa terminów Siemens z tabeli powyżej (nie generycznych)?
-- [ ] ✅ **Źródło** — czy podano źródło (PDF, norma, knowledge base) lub oznaczono `⚠️ DO WERYFIKACJI`?
+- [ ] ✅ **Źródło** — czy na końcu odpowiedzi jest sekcja `📚 **Źródła:**` z **linkami** do konkretnych plików workspace (`sources/pdfs/extracted/`, `docs/kb/`, `docs/chapters/`) i/lub nazwami norm? Brak linku = błąd jakości.
 
 ## Skrypty automatyzacji
 
