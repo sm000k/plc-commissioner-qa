@@ -4,13 +4,11 @@
 
 ### Siemens TIA Portal · Safety PLC · ET200 · Napędy SINAMICS · Robot ABB · SICAR
 
-### Wersja: v12.5 | Data: 2026-04-14 17:59 | Pytania: 175
+### Wersja: v12.5 | Data: 2026-08-20 15:49 | Pytania: 175
 
 ### Pytania + odpowiedzi zweryfikowane pod kątem rozmów kwalifikacyjnych.
 
 ### Źródła: Siemens App. Example 21064024 (E-Stop SIL3 V7.0.1), Wiring Examples 39198632, SIMATIC Safety Integrated, ControlByte Transkrypcje.
-
-### Wersja: v12.5 | Data: 2026-04-13 20:51 | Pytania: 175
 
 ---
 
