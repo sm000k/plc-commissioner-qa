@@ -19,6 +19,7 @@ Indeks maszynowy: `sources/pdfs/pdf_manifest.json`.
 | `safety_getting_started_en-US.pdf` | Podstawy SIMATIC Safety — pierwsze kroki, architektura | §2, §6 |
 | `SIMATIC Safety - Konfiguracja i programowanie (2).pdf` | Zaawansowana konfiguracja Safety, programowanie F-bloków | §2, §4, §5, §7, §9 |
 | `SIMATIC Safety Integrated – wszystko w jednym sterowniku PLC.pdf` | Koncepcja Safety Integrated, F-CPU, PROFIsafe | §2, §7 |
+| `SIMATIC_ET200SP_ET200MP_porownanie.pdf` | ET200SP vs ET200MP — budowa, BaseUnit, EK, montaż, porównanie | §19 |
 | `btc.pl-SCL-S7-1200.pdf` | Programowanie S7-1200 w SCL (TIA Portal V13+) | §1 |
 | `Sterowniki_PLC.pdf` | Ogólne informacje o sterownikach PLC | §1 |
 | `siemens SCL.PDF` | Programowanie w SCL — uzupełnienie | §1 |
@@ -47,7 +48,7 @@ Indeks maszynowy: `sources/pdfs/pdf_manifest.json`.
 | 16 | Motion Control | ❌ | SINAMICS S120/V90 Manual |
 | 17 | Scenariusze commissioning | ⚠️ knowledge base only | — |
 | 18 | TIA Portal zaawansowane | ❌ | TIA Portal V19 What's New |
-| 19 | Commissioning stacje | ❌ | ET200SP/MP System Manual |
+| 19 | Commissioning stacje | ✅ ET200SP/MP porównanie | — |
 | 20 | Schematy elektryczne | ❌ | EN 60204-1, schematy katalogowe |
 
 ---

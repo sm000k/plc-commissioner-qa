@@ -43,14 +43,73 @@ Parametr `substitute value` w TIA Portal (właściwości kanału F-DO) określa 
 
 *[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DO substitute value configuration](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 6.4. Czym różni się STO jako Safe State napędu SINAMICS od zatrzymania programowego (OFF1/OFF2)? 🔴
-STO (Safe Torque Off) jako Safe State napędu oznacza zablokowanie impulsów bramkowania tranzystorów — napęd nie może generować momentu obrotowego, nawet przy zasilaniu energetycznym. Zatrzymanie OFF1/OFF2 to kontrolowane wyhamowanie przez falownik z możliwością ponownego załączenia bez potwierdzenia.
-- STO: brak momentu → wolne wybieganie jeśli nie ma hamulca mechanicznego (niebezpieczne na siłowniku pionowym!)
-- OFF1: hamowanie po rampie (p1121 ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS), potem wyłączenie impulsów — napęd można ponownie uruchomić sygnałem ON
-- OFF2: natychmiastowe wyłączenie impulsów (jak STO, ale sterowane programem, nie Safety)
-- Safe State = STO → w konfiguracji F-DO parametr „substitute value" = 0 dla wyjścia STO
-- Dla osi pionowych (roboty, podnośniki): jako Safe State użyj SS1 (Stop + STO po rampie) lub SBC
 
-*[ZWERYFIKOWANE - IEC 61800-5-2 §6.2 (STO/SS1/SBC — Safe Torque Off jako Safe State); [SINAMICS Safety Integrated product page](https://www.siemens.com/global/en/products/drives/sinamics/safety-integrated.html)]*
+W napędach SINAMICS istnieją **dwie kategorie** zatrzymań — i trzeba je wyraźnie oddzielić, bo mieszanie ich prowadzi do błędów w projekcie Safety.
+
+---
+
+#### A) Zatrzymania PROGRAMOWE (sterowane przez PLC — bez certyfikacji Safety)
+
+Komendy OFF1/OFF2/OFF3 to standardowe zatrzymania napędu, wysyłane przez program PLC lub panel operatorski. **Nie są funkcjami Safety** — nie mają monitoringu, certyfikacji ani sprzętowego zabezpieczenia.
+
+| Komenda | Kat. zatrzymania (EN 60204-1) | Co robi | Restart |
+|---------|:-----------------------------:|---------|---------|
+| **OFF1** | 1 | Hamowanie po rampie deceleracji → po zatrzymaniu odcięcie impulsów | Komenda ON — bez potwierdzenia |
+| **OFF2** | 0 | Natychmiastowe odcięcie impulsów — wolny wybieg silnika | Komenda ON — bez potwierdzenia |
+| **OFF3** | 1 (rampa awaryjna) | Szybka rampa hamowania → po zatrzymaniu odcięcie impulsów | Komenda ON — bez potwierdzenia |
+
+> ⚠️ OFF2 wygląda jak STO (też odcina impulsy), ale **nie jest funkcją Safety** — jest sterowana programowo, bez monitoringu i bez redundancji sprzętowej.
+
+---
+
+#### B) Funkcje SAFETY (certyfikowane wg IEC 61800-5-2 — SIL3/PLe)
+
+Funkcje Safety są realizowane **sprzętowo** w napędzie (dwa niezależne kanały) i monitorowane przez PROFIsafe lub dedykowane zaciski. Nawet błąd oprogramowania nie może ich obejść.
+
+| Funkcja | Kat. zatrzymania | Co robi | Restart |
+|---------|:----------------:|---------|---------|
+| **STO** (Safe Torque Off) | 0 | Sprzętowe zablokowanie impulsów PWM → brak momentu → wolny wybieg | Wymaga ACK Safety |
+| **SS1** (Safe Stop 1) | 1 | Hamowanie po rampie → po zatrzymaniu aktywacja STO | Wymaga ACK Safety |
+| **SS2** (Safe Stop 2) | 2 | Hamowanie po rampie → po zatrzymaniu SOS (Safe Operating Stop — napęd zasilony, trzyma pozycję) | Wymaga ACK Safety |
+| **SBC** (Safe Brake Control) | — | Certyfikowane załączenie hamulca mechanicznego (monitoring prądu cewki) | Wymaga ACK Safety |
+
+---
+
+#### Podsumowanie: STO vs OFF — kluczowe różnice
+
+| Cecha | **STO** (Safety) | **OFF1/OFF2/OFF3** (programowe) |
+|-------|:----------------:|:-------------------------------:|
+| Certyfikacja | SIL3 / PLe | ❌ Brak |
+| Realizacja | Sprzętowa — 2 kanały | Programowa |
+| Monitoring | PROFIsafe / zaciski HW | Brak |
+| Gwarancja braku momentu | ✅ TAK | ❌ NIE |
+| Ponowne uruchomienie | ACK Safety | Komenda ON |
+
+---
+
+#### Jak Safe State łączy się z F-DO
+
+Passivation modułu F-DO (substitute value = 0) → wyjście `STO_enable` = 0 → napęd aktywuje **STO**. To jest implementacja Safe State na poziomie obwodu Safety — działa nawet przy awarii komunikacji.
+
+#### Osie pionowe — kiedy STO nie wystarczy
+
+Na osi pionowej (robot, podnośnik, winda) **STO = niebezpieczne**, bo wolny wybieg oznacza niekontrolowany spadek ładunku. Rozwiązania:
+- **SS1** (Safe Stop 1) — kontrolowane hamowanie po rampie → STO dopiero po zatrzymaniu
+- **SS2** (Safe Stop 2) — hamowanie po rampie → SOS (Safe Operating Stop — napęd zasilony, trzyma pozycję) — gdy oś musi utrzymać pozycję po zatrzymaniu
+- **SBC** (Safe Brake Control) — certyfikowane załączenie hamulca mechanicznego przed odcięciem momentu
+- Typowo: **SS1 + SBC** łącznie — najpierw hamowanie elektryczne, potem hamulec, potem STO
+
+> ℹ️ **SLS** (Safely Limited Speed), **SDI** (Safe Direction), **SOS** (Safe Operating Stop) — to nie są funkcje zatrzymania, lecz **monitorowania/ograniczania podczas pracy** napędu. Szczegóły → pytanie 8.4.
+
+> 💡 **Na rozmowie:** pytanie „dlaczego STO nie zawsze jest wystarczające jako Safe State?" → odpowiedź: osie pionowe, duże masy inercyjne, procesy wymagające kontrolowanego hamowania.
+
+📚 **Źródła:**
+- `docs/chapters/08_napedy_safety.md` — szczegóły STO/SS1/SBC (pytania 8.1–8.4)
+- `docs/kb/kb_S08_napedy_safety.md` — STO w V90, podłączenie dwukanałowe
+- `archive/slownik_v7.md` — definicje STO/SS1/SS2 z mapowaniem na EN 60204-1
+- Normy: IEC 61800-5-2 §6.2 (funkcje Safety napędów), EN 60204-1 §9.2.2 (kategorie zatrzymania 0/1/2)
+
+*[ZWERYFIKOWANE — IEC 61800-5-2 §6.2 (STO/SS1/SBC); EN 60204-1 §9.2.2 (kategorie zatrzymania); `archive/slownik_v7.md`; `docs/kb/kb_S08_napedy_safety.md`]*
 ### 6.5. Jak konfigurujesz substitute values dla F-DO i jaką wartość wybrać dla zaworu, siłownika i napędu? 🟡
 Substitute value to wartość logiczna wyjścia F-DO nadawana automatycznie podczas passivacji lub gdy F-CPU akceptuje błąd bezpieczeństwa. Konfigurowana w TIA Portal → właściwości modułu F-DO → „Substitute value for outputs".
 - Domyślnie: 0 (false) dla wszystkich kanałów — to zazwyczaj poprawne

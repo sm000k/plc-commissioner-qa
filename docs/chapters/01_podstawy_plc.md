@@ -6,26 +6,26 @@ PLC (Programmable Logic Controller) to przemysłowy komputer czasu rzeczywistego
 - Deterministyczny scan cycle — program wykonywany cyklicznie z przewidywalnym czasem (ms)
 - Odporność na EMI, drgania, temperatury, wilgoć przemysłową
 - Dedykowane moduły I/O (DI, DO, AI, AO) bezpośrednio do czujników i aktuatorów
-- Watchdog timer — CPU restartuje się przy zawieszeniu zamiast „wisieć"
+- Watchdog timer — nadzoruje maksymalny czas cyklu; po przekroczeniu CPU zgłasza błąd przez OB80, a jeśli błąd nie zostanie obsłużony (brak OB80 lub kolejne przekroczenie) — CPU przechodzi w **STOP**, nie autorestartuje się domyślnie
 - Brak systemu plików jak Windows — działa natychmiast po włączeniu zasilania
 
-*[ZWERYFIKOWANE - [SIMATIC S7-1500 System Manual](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html); [TIA Portal](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
+*[ZWERYFIKOWANE - [Sterowniki_PLC.pdf](sources/pdfs/extracted/Sterowniki_PLC.pdf); [docs/kb/kb_S01_podstawy_plc.md](docs/kb/kb_S01_podstawy_plc.md)]*
 ### 1.2. Co to jest scan cycle i ile trwa?  🔴
 
 Scan cycle to jeden pełny cykl pracy CPU: odczyt wejść → wykonanie programu → zapis wyjść → komunikacja.
 Typowy czas: 1–20ms dla prostych programów. Przy dużych projektach lub Safety może wzrosnąć do 50–100ms.
 W S7-1500 monitorujesz czas cyklu online (Cycle time w diagnostyce CPU). Zbyt długi scan = wolna reakcja na sygnały.
 
-*[ZWERYFIKOWANE - [SIMATIC S7-1500 System Manual — Cycle time monitoring](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html)]*
+*[PRAWDOPODOBNE - wiedza domenowa ogólna, brak lokalnego źródła z dokładnymi zakresami; zweryfikuj w SIMATIC S7-1500 System Manual, rozdział "Cycle time monitoring"]*
 ### 1.3. Co to jest OB1, OB35, OB100 — kiedy każdego używasz?
 
 Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system operacyjny CPU w ściśle określonych warunkach.
 
 **Podstawowe OB:**
 - OB1 — główny cykl programu, wykonywany ciągle. Tutaj trafia główna logika maszyny. Przerwany przez OB o wyższym priorytecie.
-- OB35 — przerwanie cykliczne (np. co 100ms). Używasz dla PID, komunikacji z napędami, obliczeń niezależnych od obciążenia OB1. Wyższy priorytet niż OB1.
-- OB100 — Startup OB, wykonywany raz po przejściu CPU z STOP→RUN. Inicjalizacja zmiennych, reset stanu maszyny, wyzerowanie wyjść. W TIA Portal S7-1200/1500: jedyny OB startu (nie ma OB101 Warm Restart / OB102 Cold Restart jak w S7-400).
-- F_MAIN — Safety OB, oddzielny cykl dla programu failsafe, chroniony przez F-CPU.
+- OB35 — przerwanie cykliczne (np. co 100ms, czas konfigurowalny). Używasz dla PID, komunikacji z napędami, obliczeń niezależnych od obciążenia OB1. Wyższy priorytet niż OB1.
+- OB100 — Startup OB, wykonywany raz po przejściu CPU z STOP→RUN. Inicjalizacja zmiennych, reset stanu maszyny, wyzerowanie wyjść. W S7-1200 to jedyny dostępny OB startowy. W S7-1500 startup obsługuje OB100, a tryb restartu (Complete/Cold restart) konfigurujesz w ustawieniach CPU — ⚠️ DO WERYFIKACJI: dokładna dostępność OB102 zależy od wersji firmware, sprawdź w System Manual dla konkretnego CPU. To inny model niż klasyczny S7-300/400, gdzie OB100 (Warm Restart) i OB102 (Cold Restart) to odrębne, zawsze dostępne bloki.
+- F_MAIN — główny blok programu Safety. To **FB** (nie odrębny typ OB) wywoływany z poziomu standardowego OB (najczęściej cyklicznego) — program Safety nie ma własnego, niezależnego cyklu systemowego CPU, lecz jest wykonywany (dwukrotnie, z porównaniem wyników) w ramach cyklu bloku wywołującego, chronionego mechanizmami F-CPU (F-signature, monitoring czasu).
 
 **Diagnostyczne OB — ważne przy commissioning:**
 - OB80 — cycle time exceeded (czas cyklu przekroczył watchdog). Sygnalizuje zbyt wolną logikę.
@@ -34,20 +34,20 @@ Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system 
 - OB121 — Programming Error: błędy programistyczne (dzielenie przez zero, błędna konwersja typów, przekroczenie zakresu tablicy).
 - OB122 — I/O Access Error: błąd dostępu do modułu I/O (moduł nie istnieje, awaria komunikacji z modułem). Ważne rozróżnienie przy uruchamianiu nowego kodu.
 
-*[ZWERYFIKOWANE - [SIMATIC S7-1500 Function Manual: Program blocks — Organization blocks](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html)]*
+*[PRAWDOPODOBNE - wiedza domenowa ogólna o systemie OB S7-1500, brak lokalnego pliku źródłowego; zweryfikuj listę i priorytety OB w SIMATIC S7-1500 Function Manual "Program blocks — Organization blocks"]*
 ### 1.4. Co to jest FB, FC, DB — kiedy używasz każdego?  🔴
 - FC (Function) — blok bez pamięci własnej (brak sekcji VAR_STAT). Używasz dla prostych obliczeń, konwersji sygnałów, logiki bez stanu. Może zwracać wartość (Return Value). Ma tylko VAR_INPUT, VAR_OUTPUT, VAR_IN_OUT i VAR_TEMP.
 - FB (Function Block) — ma instancję DB z pamięcią stanu między wywołaniami (sekcja VAR_STAT). Używasz dla sterowania silnikiem, sekwencji, timerów — wszędzie gdzie blok musi "pamiętać". Multi-instance: jeden FB może zawierać instancje innych FB bez osobnych DB.
 - DB (Data Block) — blok danych. Globalny DB: dostęp z całego programu. Instancja DB: dedykowana pamięć jednego FB.
 
 **Typy zmiennych w blokach (ważne rozróżnienie):**
-- `VAR_TEMP` — tymczasowe, przechowywane na stosie CPU. Tracą wartość po zakończeniu wywołania. Dostępne we wszystkich blokach (FB, FC, OB).
+- `VAR_TEMP` — tymczasowe, przechowywane na stosie CPU. Tracą wartość po zakończeniu wywołania danego bloku i **nie są współdzielone między blokami** — to lokalna pamięć tylko dla bieżącego wywołania. Sekcja TEMP jest dostępna jako typ deklaracji we wszystkich rodzajach bloków (FB, FC, OB), ale każde wywołanie ma własną, odizolowaną kopię.
 - `VAR_STAT` — statyczne, zachowują wartość między wywołaniami. Tylko w FB, przechowywane w instancji DB.
 - `VAR_INPUT` / `VAR_OUTPUT` / `VAR_IN_OUT` — parametry interfejsu bloku.
 
 W TIA Portal: bloki z włączonym *Optimized Block Access* używają wyłącznie nazw symbolicznych — brak adresowania absolutnego (%.0, %DB1.DBX0.0). Standardowe ustawienie dla nowych projektów.
 
-*[ZWERYFIKOWANE - [TIA Portal Help: Program blocks (FB/FC/DB), Optimized Block Access](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
+*[ZWERYFIKOWANE - [docs/kb/kb_S01_podstawy_plc.md](docs/kb/kb_S01_podstawy_plc.md); TIA Portal Help: Program blocks (FB/FC/DB), Optimized Block Access]*
 ### 1.5. Co to jest UDT i po co go używasz?
 
 UDT (User Data Type) to własny złożony typ danych definiowany raz i wielokrotnie używany w całym projekcie. Przykład: typ `Motor_t` z polami `Speed:REAL`, `Current:REAL`, `Fault:BOOL`, `Running:BOOL`.
@@ -63,7 +63,7 @@ UDT (User Data Type) to własny złożony typ danych definiowany raz i wielokrot
 
 **Wersjonowanie:** W TIA Portal można przypisać UDT do Project Library i wersjonować. Przy zmianie struktury UDT TIA Portal ostrzega o niespójnych instancjach — musisz je zaktualizować (`Update instances`). Ważne w dużych projektach — jedna zmiana UDT bez aktualizacji instancji = błąd kompilacji.
 
-*[ZWERYFIKOWANE - [TIA Portal Help: PLC data types (UDT), Project Library management](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
+*[PRAWDOPODOBNE - wiedza domenowa ogólna o TIA Portal, brak lokalnego źródła z dokładnym opisem; zweryfikuj w TIA Portal Help (PLC data types / Project Library)]*
 ### 1.6. Co to są języki programowania PLC — LAD, FBD, SCL, GRAPH?
 - LAD (Ladder) — graficzny, podobny do schematów przekaźnikowych. Dobry dla logiki binarnej, łatwy dla elektryków. Najczęściej używany.
 - FBD (Function Block Diagram) — bloki połączone liniami. Dobry dla logiki kombinacyjnej i programów Safety w TIA Portal.
@@ -99,9 +99,9 @@ END_CASE;
 **TIA Portal SCL vs klasyczny STEP 7 SCL:**
 - TIA Portal: zmienne wyłącznie symboliczne, brak tablicy symboli (Symbol Table), *Optimized Block Access* domyślnie włączony.
 - Stary STEP 7 (S7-300/400): mieszanie adresów absolutnych (I0.0, DB1.DBX0.0) i nazw symbolicznych; osobna tablica symboli.
-- W Safety: program F_MAIN w starszych wersjach TIA Portal wymaga FBD lub LAD — SCL nie jest certyfikowany dla F-bloków Safety. SCL dla F-bloków Safety został wprowadzony w TIA Portal V19 (STEP 7 Safety V19). ⚠️ DO WERYFIKACJI: dokładna wersja i wymagany firmware F-CPU w Release Notes TIA Portal. Zawsze sprawdź dopuszczalne języki dla swojej wersji portalu przed użyciem SCL w logice Safety.
+- W Safety: program F_MAIN wymaga F-LAD lub F-FBD — to jedyne języki dopuszczone i certyfikowane (TÜV) dla logiki F-bloków, ze względu na wymóg deterministycznego, ograniczonego zestawu instrukcji. ⚠️ DO WERYFIKACJI: czy i od której wersji TIA Portal/STEP 7 Safety dopuszczono SCL dla F-bloków — nie znaleziono w dostępnych źródłach potwierdzenia konkretnej wersji, nie podawaj numeru wersji bez sprawdzenia w Release Notes TIA Portal. Zawsze sprawdź dopuszczalne języki dla swojej wersji portalu przed użyciem SCL w logice Safety.
 
-*[ZWERYFIKOWANE - [IEC 61131-3 — languages (PLCopen)](https://plcopen.org/iec-61131-3); [TIA Portal Help: Programming languages overview](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
+*[ZWERYFIKOWANE - [btc.pl-SCL-S7-1200.pdf](sources/pdfs/extracted/btc.pl-SCL-S7-1200.pdf); [siemens SCL.PDF](sources/pdfs/extracted/siemens%20SCL.PDF); IEC 61131-3 (języki programowania)]*
 ### 1.7. Co to jest sygnał 4-20mA i dlaczego nie 0-20mA?
 
 4-20mA to standardowy sygnał analogowy dla czujników przemysłowych (przetworniki ciśnienia, temperatury, przepływu). Zakres 4 mA (wartość minimalna procesu) do 20 mA (wartość maksymalna).
@@ -112,10 +112,10 @@ END_CASE;
 - **Skalowanie w TIA Portal:** Surowy sygnał z modułu AI: 0–27648 (integer) dla zakresu 4–20 mA. Blok `NORM_X` normalizuje do 0.0–1.0, a `SCALE_X` skaluje na zakres inżynierski (np. 0.0–100.0 bar). Alternatywnie: bezpośrednia przeliczenie REAL w SCL: `Ciśnienie := (REAL_AI - 4.0) / 16.0 * MaxRange;`
 - **Podłączenie dwuprzewodowe (2-wire):** Zasilanie i sygnał na jednej parze kabli (czujnik = zmienna rezystancja). Oszczędność okablowania.
 
-*[ZWERYFIKOWANE - [SIMATIC ET200SP Analog Input Module Manual](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html); standard przemysłowy 4-20mA wg IEC 60381-1]*
+*[ZWERYFIKOWANE - standard przemysłowy 4-20mA wg IEC 60381-1; skalowanie 0–27648 zgodne z ogólną dokumentacją modułów AI Siemens (ET200SP/ET200MP System Manual — zweryfikuj dokładny model modułu w dokumentacji katalogowej)]*
 ### 1.8. Co to jest PROFINET i czym różni się od PROFIBUS?  🔴
 
-PROFINET: Ethernet-based, 100Mbit/s (gigabit w nowych instalacjach), elastyczna topologia (gwiazdka, linia, pierścień), plug-and-play z GSDML, obsługuje PROFIsafe i IRT (250µs, jitter <1µs). Nowy standard dla wszystkich nowych projektów.
+PROFINET: Ethernet-based, standardowo 100Mbit/s Full Duplex do urządzeń polowych (czujniki, napędy, ET200) — gigabit spotykasz głównie na backbone/nowszych CPU i switchach, nie jako regułę dla każdego urządzenia, elastyczna topologia (gwiazdka, linia, pierścień), plug-and-play z GSDML, obsługuje PROFIsafe i IRT (rzędu setek µs, jitter submikrosekundowy w konkretnych konfiguracjach). Nowy standard dla wszystkich nowych projektów.
 PROFIBUS: RS-485, max 12Mbit/s, liniowa topologia z terminatorami na obu końcach kabla, starszy standard. Nadal spotykany w modernizacjach i instalacjach sprzed 2010.
 
 **Role urządzeń PROFINET — kluczowe na rozmowie:**
@@ -127,7 +127,7 @@ Jeden CPU może być jednocześnie IO-Controller swojej sieci i IO-Device w siec
 
 PROFIBUS analogicznie: DP-Master Class 1 (CPU) → DP-Slave (ET200M/S, napęd z CB DP) → DP-Master Class 2 (PG/PC diagnostyczny).
 
-*[ZWERYFIKOWANE - [PROFINET — przegląd technologii Siemens](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html); IEC 61158 (PROFINET), IEC 61784 (PROFIBUS)]*
+*[ZWERYFIKOWANE - [docs/kb/kb_S01_podstawy_plc.md](docs/kb/kb_S01_podstawy_plc.md); IEC 61158 (PROFINET); IEC 61784 (PROFIBUS)]*
 ### 1.9. Jakie są główne rodziny sterowników PLC Siemens i do jakich zastosowań są dedykowane?
 
 Siemens oferuje różne rodziny sterowników PLC, dostosowane do aplikacji o różnej skali i złożoności, od prostych zadań po najbardziej wymagające systemy.

@@ -4,7 +4,7 @@
 
 ### Siemens TIA Portal · Safety PLC · ET200 · Napędy SINAMICS · Robot ABB · SICAR
 
-### Wersja: v12.5 | Data: 2026-04-14 17:10 | Pytania: 175
+### Wersja: v12.5 | Data: 2026-04-14 17:59 | Pytania: 175
 
 ### Pytania + odpowiedzi zweryfikowane pod kątem rozmów kwalifikacyjnych.
 

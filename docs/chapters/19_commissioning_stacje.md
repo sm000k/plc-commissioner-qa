@@ -154,7 +154,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 - **Dlaczego osobno?** F-Address jest zapisywany w urządzeniu niezależnie od download projektu — jako zabezpieczenie przed przypadkową podmianą modułów. Gdyby F-Address był nadawany automatycznie przy download, wymiana modułu na identyczny w innym slocie mogłaby pozostać niezauważona → zagrożenie bezpieczeństwa
 - **Mechanizm w ET200SP:** F-Address jest zapisywany w **elemencie kodującym (EK — Codierelement)** na BaseUnit, nie w samym module F-DI/F-DQ. Wymiana uszkodzonego modułu F nie wymaga ponownego „Assign PROFIsafe address" — adres pozostaje w EK
-- **Mechanizm w ET200MP:** F-Address jest zapisywany w profilu modułu na szynie backplane
+- **Mechanizm w ET200MP:** ET200MP nie ma elementu kodującego (EK) jak ET200SP — moduły montowane bezpośrednio na szynie DIN (format S7-300). Przy wymianie modułu F prawdopodobnie wymaga ponownego `Assign PROFIsafe address` ⚠️ DO WERYFIKACJI w dokumentacji ET200MP
 - **W napędach SINAMICS:** F-Address jest zapisywany w CU napędu (parametr wewnętrzny) — wymiana CU wymaga ponownego przypisania F-Address
 
 **Procedura „Assign PROFIsafe address" w TIA Portal:**

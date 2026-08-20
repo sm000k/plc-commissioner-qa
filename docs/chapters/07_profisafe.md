@@ -26,18 +26,33 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 *[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. PROFIsafe protocol structure](https://support.industry.siemens.com/cs/document/109751404/); IEC 61784-3-3 (PROFIsafe protocol specification)]*
 ### 7.2. Co to jest F-Address i jak go konfigurujesz?  🔴
 
-`F-Address` (F-Destination Address) to unikalny F-address przypisany do każdego modułu F w sieci. **Musi być identyczny** w konfiguracji TIA Portal i na fizycznym urządzeniu (DIP switch lub parametryzacja).
+`F-Address` (F-Destination Address) to unikalny identyfikator przypisany do każdego modułu F w sieci PROFIsafe. **Musi być identyczny** w konfiguracji TIA Portal i w fizycznym urządzeniu — niezgodność = passivation.
 
-**Konfiguracja:**
-- TIA Portal → właściwości modułu F → zakładka `Safety` → pole `Safety address`
-- Na urządzeniu: DIP switch lub przez TIA Portal `Assign PROFIsafe address` (online)
+**Konfiguracja w TIA Portal:**
+- Właściwości modułu F → zakładka `Safety` → pole `Safety address`
 
-> ⚠️ **Przy wymianie modułu:** nowy moduł musi dostać **ten sam F-Address** co stary — inaczej nie uruchomisz systemu Safety.
-> Błędny F-Address → moduł nie komunikuje się z F-CPU i pozostaje spassivowany.
+**Gdzie F-Address jest fizycznie zapisywany — zależy od typu urządzenia:**
+
+| Typ urządzenia | Gdzie przechowywany F-Address | Mechanizm zapisu |
+|----------------|-------------------------------|------------------|
+| **ET200SP** (F-DI/F-DQ) | **Element kodujący (EK)** na BaseUnit — fizyczny element na podstawce, NIE w module elektronicznym | `Assign PROFIsafe address` z TIA Portal (online) |
+| **ET200MP** (F-DI/F-DQ) | W module — ET200MP **nie ma EK** ani BaseUnit (moduły montowane bezpośrednio na szynie) | `Assign PROFIsafe address` z TIA Portal (online) |
+| **SINAMICS** (napędy z Safety) | CU (Control Unit) — parametr wewn. | `Assign PROFIsafe address` lub Startdrive |
+| **Starsze moduły** (np. ET200S) | **DIP switch** na urządzeniu | Ręczne ustawienie przełączników |
+
+> ⚠️ **Nowoczesne moduły ET200SP/MP nie mają DIP switchów** — F-Address jest zapisywany elektronicznie przez TIA Portal. DIP switche to mechanizm starszej generacji (ET200S, niektóre urządzenia firm trzecich).
+
+**Przy wymianie modułu — zachowanie F-Address:**
+- **ET200SP:** F-Address jest w EK na BaseUnit → wymiana modułu elektronicznego **nie wymaga** ponownego `Assign PROFIsafe address` — adres zostaje w EK na podstawce
+- **ET200MP:** ET200MP **nie ma EK** — moduły montowane bezpośrednio na szynie DIN (format S7-300). Przy wymianie modułu F **wymaga** ponownego `Assign PROFIsafe address` ⚠️ DO WERYFIKACJI w dokumentacji ET200MP
+- **SINAMICS:** F-Address w CU → wymiana CU **wymaga** ponownego przypisania F-Address
+- **Starsze (DIP switch):** nowy moduł musi mieć ręcznie ustawione te same przełączniki
+
+> ⚠️ Błędny lub niezgodny F-Address → moduł nie komunikuje się z F-CPU i pozostaje spassivowany.
 
 ---
 
-*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-Address, Safety address assignment](https://support.industry.siemens.com/cs/document/109751404/)]*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-Address, Safety address assignment, element kodujący](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 7.3. Co to jest F-monitoring time i co się dzieje po jego przekroczeniu?
 
 `F-monitoring time` to maksymalny czas oczekiwania F-CPU na kolejny pakiet PROFIsafe od modułu. Po przekroczeniu (np. przerwa w sieci, przeciążony switch) → moduł zostaje <span style="color:#c0392b">**spassivowany**</span>.

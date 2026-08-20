@@ -4,7 +4,7 @@
 
 ### Siemens TIA Portal · Safety PLC · ET200 · Napędy SINAMICS · Robot ABB · SICAR
 
-### Wersja: v12.5 | Data: 2026-04-14 17:10 | Pytania: 175
+### Wersja: v12.5 | Data: 2026-04-14 17:59 | Pytania: 175
 
 ### Pytania + odpowiedzi zweryfikowane pod kątem rozmów kwalifikacyjnych.
 
@@ -286,26 +286,26 @@ PLC (Programmable Logic Controller) to przemysłowy komputer czasu rzeczywistego
 - Deterministyczny scan cycle — program wykonywany cyklicznie z przewidywalnym czasem (ms)
 - Odporność na EMI, drgania, temperatury, wilgoć przemysłową
 - Dedykowane moduły I/O (DI, DO, AI, AO) bezpośrednio do czujników i aktuatorów
-- Watchdog timer — CPU restartuje się przy zawieszeniu zamiast „wisieć"
+- Watchdog timer — nadzoruje maksymalny czas cyklu; po przekroczeniu CPU zgłasza błąd przez OB80, a jeśli błąd nie zostanie obsłużony (brak OB80 lub kolejne przekroczenie) — CPU przechodzi w **STOP**, nie autorestartuje się domyślnie
 - Brak systemu plików jak Windows — działa natychmiast po włączeniu zasilania
 
-*[ZWERYFIKOWANE - [SIMATIC S7-1500 System Manual](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html); [TIA Portal](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
+*[ZWERYFIKOWANE - [Sterowniki_PLC.pdf](sources/pdfs/extracted/Sterowniki_PLC.pdf); [docs/kb/kb_S01_podstawy_plc.md](docs/kb/kb_S01_podstawy_plc.md)]*
 ### 1.2. Co to jest scan cycle i ile trwa?  🔴
 
 Scan cycle to jeden pełny cykl pracy CPU: odczyt wejść → wykonanie programu → zapis wyjść → komunikacja.
 Typowy czas: 1–20ms dla prostych programów. Przy dużych projektach lub Safety może wzrosnąć do 50–100ms.
 W S7-1500 monitorujesz czas cyklu online (Cycle time w diagnostyce CPU). Zbyt długi scan = wolna reakcja na sygnały.
 
-*[ZWERYFIKOWANE - [SIMATIC S7-1500 System Manual — Cycle time monitoring](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html)]*
+*[PRAWDOPODOBNE - wiedza domenowa ogólna, brak lokalnego źródła z dokładnymi zakresami; zweryfikuj w SIMATIC S7-1500 System Manual, rozdział "Cycle time monitoring"]*
 ### 1.3. Co to jest OB1, OB35, OB100 — kiedy każdego używasz?
 
 Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system operacyjny CPU w ściśle określonych warunkach.
 
 **Podstawowe OB:**
 - OB1 — główny cykl programu, wykonywany ciągle. Tutaj trafia główna logika maszyny. Przerwany przez OB o wyższym priorytecie.
-- OB35 — przerwanie cykliczne (np. co 100ms). Używasz dla PID, komunikacji z napędami, obliczeń niezależnych od obciążenia OB1. Wyższy priorytet niż OB1.
-- OB100 — Startup OB, wykonywany raz po przejściu CPU z STOP→RUN. Inicjalizacja zmiennych, reset stanu maszyny, wyzerowanie wyjść. W TIA Portal S7-1200/1500: jedyny OB startu (nie ma OB101 Warm Restart / OB102 Cold Restart jak w S7-400).
-- F_MAIN — Safety OB, oddzielny cykl dla programu failsafe, chroniony przez F-CPU.
+- OB35 — przerwanie cykliczne (np. co 100ms, czas konfigurowalny). Używasz dla PID, komunikacji z napędami, obliczeń niezależnych od obciążenia OB1. Wyższy priorytet niż OB1.
+- OB100 — Startup OB, wykonywany raz po przejściu CPU z STOP→RUN. Inicjalizacja zmiennych, reset stanu maszyny, wyzerowanie wyjść. W S7-1200 to jedyny dostępny OB startowy. W S7-1500 startup obsługuje OB100, a tryb restartu (Complete/Cold restart) konfigurujesz w ustawieniach CPU — ⚠️ DO WERYFIKACJI: dokładna dostępność OB102 zależy od wersji firmware, sprawdź w System Manual dla konkretnego CPU. To inny model niż klasyczny S7-300/400, gdzie OB100 (Warm Restart) i OB102 (Cold Restart) to odrębne, zawsze dostępne bloki.
+- F_MAIN — główny blok programu Safety. To **FB** (nie odrębny typ OB) wywoływany z poziomu standardowego OB (najczęściej cyklicznego) — program Safety nie ma własnego, niezależnego cyklu systemowego CPU, lecz jest wykonywany (dwukrotnie, z porównaniem wyników) w ramach cyklu bloku wywołującego, chronionego mechanizmami F-CPU (F-signature, monitoring czasu).
 
 **Diagnostyczne OB — ważne przy commissioning:**
 - OB80 — cycle time exceeded (czas cyklu przekroczył watchdog). Sygnalizuje zbyt wolną logikę.
@@ -314,20 +314,20 @@ Bloki organizacyjne (OB) to punkt wejścia do programu wywoływany przez system 
 - OB121 — Programming Error: błędy programistyczne (dzielenie przez zero, błędna konwersja typów, przekroczenie zakresu tablicy).
 - OB122 — I/O Access Error: błąd dostępu do modułu I/O (moduł nie istnieje, awaria komunikacji z modułem). Ważne rozróżnienie przy uruchamianiu nowego kodu.
 
-*[ZWERYFIKOWANE - [SIMATIC S7-1500 Function Manual: Program blocks — Organization blocks](https://www.siemens.com/global/en/products/automation/systems/industrial/plc/s7-1500.html)]*
+*[PRAWDOPODOBNE - wiedza domenowa ogólna o systemie OB S7-1500, brak lokalnego pliku źródłowego; zweryfikuj listę i priorytety OB w SIMATIC S7-1500 Function Manual "Program blocks — Organization blocks"]*
 ### 1.4. Co to jest FB, FC, DB — kiedy używasz każdego?  🔴
 - FC (Function) — blok bez pamięci własnej (brak sekcji VAR_STAT). Używasz dla prostych obliczeń, konwersji sygnałów, logiki bez stanu. Może zwracać wartość (Return Value). Ma tylko VAR_INPUT, VAR_OUTPUT, VAR_IN_OUT i VAR_TEMP.
 - FB (Function Block) — ma instancję DB z pamięcią stanu między wywołaniami (sekcja VAR_STAT). Używasz dla sterowania silnikiem, sekwencji, timerów — wszędzie gdzie blok musi "pamiętać". Multi-instance: jeden FB może zawierać instancje innych FB bez osobnych DB.
 - DB (Data Block) — blok danych. Globalny DB: dostęp z całego programu. Instancja DB: dedykowana pamięć jednego FB.
 
 **Typy zmiennych w blokach (ważne rozróżnienie):**
-- `VAR_TEMP` — tymczasowe, przechowywane na stosie CPU. Tracą wartość po zakończeniu wywołania. Dostępne we wszystkich blokach (FB, FC, OB).
+- `VAR_TEMP` — tymczasowe, przechowywane na stosie CPU. Tracą wartość po zakończeniu wywołania danego bloku i **nie są współdzielone między blokami** — to lokalna pamięć tylko dla bieżącego wywołania. Sekcja TEMP jest dostępna jako typ deklaracji we wszystkich rodzajach bloków (FB, FC, OB), ale każde wywołanie ma własną, odizolowaną kopię.
 - `VAR_STAT` — statyczne, zachowują wartość między wywołaniami. Tylko w FB, przechowywane w instancji DB.
 - `VAR_INPUT` / `VAR_OUTPUT` / `VAR_IN_OUT` — parametry interfejsu bloku.
 
 W TIA Portal: bloki z włączonym *Optimized Block Access* używają wyłącznie nazw symbolicznych — brak adresowania absolutnego (%.0, %DB1.DBX0.0). Standardowe ustawienie dla nowych projektów.
 
-*[ZWERYFIKOWANE - [TIA Portal Help: Program blocks (FB/FC/DB), Optimized Block Access](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
+*[ZWERYFIKOWANE - [docs/kb/kb_S01_podstawy_plc.md](docs/kb/kb_S01_podstawy_plc.md); TIA Portal Help: Program blocks (FB/FC/DB), Optimized Block Access]*
 ### 1.5. Co to jest UDT i po co go używasz?
 
 UDT (User Data Type) to własny złożony typ danych definiowany raz i wielokrotnie używany w całym projekcie. Przykład: typ `Motor_t` z polami `Speed:REAL`, `Current:REAL`, `Fault:BOOL`, `Running:BOOL`.
@@ -343,7 +343,7 @@ UDT (User Data Type) to własny złożony typ danych definiowany raz i wielokrot
 
 **Wersjonowanie:** W TIA Portal można przypisać UDT do Project Library i wersjonować. Przy zmianie struktury UDT TIA Portal ostrzega o niespójnych instancjach — musisz je zaktualizować (`Update instances`). Ważne w dużych projektach — jedna zmiana UDT bez aktualizacji instancji = błąd kompilacji.
 
-*[ZWERYFIKOWANE - [TIA Portal Help: PLC data types (UDT), Project Library management](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
+*[PRAWDOPODOBNE - wiedza domenowa ogólna o TIA Portal, brak lokalnego źródła z dokładnym opisem; zweryfikuj w TIA Portal Help (PLC data types / Project Library)]*
 ### 1.6. Co to są języki programowania PLC — LAD, FBD, SCL, GRAPH?
 - LAD (Ladder) — graficzny, podobny do schematów przekaźnikowych. Dobry dla logiki binarnej, łatwy dla elektryków. Najczęściej używany.
 - FBD (Function Block Diagram) — bloki połączone liniami. Dobry dla logiki kombinacyjnej i programów Safety w TIA Portal.
@@ -379,9 +379,9 @@ END_CASE;
 **TIA Portal SCL vs klasyczny STEP 7 SCL:**
 - TIA Portal: zmienne wyłącznie symboliczne, brak tablicy symboli (Symbol Table), *Optimized Block Access* domyślnie włączony.
 - Stary STEP 7 (S7-300/400): mieszanie adresów absolutnych (I0.0, DB1.DBX0.0) i nazw symbolicznych; osobna tablica symboli.
-- W Safety: program F_MAIN w starszych wersjach TIA Portal wymaga FBD lub LAD — SCL nie jest certyfikowany dla F-bloków Safety. SCL dla F-bloków Safety został wprowadzony w TIA Portal V19 (STEP 7 Safety V19). ⚠️ DO WERYFIKACJI: dokładna wersja i wymagany firmware F-CPU w Release Notes TIA Portal. Zawsze sprawdź dopuszczalne języki dla swojej wersji portalu przed użyciem SCL w logice Safety.
+- W Safety: program F_MAIN wymaga F-LAD lub F-FBD — to jedyne języki dopuszczone i certyfikowane (TÜV) dla logiki F-bloków, ze względu na wymóg deterministycznego, ograniczonego zestawu instrukcji. ⚠️ DO WERYFIKACJI: czy i od której wersji TIA Portal/STEP 7 Safety dopuszczono SCL dla F-bloków — nie znaleziono w dostępnych źródłach potwierdzenia konkretnej wersji, nie podawaj numeru wersji bez sprawdzenia w Release Notes TIA Portal. Zawsze sprawdź dopuszczalne języki dla swojej wersji portalu przed użyciem SCL w logice Safety.
 
-*[ZWERYFIKOWANE - [IEC 61131-3 — languages (PLCopen)](https://plcopen.org/iec-61131-3); [TIA Portal Help: Programming languages overview](https://www.siemens.com/global/en/products/automation/industry-software/automation-software/tia-portal.html)]*
+*[ZWERYFIKOWANE - [btc.pl-SCL-S7-1200.pdf](sources/pdfs/extracted/btc.pl-SCL-S7-1200.pdf); [siemens SCL.PDF](sources/pdfs/extracted/siemens%20SCL.PDF); IEC 61131-3 (języki programowania)]*
 ### 1.7. Co to jest sygnał 4-20mA i dlaczego nie 0-20mA?
 
 4-20mA to standardowy sygnał analogowy dla czujników przemysłowych (przetworniki ciśnienia, temperatury, przepływu). Zakres 4 mA (wartość minimalna procesu) do 20 mA (wartość maksymalna).
@@ -392,10 +392,10 @@ END_CASE;
 - **Skalowanie w TIA Portal:** Surowy sygnał z modułu AI: 0–27648 (integer) dla zakresu 4–20 mA. Blok `NORM_X` normalizuje do 0.0–1.0, a `SCALE_X` skaluje na zakres inżynierski (np. 0.0–100.0 bar). Alternatywnie: bezpośrednia przeliczenie REAL w SCL: `Ciśnienie := (REAL_AI - 4.0) / 16.0 * MaxRange;`
 - **Podłączenie dwuprzewodowe (2-wire):** Zasilanie i sygnał na jednej parze kabli (czujnik = zmienna rezystancja). Oszczędność okablowania.
 
-*[ZWERYFIKOWANE - [SIMATIC ET200SP Analog Input Module Manual](https://www.siemens.com/global/en/products/automation/systems/industrial/io-systems/et-200sp.html); standard przemysłowy 4-20mA wg IEC 60381-1]*
+*[ZWERYFIKOWANE - standard przemysłowy 4-20mA wg IEC 60381-1; skalowanie 0–27648 zgodne z ogólną dokumentacją modułów AI Siemens (ET200SP/ET200MP System Manual — zweryfikuj dokładny model modułu w dokumentacji katalogowej)]*
 ### 1.8. Co to jest PROFINET i czym różni się od PROFIBUS?  🔴
 
-PROFINET: Ethernet-based, 100Mbit/s (gigabit w nowych instalacjach), elastyczna topologia (gwiazdka, linia, pierścień), plug-and-play z GSDML, obsługuje PROFIsafe i IRT (250µs, jitter <1µs). Nowy standard dla wszystkich nowych projektów.
+PROFINET: Ethernet-based, standardowo 100Mbit/s Full Duplex do urządzeń polowych (czujniki, napędy, ET200) — gigabit spotykasz głównie na backbone/nowszych CPU i switchach, nie jako regułę dla każdego urządzenia, elastyczna topologia (gwiazdka, linia, pierścień), plug-and-play z GSDML, obsługuje PROFIsafe i IRT (rzędu setek µs, jitter submikrosekundowy w konkretnych konfiguracjach). Nowy standard dla wszystkich nowych projektów.
 PROFIBUS: RS-485, max 12Mbit/s, liniowa topologia z terminatorami na obu końcach kabla, starszy standard. Nadal spotykany w modernizacjach i instalacjach sprzed 2010.
 
 **Role urządzeń PROFINET — kluczowe na rozmowie:**
@@ -407,7 +407,7 @@ Jeden CPU może być jednocześnie IO-Controller swojej sieci i IO-Device w siec
 
 PROFIBUS analogicznie: DP-Master Class 1 (CPU) → DP-Slave (ET200M/S, napęd z CB DP) → DP-Master Class 2 (PG/PC diagnostyczny).
 
-*[ZWERYFIKOWANE - [PROFINET — przegląd technologii Siemens](https://www.siemens.com/global/en/products/automation/industrial-communication/profinet.html); IEC 61158 (PROFINET), IEC 61784 (PROFIBUS)]*
+*[ZWERYFIKOWANE - [docs/kb/kb_S01_podstawy_plc.md](docs/kb/kb_S01_podstawy_plc.md); IEC 61158 (PROFINET); IEC 61784 (PROFIBUS)]*
 ### 1.9. Jakie są główne rodziny sterowników PLC Siemens i do jakich zastosowań są dedykowane?
 
 Siemens oferuje różne rodziny sterowników PLC, dostosowane do aplikacji o różnej skali i złożoności, od prostych zadań po najbardziej wymagające systemy.
@@ -1646,14 +1646,73 @@ Parametr `substitute value` w TIA Portal (właściwości kanału F-DO) określa 
 
 *[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-DO substitute value configuration](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 6.4. Czym różni się STO jako Safe State napędu SINAMICS od zatrzymania programowego (OFF1/OFF2)? 🔴
-STO (Safe Torque Off) jako Safe State napędu oznacza zablokowanie impulsów bramkowania tranzystorów — napęd nie może generować momentu obrotowego, nawet przy zasilaniu energetycznym. Zatrzymanie OFF1/OFF2 to kontrolowane wyhamowanie przez falownik z możliwością ponownego załączenia bez potwierdzenia.
-- STO: brak momentu → wolne wybieganie jeśli nie ma hamulca mechanicznego (niebezpieczne na siłowniku pionowym!)
-- OFF1: hamowanie po rampie (p1121 ⚠️ DO WERYFIKACJI w dokumentacji SINAMICS), potem wyłączenie impulsów — napęd można ponownie uruchomić sygnałem ON
-- OFF2: natychmiastowe wyłączenie impulsów (jak STO, ale sterowane programem, nie Safety)
-- Safe State = STO → w konfiguracji F-DO parametr „substitute value" = 0 dla wyjścia STO
-- Dla osi pionowych (roboty, podnośniki): jako Safe State użyj SS1 (Stop + STO po rampie) lub SBC
 
-*[ZWERYFIKOWANE - IEC 61800-5-2 §6.2 (STO/SS1/SBC — Safe Torque Off jako Safe State); [SINAMICS Safety Integrated product page](https://www.siemens.com/global/en/products/drives/sinamics/safety-integrated.html)]*
+W napędach SINAMICS istnieją **dwie kategorie** zatrzymań — i trzeba je wyraźnie oddzielić, bo mieszanie ich prowadzi do błędów w projekcie Safety.
+
+---
+
+#### A) Zatrzymania PROGRAMOWE (sterowane przez PLC — bez certyfikacji Safety)
+
+Komendy OFF1/OFF2/OFF3 to standardowe zatrzymania napędu, wysyłane przez program PLC lub panel operatorski. **Nie są funkcjami Safety** — nie mają monitoringu, certyfikacji ani sprzętowego zabezpieczenia.
+
+| Komenda | Kat. zatrzymania (EN 60204-1) | Co robi | Restart |
+|---------|:-----------------------------:|---------|---------|
+| **OFF1** | 1 | Hamowanie po rampie deceleracji → po zatrzymaniu odcięcie impulsów | Komenda ON — bez potwierdzenia |
+| **OFF2** | 0 | Natychmiastowe odcięcie impulsów — wolny wybieg silnika | Komenda ON — bez potwierdzenia |
+| **OFF3** | 1 (rampa awaryjna) | Szybka rampa hamowania → po zatrzymaniu odcięcie impulsów | Komenda ON — bez potwierdzenia |
+
+> ⚠️ OFF2 wygląda jak STO (też odcina impulsy), ale **nie jest funkcją Safety** — jest sterowana programowo, bez monitoringu i bez redundancji sprzętowej.
+
+---
+
+#### B) Funkcje SAFETY (certyfikowane wg IEC 61800-5-2 — SIL3/PLe)
+
+Funkcje Safety są realizowane **sprzętowo** w napędzie (dwa niezależne kanały) i monitorowane przez PROFIsafe lub dedykowane zaciski. Nawet błąd oprogramowania nie może ich obejść.
+
+| Funkcja | Kat. zatrzymania | Co robi | Restart |
+|---------|:----------------:|---------|---------|
+| **STO** (Safe Torque Off) | 0 | Sprzętowe zablokowanie impulsów PWM → brak momentu → wolny wybieg | Wymaga ACK Safety |
+| **SS1** (Safe Stop 1) | 1 | Hamowanie po rampie → po zatrzymaniu aktywacja STO | Wymaga ACK Safety |
+| **SS2** (Safe Stop 2) | 2 | Hamowanie po rampie → po zatrzymaniu SOS (Safe Operating Stop — napęd zasilony, trzyma pozycję) | Wymaga ACK Safety |
+| **SBC** (Safe Brake Control) | — | Certyfikowane załączenie hamulca mechanicznego (monitoring prądu cewki) | Wymaga ACK Safety |
+
+---
+
+#### Podsumowanie: STO vs OFF — kluczowe różnice
+
+| Cecha | **STO** (Safety) | **OFF1/OFF2/OFF3** (programowe) |
+|-------|:----------------:|:-------------------------------:|
+| Certyfikacja | SIL3 / PLe | ❌ Brak |
+| Realizacja | Sprzętowa — 2 kanały | Programowa |
+| Monitoring | PROFIsafe / zaciski HW | Brak |
+| Gwarancja braku momentu | ✅ TAK | ❌ NIE |
+| Ponowne uruchomienie | ACK Safety | Komenda ON |
+
+---
+
+#### Jak Safe State łączy się z F-DO
+
+Passivation modułu F-DO (substitute value = 0) → wyjście `STO_enable` = 0 → napęd aktywuje **STO**. To jest implementacja Safe State na poziomie obwodu Safety — działa nawet przy awarii komunikacji.
+
+#### Osie pionowe — kiedy STO nie wystarczy
+
+Na osi pionowej (robot, podnośnik, winda) **STO = niebezpieczne**, bo wolny wybieg oznacza niekontrolowany spadek ładunku. Rozwiązania:
+- **SS1** (Safe Stop 1) — kontrolowane hamowanie po rampie → STO dopiero po zatrzymaniu
+- **SS2** (Safe Stop 2) — hamowanie po rampie → SOS (Safe Operating Stop — napęd zasilony, trzyma pozycję) — gdy oś musi utrzymać pozycję po zatrzymaniu
+- **SBC** (Safe Brake Control) — certyfikowane załączenie hamulca mechanicznego przed odcięciem momentu
+- Typowo: **SS1 + SBC** łącznie — najpierw hamowanie elektryczne, potem hamulec, potem STO
+
+> ℹ️ **SLS** (Safely Limited Speed), **SDI** (Safe Direction), **SOS** (Safe Operating Stop) — to nie są funkcje zatrzymania, lecz **monitorowania/ograniczania podczas pracy** napędu. Szczegóły → pytanie 8.4.
+
+> 💡 **Na rozmowie:** pytanie „dlaczego STO nie zawsze jest wystarczające jako Safe State?" → odpowiedź: osie pionowe, duże masy inercyjne, procesy wymagające kontrolowanego hamowania.
+
+📚 **Źródła:**
+- `docs/chapters/08_napedy_safety.md` — szczegóły STO/SS1/SBC (pytania 8.1–8.4)
+- `docs/kb/kb_S08_napedy_safety.md` — STO w V90, podłączenie dwukanałowe
+- `archive/slownik_v7.md` — definicje STO/SS1/SS2 z mapowaniem na EN 60204-1
+- Normy: IEC 61800-5-2 §6.2 (funkcje Safety napędów), EN 60204-1 §9.2.2 (kategorie zatrzymania 0/1/2)
+
+*[ZWERYFIKOWANE — IEC 61800-5-2 §6.2 (STO/SS1/SBC); EN 60204-1 §9.2.2 (kategorie zatrzymania); `archive/slownik_v7.md`; `docs/kb/kb_S08_napedy_safety.md`]*
 ### 6.5. Jak konfigurujesz substitute values dla F-DO i jaką wartość wybrać dla zaworu, siłownika i napędu? 🟡
 Substitute value to wartość logiczna wyjścia F-DO nadawana automatycznie podczas passivacji lub gdy F-CPU akceptuje błąd bezpieczeństwa. Konfigurowana w TIA Portal → właściwości modułu F-DO → „Substitute value for outputs".
 - Domyślnie: 0 (false) dla wszystkich kanałów — to zazwyczaj poprawne
@@ -1692,18 +1751,33 @@ Ochrona przed utratą/powtórzeniem pakietów (VCN) i błędnym adresowaniem (F-
 *[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. PROFIsafe protocol structure](https://support.industry.siemens.com/cs/document/109751404/); IEC 61784-3-3 (PROFIsafe protocol specification)]*
 ### 7.2. Co to jest F-Address i jak go konfigurujesz?  🔴
 
-`F-Address` (F-Destination Address) to unikalny F-address przypisany do każdego modułu F w sieci. **Musi być identyczny** w konfiguracji TIA Portal i na fizycznym urządzeniu (DIP switch lub parametryzacja).
+`F-Address` (F-Destination Address) to unikalny identyfikator przypisany do każdego modułu F w sieci PROFIsafe. **Musi być identyczny** w konfiguracji TIA Portal i w fizycznym urządzeniu — niezgodność = passivation.
 
-**Konfiguracja:**
-- TIA Portal → właściwości modułu F → zakładka `Safety` → pole `Safety address`
-- Na urządzeniu: DIP switch lub przez TIA Portal `Assign PROFIsafe address` (online)
+**Konfiguracja w TIA Portal:**
+- Właściwości modułu F → zakładka `Safety` → pole `Safety address`
 
-> ⚠️ **Przy wymianie modułu:** nowy moduł musi dostać **ten sam F-Address** co stary — inaczej nie uruchomisz systemu Safety.
-> Błędny F-Address → moduł nie komunikuje się z F-CPU i pozostaje spassivowany.
+**Gdzie F-Address jest fizycznie zapisywany — zależy od typu urządzenia:**
+
+| Typ urządzenia | Gdzie przechowywany F-Address | Mechanizm zapisu |
+|----------------|-------------------------------|------------------|
+| **ET200SP** (F-DI/F-DQ) | **Element kodujący (EK)** na BaseUnit — fizyczny element na podstawce, NIE w module elektronicznym | `Assign PROFIsafe address` z TIA Portal (online) |
+| **ET200MP** (F-DI/F-DQ) | W module — ET200MP **nie ma EK** ani BaseUnit (moduły montowane bezpośrednio na szynie) | `Assign PROFIsafe address` z TIA Portal (online) |
+| **SINAMICS** (napędy z Safety) | CU (Control Unit) — parametr wewn. | `Assign PROFIsafe address` lub Startdrive |
+| **Starsze moduły** (np. ET200S) | **DIP switch** na urządzeniu | Ręczne ustawienie przełączników |
+
+> ⚠️ **Nowoczesne moduły ET200SP/MP nie mają DIP switchów** — F-Address jest zapisywany elektronicznie przez TIA Portal. DIP switche to mechanizm starszej generacji (ET200S, niektóre urządzenia firm trzecich).
+
+**Przy wymianie modułu — zachowanie F-Address:**
+- **ET200SP:** F-Address jest w EK na BaseUnit → wymiana modułu elektronicznego **nie wymaga** ponownego `Assign PROFIsafe address` — adres zostaje w EK na podstawce
+- **ET200MP:** ET200MP **nie ma EK** — moduły montowane bezpośrednio na szynie DIN (format S7-300). Przy wymianie modułu F **wymaga** ponownego `Assign PROFIsafe address` ⚠️ DO WERYFIKACJI w dokumentacji ET200MP
+- **SINAMICS:** F-Address w CU → wymiana CU **wymaga** ponownego przypisania F-Address
+- **Starsze (DIP switch):** nowy moduł musi mieć ręcznie ustawione te same przełączniki
+
+> ⚠️ Błędny lub niezgodny F-Address → moduł nie komunikuje się z F-CPU i pozostaje spassivowany.
 
 ---
 
-*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-Address, Safety address assignment](https://support.industry.siemens.com/cs/document/109751404/)]*
+*[ZWERYFIKOWANE - [SIMATIC Safety - Konfiguracja i programowanie (Entry ID: 109751404), rozdz. F-Address, Safety address assignment, element kodujący](https://support.industry.siemens.com/cs/document/109751404/)]*
 ### 7.3. Co to jest F-monitoring time i co się dzieje po jego przekroczeniu?
 
 `F-monitoring time` to maksymalny czas oczekiwania F-CPU na kolejny pakiet PROFIsafe od modułu. Po przekroczeniu (np. przerwa w sieci, przeciążony switch) → moduł zostaje <span style="color:#c0392b">**spassivowany**</span>.
@@ -3718,7 +3792,7 @@ Wyspa zaworów pneumatycznych SMC EX600 komunikuje się przez PROFINET jako stan
 
 - **Dlaczego osobno?** F-Address jest zapisywany w urządzeniu niezależnie od download projektu — jako zabezpieczenie przed przypadkową podmianą modułów. Gdyby F-Address był nadawany automatycznie przy download, wymiana modułu na identyczny w innym slocie mogłaby pozostać niezauważona → zagrożenie bezpieczeństwa
 - **Mechanizm w ET200SP:** F-Address jest zapisywany w **elemencie kodującym (EK — Codierelement)** na BaseUnit, nie w samym module F-DI/F-DQ. Wymiana uszkodzonego modułu F nie wymaga ponownego „Assign PROFIsafe address" — adres pozostaje w EK
-- **Mechanizm w ET200MP:** F-Address jest zapisywany w profilu modułu na szynie backplane
+- **Mechanizm w ET200MP:** ET200MP nie ma elementu kodującego (EK) jak ET200SP — moduły montowane bezpośrednio na szynie DIN (format S7-300). Przy wymianie modułu F prawdopodobnie wymaga ponownego `Assign PROFIsafe address` ⚠️ DO WERYFIKACJI w dokumentacji ET200MP
 - **W napędach SINAMICS:** F-Address jest zapisywany w CU napędu (parametr wewnętrzny) — wymiana CU wymaga ponownego przypisania F-Address
 
 **Procedura „Assign PROFIsafe address" w TIA Portal:**
