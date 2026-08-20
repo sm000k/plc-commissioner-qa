@@ -284,7 +284,7 @@ PLC (Programmable Logic Controller) to przemysłowy komputer czasu rzeczywistego
 - Deterministyczny scan cycle — program wykonywany cyklicznie z przewidywalnym czasem (ms)
 - Odporność na EMI, drgania, temperatury, wilgoć przemysłową
 - Dedykowane moduły I/O (DI, DO, AI, AO) bezpośrednio do czujników i aktuatorów
-- Watchdog timer — nadzoruje maksymalny czas cyklu; po przekroczeniu CPU zgłasza błąd przez OB80, a jeśli błąd nie zostanie obsłużony (brak OB80 lub kolejne przekroczenie) — CPU przechodzi w **STOP**, nie autorestartuje się domyślnie
+- Watchdog timer — nadzoruje maksymalny czas cyklu (cycle time monitoring); po przekroczeniu **CPU przechodzi w STOP** — to sprzętowe zabezpieczenie przed zawieszeniem się programu, nie „miękkie" wyłączenie
 - Brak systemu plików jak Windows — działa natychmiast po włączeniu zasilania
 
 *[ZWERYFIKOWANE - [Sterowniki_PLC.pdf](sources/pdfs/extracted/Sterowniki_PLC.pdf); [docs/kb/kb_S01_podstawy_plc.md](docs/kb/kb_S01_podstawy_plc.md)]*
